@@ -15,7 +15,7 @@ The files in the **functions** folder are the backbone of this repository, offer
 It is a good idea to review the accompanying documentation for each function, but more specifically the description of what the function does and the example implementations. These documentation files should hopefully illuminate the structure of the function calls and provide more clarity than the abstract description here.
 
 # Get involved
-If you would like to contribute a file to this repository, have suggestions, or have found bugs or errors please raise an issue, leave a contact address if you would like, and I will get back to you.
+If you would like to contribute a file to this repository, have suggestions, or have found bugs or errors please raise an issue via github on this repository (leave a contact address if you would like) and I will get back to you.
 
 Code files themselves reflect authorship, however briefly the following people deserve acknowledgement for either direct contribution to the code files, or through indirect efforts (research papers, insightful discussions surrounding FFMs, suggestions for methods, testing/error reports):
 
