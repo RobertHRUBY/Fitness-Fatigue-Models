@@ -1,4 +1,4 @@
-# FFM-Model-Functions
+# Fitness-Fatigue model resources
 
 The aim of this repository is to gather up and centralise my fitness fatigue model tools and resources. These are mostly R functions that have been developed as part of collaborative research projects, or by myself for my PhD thesis in *Health Science with Computing*. The plan where possible is also to include some excellent functions developed by others (with their permission). It is hoped this repository will represent a key resource for those interested in the area of fitness fatigue modelling in sport science; allowing others to develop and implement the available IR models and methods. All of the included files are under continued development and subject to improvement, so please check back from time to time to make sure you have the latest version (I may have already fixed the error you found, but still report it anyway). The repository is organised into the following folders:
 
