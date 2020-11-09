@@ -4,7 +4,7 @@ This repository centralises my fitness-fatigue model tools, resources, and exper
 
 ### Repository organisation
 
- - [**notes**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/notes) : general notes, papers, other docs
+ - [**resources**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources) : general notes, papers, lists of great resources and historical research, and other docs
  - [**functions**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions) : a cookbook for FFMs (bespoke R functions, scripts, documentation)
  - [**simulations**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) : study code files from experimental simulations
 
@@ -16,4 +16,4 @@ I recommend that users review the accompanying documentation for each function.
 
 If you would like to contribute a file to this repository, have suggestions, or have found bugs or errors please raise an issue via github on this repository (leave a contact address if you would like) and I will get back to you.
 
-Note: *Code files themselves reflect authorship if it differs from myself.*
+Note: *Code files themselves reflect authorship in the event it differs from myself.*
