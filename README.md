@@ -16,4 +16,4 @@ I recommend that users review the accompanying documentation for each function.
 
 If you would like to contribute a file to this repository, have suggestions, or have found bugs or errors please raise an issue via github on this repository (leave a contact address if you would like) and I will get back to you.
 
-*Note*: *Code files themselves reflect authorship if it differs from myself.*
+Note: *Code files themselves reflect authorship if it differs from myself.*
