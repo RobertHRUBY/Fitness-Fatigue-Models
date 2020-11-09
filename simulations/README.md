@@ -10,4 +10,4 @@ The effects of measurement error and testing frequency on the standard fitness-f
 
 Investigating parameter estimation approaches for the standard fitness-fatigue model: From exhaustive grid-search to calibration-based simulation using gradient-based and evolutionary strategies
 
-[Research Paper Coming Soon]()
+**RESEARCH PAPER COMING SOON**

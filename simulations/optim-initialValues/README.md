@@ -8,7 +8,7 @@ Assess the effects of initial values on parameter estimates obtained for the sta
 * Paul Swinton
 
 ### Research Paper
-[To be linked](github.com/bsh2)
+**COMING SOON**
 
 ### Simulation Output Data
 The output data from the simulation is large, and so due to file size restrictions we cannot make these available here. However, you are welcome to request this data by contacting the research group via the email address provided within the paper.
