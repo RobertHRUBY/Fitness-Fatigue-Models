@@ -1,7 +1,7 @@
 turnerModel = function(inputData,
                        constraints,
                        doTrace = FALSE,
-                       useEvolution = FALSE,
+                       useEvolution = TRUE,
                        initialWindow = NULL,
                        testHorizon = NULL,
                        expandRate = NULL
@@ -132,7 +132,7 @@ turnerModel = function(inputData,
     
     # Fit the model (Two strategies made available)
     
-    # Use Differential evolution (Slow)
+    # Use Differential evolution (Default as L-BFGS-B does not do very well)
     
     if (useEvolution == TRUE){
       
@@ -163,9 +163,6 @@ turnerModel = function(inputData,
           popInit[l,4] = tempVal
         }
       }
-      if (exists(tempVal)){
-        rm(tempVal)
-      }
       
 
       # Call DE optimiser
@@ -189,7 +186,7 @@ turnerModel = function(inputData,
     } # End of DE (Evolutionary) fitting method
     
     # If using limited memory modification of bounded BFGS (quasi-Newton)
-    # (Default)
+    # Caution with this, does not do well usually.
     if (useEvolution == FALSE){
       
       # Generate some guesses towards the starting values
@@ -212,9 +209,6 @@ turnerModel = function(inputData,
         tempVal = startingValues[3]
         startingValues[3] = startingValues[4]
         startingValues[4] = tempVal
-      }
-      if (exists(tempVal)){
-        rm(tempVal)
       }
       
       # Tracing? or no? (default off)

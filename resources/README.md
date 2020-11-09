@@ -13,7 +13,13 @@
 2. [Calvert et al. (1976)](): A systems model of effects of training on physical performance
 3. [Corlett, Calvert, Banister (1978)](): Cybernetics of Human Performance
 4. [Banister and Hamilton (1985)](): Variations in iron status with fatigue modelled from training in female distance runners
-5. [Busso et al. (1990)](): A systems model of training responses
+5. [Busso et al. (1990)](): A systems model of training responses and its relationship to hormonal responses in elite weight lifters
+6. [Morton, Fitz-Clark, Banister (1990)](): Modeling human performance in running
+7. [Banister et al. (1991)](): Modeling elite athletic performance
+8. [Busso, Carasso, Lacour (1991)](): Adequacy of a systems structure in the modeling of training effects on performance
+9. [Fitz-Clark et al. (1991)](): Optimising athletic performance by influence curves
+10. [Morton (1991)](): The quantitative periodisation of athletic training - a model study
+11. [Banister, Morton, Fitz-Clark (1992)]: Dose/response effects of exercise modeled from training, physical, and biochemical measures
 
 ### Links to other great resources
 - [Kalman-Filter estimation in MATLAB](https://github.com/bsh2/Kalman-Fitness-Fatigue): Kolossa et al. (2017) (Forked)
