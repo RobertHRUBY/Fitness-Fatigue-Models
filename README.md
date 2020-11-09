@@ -1,16 +1,19 @@
-## Fitness-Fatigue model resources
+## Fitness-fatigue model resources
 
-This repository has been constructed to centralise my fitness-fatigue model tools, resources and experiments developed as part of collaborative research projects or by myself for my PhD thesis in Health Sciences. It is hoped that this repository will represent a helpful resource for those interested in the area of fitness-fatigue modelling in the exercise sciences. In particular, provide the tools to assist others develop and implement methods and models currently available. All of the included files are under development and subject to improvement, so check back from time to time for updates. Please report any errors by raising and issue.
+This repository centralises my fitness-fatigue model tools, resources, and experiments that I have developed or that have been developed within collaborative research projects. The aim is to provide helpful code resources for those interested in fitness-fatigue modeling in exercise science. Particularly tools to assist with the development and implementation of models and methods currently available. All included files are updated from time-to-time so check back for updates.
 
 ### Repository organisation
 
- - **notes**: Notes, challenges, research papers, other files and documents
- - **functions**: Effectively a 'cookbook' for FFMs, included here are bespoke R functions and associated scripts, alongside documentation for each of them.
- - **simulations**: These are simulation study code files, forming the core of my PhD research
+ - [**notes**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/notes) : general notes, papers, other docs
+ - [**functions**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions) : a cookbook for FFMs (bespoke R functions, scripts, documentation)
+ - [**simulations**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) : study code files from experimental simulations
 
-The files in **functions** are the backbone of this repository, providing mainly estimation functionality within cross-validation frameworks such as expanding-window. Functions are written to be ready for use by researchers and practitioners 'out the box'. At some point I may put these functions into a dedicated R package, but we already have an ongoing project in this area [dorem.net](dorem.net). I think right now the files offer flexibility in their current form for both researchers and practitioners. It is a good idea to review the accompanying documentation (typically a .pdf or .html document of the same name) for each function file. 
+The files in [**functions**](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions) form the backbone of this repository, and are mostly estimation functions which include cross-validation methods such as 'expanding window'. Functions are written to be ready to use by researchers and practitioners, and include input validation checks and error handling. I am also in the process of helping to develop an R package called [dorem](dorem.net) which aims to facilitate dose-response modeling in R, however this is not as complete as the functions individually.
 
-### Get involved
+I recommend that users review the accompanying documentation for each function.
+
+### Get involved or raise an issue
+
 If you would like to contribute a file to this repository, have suggestions, or have found bugs or errors please raise an issue via github on this repository (leave a contact address if you would like) and I will get back to you.
 
 *Note*: *Code files themselves reflect authorship if it differs from myself.*
