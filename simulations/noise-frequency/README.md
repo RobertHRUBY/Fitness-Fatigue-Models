@@ -1,4 +1,4 @@
-# Fitness Fatigue Model - Simulation Experiment
+# Fitness Fatigue Model - Simulation Experiment 1
 
 # Authors
 * Ben Stephens Hemingway
