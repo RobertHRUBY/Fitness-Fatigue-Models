@@ -7,7 +7,6 @@ This repository has been constructed to centralise my fitness-fatigue model tool
  - **docs**: Notes and research papers
  - **functions**: Effectively a 'cookbook' for FFMs, included here are bespoke R functions and associated scripts, alongside documentation for each of them.
  - **simulations**: These are simulation study code files, forming the core of my PhD research
- - **other**:  Files or docs that don't fit in any of the above
 
 The files in **functions** are the backbone of this repository, providing mainly estimation functionality within cross-validation frameworks such as expanding-window. Functions are written to be ready for use by researchers and practitioners 'out the box'. At some point I may put these functions into a dedicated R package, but we already have an ongoing project in this area [dorem.net](dorem.net). I think right now the files offer flexibility in their current form for both researchers and practitioners. It is a good idea to review the accompanying documentation (typically a .pdf or .html document of the same name) for each function file. 
 
