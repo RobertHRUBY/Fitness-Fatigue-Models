@@ -1,18 +1,23 @@
 turnerModel = function(inputData,
                        constraints,
                        doTrace = FALSE,
-                       useEvolution = TRUE,
+                       useEvolution = FALSE,
                        initialWindow = NULL,
                        testHorizon = NULL,
                        expandRate = NULL
                        ){
   
-  # Function dependencies
-  require(caret)
-  require(DEoptim)
-  require(truncnorm)
+  # (1) Check function dependencies
   
-  # Function input validation checks
+  require(caret)        # Handy time-interval slicer function for CV
+  if (useEvolution == TRUE){
+  require(DEoptim)      # Differential evolution optimiser
+  }
+  require(truncnorm)    # To generate random initial population member(s) for
+                        # the optimisation routine with two heuristics used
+  require(deSolve)      # Numerical methods differential equation solver
+  
+  # (2) Function input validation checks
   
   # Set default expanding window cross-validation parameters (if not passed)
   # If initialWindow specified, make user also supply testHorizon and expandRate
@@ -47,16 +52,20 @@ turnerModel = function(inputData,
   # Check that the input data has the right colnames
   colnames(inputData) <- c("days", "performances", "loads")
   
-  # Calibration function
+  
+  # (3) Develop calibration function
+  
   turnerCalibrate = function(sliceIntervals, currentSlice){
     
     # Model computation function (i.e. given known parameters)
+    
     turnerCompute = function(parmsAndICS){
       # TODO
     } # End of turnerCompute
     
     
     # Mean-squared error (objective) function (i.e. used in optimization)
+    
     turnerMSE = function(parmsAndICS){
       
       # Function called by numerical ODE solver
@@ -74,20 +83,20 @@ turnerModel = function(inputData,
         
         currentLoad = compData$loads[j]
         
-        if (i == 1){
-          stateInit = c("G" = parmsAndICS[8],     # Fitness
-                        "H" = parmsAndICS[9])     # Fatigue
+        if (j == 1){
+          stateInit = c(G = parmsAndICS[8],     # Fitness
+                        H = parmsAndICS[9])     # Fatigue
         } else{
           # Initialize based on previous value
-          stateInit = c("G" = compData$G[j-1],    # Fitness 
-                        "H" = compData$H[j-1])    # Fatigue
+          stateInit = c(G = compData$G[j-1],    # Fitness 
+                        H = compData$H[j-1])    # Fatigue
         }
         
         t = 0:1
         out = ode(y = stateInit, times = t, func = turnerSolve, 
-                  parms = parmsAndICS[1:6])
+                  parms = parmsAndICS)
         
-        if (i == 1){
+        if (j == 1){
           compData$G[j] <- unname(out[1,2])
           compData$H[j] <- unname(out[1,3])
         } else{
@@ -105,11 +114,14 @@ turnerModel = function(inputData,
       
       # Return MSE value
       return(MSE)
-    } # End of turnerMSE
+    } # End of turnerMSE function
     
     # Subset user input into training and testing data for current slice
+    
     trainingData = inputData[sliceIntervals$train[[currentSlice]],]
     testingData = inputData[sliceIntervals$test[[currentSlice]],]
+    
+    # Create data structure for the solver
     
     compData = data.frame("days" = 0:length(trainingData$days),
                           "G" = c(rep(0, length(trainingData$days)+1)),
@@ -118,40 +130,46 @@ turnerModel = function(inputData,
                           "pHat" = c(rep(0, length(trainingData$days)+1)),
                           "loads" = c(0, trainingData$loads))
     
-    # Fit the model (Two strategies available. Default is DE but its slow)
+    # Fit the model (Two strategies made available)
     
-    # Use Differential evolution
+    # Use Differential evolution (Slow)
+    
     if (useEvolution == TRUE){
       
       NPop = 300
       
       #Create initial population matrix for parameters and initial conditions
       #(kg,kh,Tg,Th,alpha,beta,p0,g0,h0)
-      initialPop = matrix(data = NA, nrow = NPop, ncol = 9)
+      popInit = matrix(data = NA, nrow = NPop, ncol = 9)
       for (k in 1:9){
         set.seed(100)
-        initialPop[,k] = rtruncnorm(n = NPop, a = constraints$lower[k],
+        popInit[,k] = rtruncnorm(n = NPop, a = constraints$lower[k],
                    b = constraints$upper[k], mean = constraints$upper[k]/2,
-                   sd = constraints$upper[k]/10)
+                   sd = constraints$upper[k]/5)
       }
-      # Filter such that kh > kg and Tg > Th in initial population
+      
+      # Filter such that kh > kg and Tg > Th in initial population (Heuristic)
       for (l in 1:NPop){
         # If kg > kh then swap
-        if (initialPop[l,1] > initialPop[l,2]){
-          tempVal = initialPop[l,1]
-          initialPop[l,1] = initialPop[l,2]
-          initialPop[l,2] = tempVal
+        if (popInit[l,1] > popInit[l,2]){
+          tempVal = popInit[l,1]
+          popInit[l,1] = popInit[l,2]
+          popInit[l,2] = tempVal
         }
         # If Tg < Th then swap
-        if (initialPop[l,3] < initialPop[l,4]){
-          tempVal = initialPop[l,3]
-          initialPop[l,3] = initialPop[l,4]
-          initialPop[l,4] = tempVal
+        if (popInit[l,3] < popInit[l,4]){
+          tempVal = popInit[l,3]
+          popInit[l,3] = popInit[l,4]
+          popInit[l,4] = tempVal
         }
       }
-      rm(tempVal)
+      if (exists(tempVal)){
+        rm(tempVal)
+      }
+      
 
-      # Call DE
+      # Call DE optimiser
+      
       fittedModel = DEoptim(fn = turnerMSE,
                             lower = constraints$lower,
                             upper = constraints$upper,
@@ -161,15 +179,17 @@ turnerModel = function(inputData,
                                             CR = 0.5, # Crossover probability
                                             F = 0.8, # Differential weighting
                                             itermax = 100, # Max iterations
-                                            initialPop = initialPop
+                                            initialpop = popInit
                                             )
                             )
       
       # Extract fitted values
       
+      
     } # End of DE (Evolutionary) fitting method
     
-    # Use limited memory modification of bounded BFGS (quasi-Newton)
+    # If using limited memory modification of bounded BFGS (quasi-Newton)
+    # (Default)
     if (useEvolution == FALSE){
       
       # Generate some guesses towards the starting values
@@ -181,7 +201,8 @@ turnerModel = function(inputData,
                                        mean = constraints$upper[m]/2,
                                        sd = constraints$upper[m]/10)
       }
-      # Check conditions on starting values kg < kh and Tg > Th hold
+      
+      # Check conditions on starting values kg < kh and Tg > Th hold (Heuristic)
       if (startingValues[1] > startingValues[2]){
         tempVal = startingValues[1]
         startingValues[1] = startingValues[2]
@@ -192,14 +213,18 @@ turnerModel = function(inputData,
         startingValues[3] = startingValues[4]
         startingValues[4] = tempVal
       }
-      rm(tempVal)
+      if (exists(tempVal)){
+        rm(tempVal)
+      }
       
-      # Tracing or no tracing on the optimisation routine (default off)
+      # Tracing? or no? (default off)
       if (doTrace == TRUE){
         doTrace = 6
       } else{
         doTrace = 0
       }
+      
+      # Call the optimiser
       
       fittedModel = optim(fn = turnerMSE,
                           par = startingValues,
@@ -218,6 +243,13 @@ turnerModel = function(inputData,
     
     # Compute modeled values, forecast errors
     
+      # R-squared (Train)
+    
+      # RMSE (Train)
+    
+      # RMSE (Test)
+    
+      # MAPE (Test) - This is the metric for selecting the 'best' parameter set
     
     # Return results for current slice
     return(fittedModel)
@@ -233,7 +265,7 @@ turnerModel = function(inputData,
   # Implement model (loop over the slices by calling the turnerCalibrate fn
   sliceModels <- list()
   for (i in 1:length(sliceIntervals$train)){
-    sliceModels[i] = turnerCalibrate(sliceIntervals, currentSlice = i)
+    sliceModels[[i]] = turnerCalibrate(sliceIntervals, currentSlice = i)
   }
   
   # Tabulate results (print to console) and generate plots (best set, all sets)
@@ -242,5 +274,6 @@ turnerModel = function(inputData,
   return(sliceModels)
 }
 
+# Vector order is : k_g, k_h, T_g, T_h, alpha, beta, p0, g0, h0
 constraints <- data.frame("lower" = c(0.1,0.1,1,1,0.5,0.5,25,5,5),
                           "upper" = c(10,10,50,50,5,5,200,100,100))
