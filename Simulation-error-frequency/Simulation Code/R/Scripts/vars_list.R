@@ -1,0 +1,10 @@
+varslist <- setdiff(ls(), c("ath_adv", "ath_int", "buildregression",
+  "ComputeDPE", "CorrelatePars", "CorrelatePars2", "errors", "errors_adv",
+    "errors_int", "ffm.compute", "non_convergence", "ffm.predictions",
+      "frequencies", "k", "kPT", "mainStart", "multiplot", "nSims", "optim_adv",
+        "optim_int", "perf_matrix", "PlotScatters", "s1", "scenario_params", 
+            "TransformPred", "TimeChunks", "true_adv_1", "true_adv_2", 
+              "true_block1", "true_block2", "true_int_1", "true_int_2", 
+                "prediction_vals", "trimps_1_adv", "trimps_1_int", 
+                  "trimps_2_adv", "trimps_2_int", "plotParameters", 
+                    "subsetParameterList"))
