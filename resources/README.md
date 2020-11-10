@@ -22,6 +22,8 @@
 
 ### Historical research list: FFM and closely related models
 
+![historical timeline](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/resources/timeline.pdf)
+
 1. [Banister et al. (1975)](): A systems model of training for athletic performance
 2. [Calvert et al. (1976)](): A systems model of effects of training on physical performance
 3. [Corlett, Calvert, Banister (1978)](): Cybernetics of Human Performance
@@ -71,4 +73,16 @@
 47. [Sanchez et al. (2013)](): Modeling training response in elite female gymnasts and optimal strategies of overload in training and taper
 48. [Agostinho et al. (2015)](): Perceived training intensity and performance change quantification in Judo
 49. [Philippe et al. (2015)](): Modeling the responses to resistance training in an animal experiment study
-50. []():
+50. [Schaefer et al. (2015)](): Training plan evolution based on training models
+51. [Ludwig et al. (2016)](): Predicting performance from outdoor cycling training with the fitness-fatigue model
+52. [Ludwig et al. (2016)](): A convolution model for heart rate prediction in physical exercise
+53. [Ludwig et al. (2016)](): Training simulation with nothing but training data
+54. [Matabuena and Rodriguez-Lopez](): A new approach to predict changes in physical condition (A new extension of the classical Banister model)
+55. [Revie et al. (2016)](): On modeling player fitness in training for team sports with application to Glasgow Warriors Rugby Club
+56. [Busso (2017)](): From an indirect response pharmacodynamic model towarsd a secondary signal model of dose response relationship between exercise training and physical performance
+57. [Kolossa et al. (2017)](): Performance estimation using the fitness-fatigue model with Kalman filter feedback
+58. [Graham et al. (2018)](): Relationships between model predicted and actual match performance in professional australian footballers during an in-season training macrocycle
+59. [Graham et al. (2018)](): Relationship between model-predicted and actual match-play exercise intensity performance
+60. [Kumyaito et al. (2018)](): Planning a sports training program using Adaptive particle swarm optimisation with emphasis on physiological constraints
+61. [Meline et al. (2018)](): Systems model and individual simulations of training strategies in elite short-track speed skaters
+62. 
