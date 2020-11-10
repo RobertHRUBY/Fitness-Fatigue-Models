@@ -16,6 +16,10 @@ This repository has been put together to centralise fitness-fatigue model tools,
 
 ### Get involved (contribute) or raise an issue with one of the files
 
-If you would like to contribute a file to this repository, have suggestions, or have found bugs or errors please raise an issue via github on this repository (leave a contact email address if you would like) and I will get back to you.
+If you would like to contribute a code file, related link (for one of the lists) or related document to this repository, have suggestions, or have found bugs or errors please raise an issue via github on this repository (leave a contact email address if you would like) and I will get back to you.
+
+
+#### Current contributors:
+* Ben Ogorek [(Kalman filter estimation)]()
 
 Note: *Code and README files in each directory reflect authorship in the event it differs from myself.*
