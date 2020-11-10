@@ -22,6 +22,8 @@
 
 ### Historical research list: FFM and closely related models
 
+![alt text](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/resources/timeline.pdf?raw=true)
+
 ![historical timeline](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/resources/timeline.pdf)
 
 1. [Banister et al. (1975)](): A systems model of training for athletic performance
