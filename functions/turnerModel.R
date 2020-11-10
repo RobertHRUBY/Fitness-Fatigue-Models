@@ -289,7 +289,8 @@ turnerModel = function(inputData,
                           upper = constraints$upper,
                           control = list(
                             trace = doTrace,
-                            maxit = 200
+                            maxit = 20000
+                            # TODO: Parscale
                                         )
                           )
       
@@ -356,33 +357,64 @@ turnerModel = function(inputData,
       # Compile results
       fittedStats = data.frame("RSQtrain" = RSQtrain, "RMSEtrain" = RMSEtrain,
                              "RMSEtest" = RMSEtest, "MAPEtest" = MAPEtest)
-      
+    
+    # Object to return
+      returnObject = list("fittedModel" = fittedModel,
+                          "fittedPerf" = fittedPerf,
+                          "fittedStats" = fittedStats)
+    
     # Return results for current slice
-    return(fittedModel, fittedPerf, fittedStats)
-  }
+    return(returnObject)
   
-  # Split and isolate data into expanding windows (Cross-validation split)
+  } # End of turnerCalibrate() function
+  
+  
+  # (4) Split and isolate data into expanding windows (Cross-validation split)
   sliceIntervals = createTimeSlices(inputData$days,
                                      initialWindow = initialWindow,
                                      horizon = testHorizon,
                                      fixedWindow = FALSE,
                                      skip = expandRate)
   
-  # Implement model (loop over the slices by calling the turnerCalibrate fn
+  nIntervals = length(sliceIntervals$train)
+  
+  # (5) Implement model (loop over the slices by calling the turnerCalibrate fn
   sliceModels = list()
-  for (i in 1:length(sliceIntervals$train)){
+  for (i in 1:nIntervals){
     currentSlice = i
     print(paste0("Training model ~ Slice ", currentSlice, " ..."))
     sliceModels[[i]] = turnerCalibrate(sliceIntervals, currentSlice, inputData)
     print(paste0("Slice ", currentSlice, " estimation complete"))
   }
   
-  # Tabulate results (print to console) and generate plots (best set, all sets)
+  # (6) Tabulate results (print to console) and generate plots 
   
-  # Return fitted model to user
-  return(sliceModels)
+  # Best set found (by lowest MAPE_test)
+  MAPEvals = c()
+  for (i in 1:nIntervals){
+    MAPEvals[i] = sliceModels[[i]]$fittedStats[1,4]
+  }
+  lowestMAPE = which.min(MAPEvals)
+  bestModel = sliceModels[[lowestMAPE]]
+  
+  # Summary statistics
+  collateMatrix = matrix(data = NA, nrow = nIntervals, ncol = 14)
+  for (i in 1:nIntervals){
+    collateMatrix[i,1:10] = sliceModels[[i]]$fittedModel[1:10]
+    collateMatrix[i,11:14] = sliceModels[[i]]$fittedStats[1:4]
+  }
+  sliceSummary = apply(collateMatrix, 1, summary)
+  
+  # Plot best set
+  
+  # Plot all sets (interval/region plot)
+  
+  # Print results to console
+  
+  # Return fitted models to user
+  returnObject = list("bestModel" = bestModel,
+                      "sliceSummary" = sliceSummary,
+                      "sliceModels" = sliceModels)
+  
+  return(returnObject)
 }
-
-# Vector order is : k_g, k_h, T_g, T_h, alpha, beta, p0, g0, h0
-constraints = data.frame("lower" = c(0.1,0.1,1,1,0.5,0.5,25,5,5),
-                          "upper" = c(10,10,50,50,5,5,200,100,100))

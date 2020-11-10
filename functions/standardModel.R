@@ -41,10 +41,7 @@ standardModel <- function(inputData,
   
   # Check if box-constraints are supplied, if not set to default values
   if(is.null(constraints)){
-    print("Warning: No box constraints supplied. Wide values used by default!")
-    print("This may return unexpected parameter estimates, consider specifying")
-    constraints <- data.frame("lower" = c(1,0.01,1,0.01,1),
-                              "upper" = c(1000,10,100,10,100))
+    stop("No box constraints supplied for the optimisation. Please supply.")
   }
   
   # Check availability of starting values for BFGS algorithm
@@ -137,6 +134,7 @@ standardModel <- function(inputData,
                                   is.na(trainingData$performances) == FALSE)
     
     # Method: Broyden-Fletcher-Goldfarb-Shanno (Limited memory modification)
+    # (Default)
     if (method == 'bfgs'){
       
       if(doTrace == TRUE){
@@ -152,7 +150,8 @@ standardModel <- function(inputData,
                                upper = constraints$upper,
                                method = "L-BFGS-B",
                                control = list(trace = traceRef,
-                                              maxit = 250
+                                              maxit = 10000
+                                              # TODO: Parscale
                                )
       )
       
@@ -179,7 +178,8 @@ standardModel <- function(inputData,
                                    trace = doTrace,
                                    CR = 0.9,
                                    F = 0.9,
-                                   itermax = 100
+                                   itermax = 250
+                                   # TODO: Parallelise the code
                                  )
       )
       

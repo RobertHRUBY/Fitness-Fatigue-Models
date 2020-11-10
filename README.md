@@ -1,4 +1,6 @@
-## Fitness-fatigue model resources
+## The fitness-fatigue model project (A resource hub)
+
+This repository has been developed to centralise fitness-fatigue model tools, resources, and simulation experiments. 
 
 This repository centralises my fitness-fatigue model tools, resources, and experiments that I have developed or that have been developed within collaborative research projects. The aim is to provide helpful code resources for those interested in fitness-fatigue modeling in exercise science. Particularly tools to assist with the development and implementation of models and methods currently available. All included files are updated from time-to-time so check back for updates.
 
