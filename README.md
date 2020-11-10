@@ -20,7 +20,7 @@ If you would like to contribute a code file, related link (for one of the lists)
 
 
 #### Current contributors:
-* [Ben Ogorek](https://twitter.com/benogorek?lang=en): [(Kalman filter estimation)]()
+* [Ben Ogorek](https://twitter.com/benogorek?lang=en): Estimation of FFM with Kalman filter feedback in R
 * [Paul Swinton](https://www3.rgu.ac.uk/dmstaff/swinton-paul): Code review and general assistance
 
 Note: *Code and README files in each directory reflect authorship in the event it differs from myself.*
