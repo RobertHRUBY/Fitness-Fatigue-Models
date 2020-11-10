@@ -19,7 +19,7 @@
 8. [Busso, Carasso, Lacour (1991)](): Adequacy of a systems structure in the modeling of training effects on performance
 9. [Fitz-Clark et al. (1991)](): Optimising athletic performance by influence curves
 10. [Morton (1991)](): The quantitative periodisation of athletic training - a model study
-11. [Banister, Morton, Fitz-Clark (1992)]: Dose/response effects of exercise modeled from training, physical, and biochemical measures
+11. [Banister, Morton, Fitz-Clark (1992)](): Dose/response effects of exercise modeled from training, physical, and biochemical measures
 
 ### Links to other great resources
 - [Kalman-Filter estimation in MATLAB](https://github.com/bsh2/Kalman-Fitness-Fatigue): Kolossa et al. (2017) (Forked)

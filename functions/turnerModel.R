@@ -29,9 +29,9 @@ turnerModel = function(inputData,
   # If no initialWindow specified, or just testHorizon or expandRate arguments
   # supplied. Just use following default(s)
   if(is.null(initialWindow)){
-    initialWindow <- round(length(inputData$days) * 0.60, 0)   # 60% of data
-    testHorizon <- round(length(inputData$days) * 0.2, 0)      # 20% of data
-    expandRate <- round(length(inputData$days) * 0.04, 0)      # 4% of data
+    initialWindow = round(length(inputData$days) * 0.60, 0)   # 60% of data
+    testHorizon = round(length(inputData$days) * 0.2, 0)      # 20% of data
+    expandRate = round(length(inputData$days) * 0.04, 0)      # 4% of data
     print("No initialWindow argument supplied", quote = FALSE)
     print("Defaults used for initialWindow, testHorizon and expandRate",
           quote = FALSE)
@@ -55,18 +55,76 @@ turnerModel = function(inputData,
   
   # (3) Develop calibration function
   
-  turnerCalibrate = function(sliceIntervals, currentSlice){
+  turnerCalibrate = function(sliceIntervals, currentSlice, inputData){
     
     # Model computation function (i.e. given known parameters)
     
-    turnerCompute = function(parmsAndICS){
-      # TODO
+    turnerCompute = function(parmsAndICS, inputData){
+      
+      compData = data.frame("days" = 0:length(inputData$days),
+                            "G" = c(rep(0, length(inputData$days)+1)),
+                            "H" = c(rep(0, length(inputData$days)+1)),
+                            "p" = c(NA, inputData$performances),
+                            "pHat" = c(rep(0, length(inputData$days)+1)),
+                            "loads" = c(0, inputData$loads)
+                            )
+      
+      # Function called by numerical ODE solver
+      turnerSolve = function(t, y, parmsAndICS){
+        r = c()
+        r[1] = (parmsAndICS[1]*currentLoad) - 
+          ((1/parmsAndICS[3]) * y["G"]^(parmsAndICS[5]))
+        r[2] = (parmsAndICS[2]*currentLoad) - 
+          ((1/parmsAndICS[4]) * y["H"]^(parmsAndICS[6]))
+        return(list(r))
+      } # end of turnerSolve
+      
+      # Solve model
+      for (j in 1:length(compData$days)){
+        
+        currentLoad = compData$loads[j]
+        
+        if (j == 1){
+          stateInit = c(G = parmsAndICS[8],     # Fitness
+                        H = parmsAndICS[9])     # Fatigue
+        } else{
+          # Initialize based on previous value
+          stateInit = c(G = compData$G[j-1],    # Fitness 
+                        H = compData$H[j-1])    # Fatigue
+        }
+        
+        t = 0:1
+        out = ode(y = stateInit, times = t, func = turnerSolve, 
+                  parms = parmsAndICS)
+        
+        if (j == 1){
+          compData$G[j] <- unname(out[1,2])
+          compData$H[j] <- unname(out[1,3])
+        } else{
+          compData$G[j] <- unname(out[2,2])
+          compData$H[j] <- unname(out[2,3])
+        }
+        
+        compData$pHat[j] <- parmsAndICS[7] + compData$G[j] - compData$H[j]
+        
+      } # End of solve loop
+      
+      return(compData)
+      
     } # End of turnerCompute
-    
     
     # Mean-squared error (objective) function (i.e. used in optimization)
     
     turnerMSE = function(parmsAndICS){
+      
+      # Create data structure for the solver
+      
+      compData = data.frame("days" = 0:length(trainingData$days),
+                            "G" = c(rep(0, length(trainingData$days)+1)),
+                            "H" = c(rep(0, length(trainingData$days)+1)),
+                            "p" = c(NA, trainingData$performances),
+                            "pHat" = c(rep(0, length(trainingData$days)+1)),
+                            "loads" = c(0, trainingData$loads))
       
       # Function called by numerical ODE solver
       turnerSolve = function(t, y, parmsAndICS){
@@ -121,22 +179,13 @@ turnerModel = function(inputData,
     trainingData = inputData[sliceIntervals$train[[currentSlice]],]
     testingData = inputData[sliceIntervals$test[[currentSlice]],]
     
-    # Create data structure for the solver
-    
-    compData = data.frame("days" = 0:length(trainingData$days),
-                          "G" = c(rep(0, length(trainingData$days)+1)),
-                          "H" = c(rep(0, length(trainingData$days)+1)),
-                          "p" = c(0, trainingData$performances),
-                          "pHat" = c(rep(0, length(trainingData$days)+1)),
-                          "loads" = c(0, trainingData$loads))
-    
     # Fit the model (Two strategies made available)
     
     # Use Differential evolution (Default as L-BFGS-B does not do very well)
     
     if (useEvolution == TRUE){
       
-      NPop = 300
+      NPop = 250
       
       #Create initial population matrix for parameters and initial conditions
       #(kg,kh,Tg,Th,alpha,beta,p0,g0,h0)
@@ -164,6 +213,7 @@ turnerModel = function(inputData,
         }
       }
       
+      # TODO: Print the initial population distribution as histograms
 
       # Call DE optimiser
       
@@ -176,12 +226,24 @@ turnerModel = function(inputData,
                                             CR = 0.5, # Crossover probability
                                             F = 0.8, # Differential weighting
                                             itermax = 100, # Max iterations
-                                            initialpop = popInit
+                                            initialpop = popInit,
+                                            parallelType = 1,
+                                            parVar = list("trainingData"),
+                                            packages = list("deSolve")
                                             )
                             )
       
       # Extract fitted values
       
+      fittedPars = as.mumeric(fittedModel$optim$bestmem)
+      fittedModel = data.frame("kg" = fittedPars[1], "kh" = fittedPars[2],
+                               "Tg" = fittedPars[3], "Th" = fittedPars[4],
+                               "alpha" = fittedPars[5], "beta" = fittedPars[6],
+                               "p0" = fittedPars[7], "g0" = fittedPars[8],
+                               "h0" = fittedPars[9],
+                               "MSE" = as.numeric(fittedModel$optim$bestval),
+                               "nFevals" = as.numeric(fittedModel$optim$nfeval),
+                               "nIter" = as.numeric(fittedModel$optim$iter))
       
     } # End of DE (Evolutionary) fitting method
     
@@ -190,7 +252,7 @@ turnerModel = function(inputData,
     if (useEvolution == FALSE){
       
       # Generate some guesses towards the starting values
-      startingValues <- numeric(length = 9)
+      startingValues = numeric(length = 9)
       for (m in 1:9){
         set.seed(100)
         startingValues[m] = rtruncnorm(1, a = constraints$lower[m],
@@ -232,21 +294,71 @@ turnerModel = function(inputData,
                           )
       
       # Extract fitted values
+      fittedModel = unlist(fittedModel)
+      fittedPars = as.numeric(fittedModel[1:9])
+      fittedModel = as.data.frame(t(fittedModel))
+      colnames(fittedModel) = c("kg","kh","Tg","Th","alpha","beta","p0",
+                                "g0","h0","MSE","countsFn","countsGn",
+                                "convcode", "convergenceMessage")
       
     } # End of BFGS Fitting Method
     
     # Compute modeled values, forecast errors
     
-      # R-squared (Train)
+      # Compute modeled performance values and isolate for train/test
     
-      # RMSE (Train)
+      fittedPerf = turnerCompute(parmsAndICS = fittedPars,
+                                 inputData = inputData)
+      
+      fittedPerfTrain = subset(fittedPerf[1:length(trainingData$days)+1,], 
+                               !is.na(
+                                 fittedPerf[1:length(trainingData$days)+1,"p"]
+                                      ) == TRUE)
+      
+      testHead = head(sliceIntervals$test[[currentSlice]],n=1)+1
+      testTail = tail(sliceIntervals$test[[currentSlice]],n=1)+1
+      
+      fittedPerfTest = subset(fittedPerf[testHead:testTail,], 
+                              !is.na(fittedPerf[testHead:testTail,"p"]) == TRUE)
     
-      # RMSE (Test)
-    
-      # MAPE (Test) - This is the metric for selecting the 'best' parameter set
-    
+      # Fit and error statistic functions
+      
+        # R-squared function
+        RSQfunc = function(x,y){
+          rsq = 1 - ( (sum((y-x)^2))  / (sum((y-mean(y))^2))) 
+          return(round(rsq*100,3))
+        }
+      
+        # RMSE function
+        RMSEfunc = function(x,y,n){
+          z = (x - y)^2
+          return(sqrt(sum(z)/n))
+        }
+          
+        # MAPE function
+        MAPEfunc = function(x,y,n){
+          return(mean(abs((x-y)/x))*100)
+        }
+      
+      # Training set statistics
+        
+      RSQtrain = RSQfunc(x = fittedPerfTrain$pHat, y = fittedPerfTrain$p)
+      RMSEtrain = RMSEfunc(x = fittedPerfTrain$pHat, y = fittedPerfTrain$p,
+                           n = length(fittedPerfTrain$days))
+      
+      # Test set statistics
+      
+      RMSEtest = RMSEfunc(x = fittedPerfTest$pHat, y = fittedPerfTest$p,
+                          n = length(fittedPerfTest$days))
+      MAPEtest = MAPEfunc(x = fittedPerfTest$p, y= fittedPerfTest$pHat,
+                          n = length(fittedPerfTest$days))  
+        
+      # Compile results
+      fittedStats = data.frame("RSQtrain" = RSQtrain, "RMSEtrain" = RMSEtrain,
+                             "RMSEtest" = RMSEtest, "MAPEtest" = MAPEtest)
+      
     # Return results for current slice
-    return(fittedModel)
+    return(fittedModel, fittedPerf, fittedStats)
   }
   
   # Split and isolate data into expanding windows (Cross-validation split)
@@ -257,9 +369,12 @@ turnerModel = function(inputData,
                                      skip = expandRate)
   
   # Implement model (loop over the slices by calling the turnerCalibrate fn
-  sliceModels <- list()
+  sliceModels = list()
   for (i in 1:length(sliceIntervals$train)){
-    sliceModels[[i]] = turnerCalibrate(sliceIntervals, currentSlice = i)
+    currentSlice = i
+    print(paste0("Training model ~ Slice ", currentSlice, " ..."))
+    sliceModels[[i]] = turnerCalibrate(sliceIntervals, currentSlice, inputData)
+    print(paste0("Slice ", currentSlice, " estimation complete"))
   }
   
   # Tabulate results (print to console) and generate plots (best set, all sets)
@@ -269,5 +384,5 @@ turnerModel = function(inputData,
 }
 
 # Vector order is : k_g, k_h, T_g, T_h, alpha, beta, p0, g0, h0
-constraints <- data.frame("lower" = c(0.1,0.1,1,1,0.5,0.5,25,5,5),
+constraints = data.frame("lower" = c(0.1,0.1,1,1,0.5,0.5,25,5,5),
                           "upper" = c(10,10,50,50,5,5,200,100,100))
