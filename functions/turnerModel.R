@@ -1,24 +1,31 @@
 turnerModel = function(inputData,
                        constraints,
                        doTrace = FALSE,
-                       useEvolution = TRUE,
                        initialWindow = NULL,
                        testHorizon = NULL,
-                       expandRate = NULL
+                       expandRate = NULL,
+                       doParallel = FALSE,   # Do not parallise by default
                        ){
   
   # (1) Check function dependencies (packages)
   
   require(caret)        # Handy time-interval slicer function for CV
   
-  if (useEvolution == TRUE){
-    require(DEoptim)    # Differential evolution optimiser
-  }
+  require(GA)           # Genetic Evolution Optimiser
   
   require(truncnorm)    # To generate random initial population member(s) for
                         # the optimisation routine with two heuristics used
   
   require(deSolve)      # Numerical methods differential equation solver
+  
+  # Required for parallelisation of GA
+  if (doParallel = TRUE){
+  require(parallel)
+  require(foreach)
+  require(iterators)
+  require(doParallel)
+  require(doRNG)        # allows to seed GA search to facilitate replication
+  }
   
   # (2) Function input validation checks
   
@@ -107,17 +114,17 @@ turnerModel = function(inputData,
         
         t = 0:1
         out = ode(y = stateInit, times = t, func = turnerSolve, 
-                  parms = parmsAndICS, method = "euler")
+                  parms = parmsAndICS)
         
         if (j == 1){
-          compData$G[j] <- unname(out[1,2])
-          compData$H[j] <- unname(out[1,3])
+          compData$G[j] = unname(out[1,2])
+          compData$H[j] = unname(out[1,3])
         } else{
-          compData$G[j] <- unname(out[2,2])
-          compData$H[j] <- unname(out[2,3])
+          compData$G[j] = unname(out[2,2])
+          compData$H[j] = unname(out[2,3])
         }
         
-        compData$pHat[j] <- parmsAndICS[7] + compData$G[j] - compData$H[j]
+        compData$pHat[j] = parmsAndICS[7] + compData$G[j] - compData$H[j]
         
       } # End of solve loop
       
@@ -167,23 +174,23 @@ turnerModel = function(inputData,
                   parms = parmsAndICS)
         
         if (j == 1){
-          compData$G[j] <- unname(out[1,2])
-          compData$H[j] <- unname(out[1,3])
+          compData$G[j] = unname(out[1,2])
+          compData$H[j] = unname(out[1,3])
         } else{
-          compData$G[j] <- unname(out[2,2])
-          compData$H[j] <- unname(out[2,3])
+          compData$G[j] = unname(out[2,2])
+          compData$H[j] = unname(out[2,3])
         }
         
-        compData$pHat[j] <- parmsAndICS[7] + compData$G[j] - compData$H[j]
+        compData$pHat[j] = parmsAndICS[7] + compData$G[j] - compData$H[j]
         
       } # End of solve loop
       
       # Wrap in cost function (Mean squared error)
-      compSubset <- subset(compData, !is.na(compData$p) == TRUE)
-      MSE <- mean((compSubset$p - compSubset$pHat)^2)
+      compSubset = subset(compData, !is.na(compData$p) == TRUE)
+      MSE = mean((compSubset$p - compSubset$pHat)^2)
       
-      # Return MSE value
-      return(MSE)
+      # Return MSE value (note minus due to minimization in GA)
+      return(-MSE)
     } # End of turnerMSE function
     
     # Subset user input into training and testing data for current slice
@@ -191,130 +198,33 @@ turnerModel = function(inputData,
     trainingData = inputData[sliceIntervals$train[[currentSlice]],]
     testingData = inputData[sliceIntervals$test[[currentSlice]],]
     
-    # Fit the model (Two strategies made available)
+    # Fit the model (Genetic evolution strategy)
     
-    # Use Differential evolution (Default as L-BFGS-B does not do very well)
+    # Original paper uses: tournament selection, BLX-alpha crossover,
+    #                      Gaussian mutation, external penalties to enforce
+    #                      constraints (not included here)
     
-    if (useEvolution == TRUE){
-      
-      NPop = 250
-      
-      #Create initial population matrix for parameters and initial conditions
-      #(kg,kh,Tg,Th,alpha,beta,p0,g0,h0)
-      popInit = matrix(data = NA, nrow = NPop, ncol = 9)
-      for (k in 1:9){
-        set.seed(100)
-        popInit[,k] = rtruncnorm(n = NPop, a = constraints$lower[k],
-                   b = constraints$upper[k], mean = constraints$upper[k]/2,
-                   sd = constraints$upper[k]/5)
-      }
-      
-      # Filter such that kh > kg and Tg > Th in initial population (Heuristic)
-      for (l in 1:NPop){
-        # If kg > kh then swap
-        if (popInit[l,1] > popInit[l,2]){
-          tempVal = popInit[l,1]
-          popInit[l,1] = popInit[l,2]
-          popInit[l,2] = tempVal
-        }
-        # If Tg < Th then swap
-        if (popInit[l,3] < popInit[l,4]){
-          tempVal = popInit[l,3]
-          popInit[l,3] = popInit[l,4]
-          popInit[l,4] = tempVal
-        }
-      }
-      
-      # TODO: Print the initial population distribution as histograms
-
-      # Call DE optimiser
-      
-      fittedModel = DEoptim(fn = turnerMSE,
-                            lower = constraints$lower,
-                            upper = constraints$upper,
-                            DEoptim.control(strategy = 6,
-                                            NP = NPop, #Population members
-                                            trace = doTrace, # Trace output
-                                            CR = 0.5, # Crossover probability
-                                            F = 0.8, # Differential weighting
-                                            itermax = 100, # Max iterations
-                                            initialpop = popInit,
-                                            parallelType = 1,
-                                            parVar = list("trainingData"),
-                                            packages = list("deSolve")
-                                            )
-                            )
-      
-      # Extract fitted values
-      
-      fittedPars = as.mumeric(fittedModel$optim$bestmem)
-      fittedModel = data.frame("kg" = fittedPars[1], "kh" = fittedPars[2],
-                               "Tg" = fittedPars[3], "Th" = fittedPars[4],
-                               "alpha" = fittedPars[5], "beta" = fittedPars[6],
-                               "p0" = fittedPars[7], "g0" = fittedPars[8],
-                               "h0" = fittedPars[9],
-                               "MSE" = as.numeric(fittedModel$optim$bestval),
-                               "nFevals" = as.numeric(fittedModel$optim$nfeval),
-                               "nIter" = as.numeric(fittedModel$optim$iter))
-      
-    } # End of DE (Evolutionary) fitting method
+    require(GA)
+    fittedModel = ga(type = "real-valued", 
+                     fitness = turnerMSE,
+                     lower = constraints$lower,
+                     upper = constraints$upper,
+                     maxiter = 500,
+                     monitor = doTrace, # monitor the optimization
+                     popSize = 400,
+                     elitism = base::max(1, round(popSize*0.05)),
+                     selection = gareal_tourSelection, # Tournament selection
+                     crossover = gareal_blxCrossover,  # BLX (blend crossover)
+                     mutation = gareal_rsMutation,     # Random around solution
+                     run = 25, # Halt if no. consecutive gens w/out improvement
+                     parallel = doParallel, # Snow (windows), multicore (MacOS)
+                     seed = 12345 # Seed for replication later
+                     )
     
-    # If using limited memory modification of bounded BFGS (quasi-Newton)
-    # Caution with this, does not do well usually.
-    if (useEvolution == FALSE){
-      
-      # Generate some guesses towards the starting values
-      startingValues = numeric(length = 9)
-      for (m in 1:9){
-        set.seed(100)
-        startingValues[m] = rtruncnorm(1, a = constraints$lower[m],
-                                       b = constraints$upper[m],
-                                       mean = constraints$upper[m]/2,
-                                       sd = constraints$upper[m]/10)
-      }
-      
-      # Check conditions on starting values kg < kh and Tg > Th hold (Heuristic)
-      if (startingValues[1] > startingValues[2]){
-        tempVal = startingValues[1]
-        startingValues[1] = startingValues[2]
-        startingValues[2] = tempVal
-      }
-      if (startingValues[3] < startingValues[4]){
-        tempVal = startingValues[3]
-        startingValues[3] = startingValues[4]
-        startingValues[4] = tempVal
-      }
-      
-      # Tracing? or no? (default off)
-      if (doTrace == TRUE){
-        doTrace = 6
-      } else{
-        doTrace = 0
-      }
-      
-      # Call the optimiser
-      
-      fittedModel = optim(fn = turnerMSE,
-                          par = startingValues,
-                          method = "L-BFGS-B",
-                          lower = constraints$lower,
-                          upper = constraints$upper,
-                          control = list(
-                            trace = doTrace,
-                            maxit = 20000
-                            # TODO: Parscale
-                                        )
-                          )
-      
-      # Extract fitted values
-      fittedModel = unlist(fittedModel)
-      fittedPars = as.numeric(fittedModel[1:9])
-      fittedModel = as.data.frame(t(fittedModel))
-      colnames(fittedModel) = c("kg","kh","Tg","Th","alpha","beta","p0",
-                                "g0","h0","MSE","countsFn","countsGn",
-                                "convcode", "convergenceMessage")
-      
-    } # End of BFGS Fitting Method
+    # Reference: https://www.jstatsoft.org/article/view/v053i04
+    
+    # Extract fitted values (model parameters, results etc)
+    parmsAndICS = c()
     
     # Compute modeled values, forecast errors
     
