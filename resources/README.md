@@ -6,8 +6,8 @@
 
 | File                                                                                                                           | Description                                                                                                                                                                                                         |
 |--------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Fitness-fatigue_summation.xlsx](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/notes/Fitness-fatigue_summation.xlsx) | xcel file demonstrating the calculation of the fitness-fatigue model from given parameters and training load values. It is a good illustration of the standard model function                                       |
-| [Increasing_n_parameters.pdf](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/notes/Increasing_n_parameters.pdf)       | PDF demonstrating various model formulae with increasing numbers of parameters derived from existing research                                                                                                       |
+| [Fitness-fatigue_summation.xlsx](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/notes/Fitness-fatigue_summation.xlsx) | Excel file demonstrating the calculation of the fitness-fatigue model from given parameters and training load values. It is a good illustration of the standard model function                                       |
+| [Increasing_n_parameters.pdf](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/notes/Increasing_n_parameters.pdf)       | PDF describing various model formulae with increasing numbers of parameters derived from existing research                                                                                                       |
 | [Undergrad_homework_tasks.pdf](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/notes/Undergrad_homework_tasks.pdf)     | Three tasks (2 in Excel, 1 in R) for working with the fitness-fatigue model. These would be good for introducing undergraduate exercise science students to the model and setting them something a bit challenging. |
 | [timeline.jpeg](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/resources/timeline.jpg)                               | Historical timeline (graphic) of FFM research (major developments)                                                                                                                                                  |
 
@@ -26,6 +26,7 @@
 ### Historical research list: FFM and closely related models
 
 ![Historical timeline](https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/resources/timeline.jpg?token=AGTSF7KJRTCN2SEXMASE3T27WQRU4)
+
 
 
 1. [Banister et al. (1975)](): A systems model of training for athletic performance
