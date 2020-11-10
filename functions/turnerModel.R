@@ -4,7 +4,7 @@ turnerModel = function(inputData,
                        initialWindow = NULL,
                        testHorizon = NULL,
                        expandRate = NULL,
-                       doParallel = FALSE,   # Do not parallise by default
+                       doParallel = FALSE   # Not parallel by default
                        ){
   
   # (1) Check function dependencies (packages)
@@ -18,13 +18,13 @@ turnerModel = function(inputData,
   
   require(deSolve)      # Numerical methods differential equation solver
   
-  # Required for parallelisation of GA
-  if (doParallel = TRUE){
-  require(parallel)
-  require(foreach)
-  require(iterators)
-  require(doParallel)
-  require(doRNG)        # allows to seed GA search to facilitate replication
+  # Packages required for parallelisation of GA
+  if (doParallel == TRUE){
+    require(parallel)
+    require(foreach)
+    require(iterators)
+    require(doParallel)
+    require(doRNG)        # allows to seed GA search to facilitate replication
   }
   
   # (2) Function input validation checks
@@ -70,7 +70,6 @@ turnerModel = function(inputData,
   
   # Check that the input data has the right colnames
   colnames(inputData) <- c("days", "performances", "loads")
-  
   
   # (3) Develop calibration function
   
@@ -185,12 +184,12 @@ turnerModel = function(inputData,
         
       } # End of solve loop
       
-      # Wrap in cost function (Mean squared error)
-      compSubset = subset(compData, !is.na(compData$p) == TRUE)
-      MSE = mean((compSubset$p - compSubset$pHat)^2)
+    # Wrap in cost function (Mean squared error)
+    compSubset = subset(compData, !is.na(compData$p) == TRUE)
+    MSE = mean((compSubset$p - compSubset$pHat)^2)
       
-      # Return MSE value (note minus due to minimization in GA)
-      return(-MSE)
+    # Return MSE value (note minus due to minimization in GA)
+    return(-MSE)
     } # End of turnerMSE function
     
     # Subset user input into training and testing data for current slice
@@ -216,21 +215,26 @@ turnerModel = function(inputData,
                      selection = gareal_tourSelection, # Tournament selection
                      crossover = gareal_blxCrossover,  # BLX (blend crossover)
                      mutation = gareal_rsMutation,     # Random around solution
-                     run = 25, # Halt if no. consecutive gens w/out improvement
+                     run = 50, # Halt if no. consecutive gens w/out improvement
                      parallel = doParallel, # Snow (windows), multicore (MacOS)
                      seed = 12345 # Seed for replication later
                      )
     
     # Reference: https://www.jstatsoft.org/article/view/v053i04
+    # Reference: https://cran.r-project.org/web/packages/GA/GA.pdf
+    # Reference: https://cran.r-project.org/web/packages/GA/vignettes/GA.html
     
     # Extract fitted values (model parameters, results etc)
-    parmsAndICS = c()
+    fittedPars = as.data.frame(t(as.numeric(fittedModel@solution[1,])))
+    fittedPars[1,10] = abs(as.numeric(fittedModel@fitnessValue))
+    colnames(fittedPars) = c("kg","kh","Tg","Th","alpha","beta","p0","g0","h0",
+                             "MSE")
     
     # Compute modeled values, forecast errors
     
       # Compute modeled performance values and isolate for train/test
     
-      fittedPerf = turnerCompute(parmsAndICS = fittedPars,
+      fittedPerf = turnerCompute(parmsAndICS = as.numeric(fittedPars[1,1:9]),
                                  inputData = inputData)
       
       fittedPerfTrain = subset(fittedPerf[1:length(trainingData$days)+1,], 
@@ -277,13 +281,15 @@ turnerModel = function(inputData,
                           n = length(fittedPerfTest$days))  
         
       # Compile results
-      fittedStats = data.frame("RSQtrain" = RSQtrain, "RMSEtrain" = RMSEtrain,
-                             "RMSEtest" = RMSEtest, "MAPEtest" = MAPEtest)
+      fittedPars[1,"RSQTrain"] = RSQtrain
+      fittedPars[1,"RMSETrain"] = RMSEtrain
+      fittedPars[1,"RMSETest"] = RMSEtest
+      fittedPars[1,"MAPETest"] = MAPEtest
     
     # Object to return
-      returnObject = list("fittedModel" = fittedModel,
+      returnObject = list("fittedPars" = fittedPars,
                           "fittedPerf" = fittedPerf,
-                          "fittedStats" = fittedStats)
+                          "optimModel" = fittedModel)
     
     # Return results for current slice
     return(returnObject)
@@ -291,7 +297,7 @@ turnerModel = function(inputData,
   } # End of turnerCalibrate() function
   
   
-  # (4) Split and isolate data into expanding windows (Cross-validation split)
+  # (4) Slice data into expanding windows (Cross-validation split)
   sliceIntervals = createTimeSlices(inputData$days,
                                      initialWindow = initialWindow,
                                      horizon = testHorizon,
@@ -300,7 +306,7 @@ turnerModel = function(inputData,
   
   nIntervals = length(sliceIntervals$train)
   
-  # (5) Implement model (loop over the slices by calling the turnerCalibrate fn
+  # (5) Implement model - loop over the slices by calling turnerCalibrate()
   sliceModels = list()
   for (i in 1:nIntervals){
     currentSlice = i
@@ -314,32 +320,85 @@ turnerModel = function(inputData,
   # Best set found (by lowest MAPE_test)
   MAPEvals = c()
   for (i in 1:nIntervals){
-    MAPEvals[i] = sliceModels[[i]]$fittedStats[1,4]
+    MAPEvals[i] = sliceModels[[i]]$fittedPars$MAPETest
   }
+  
   lowestMAPE = which.min(MAPEvals)
-  bestModel = sliceModels[[lowestMAPE]]
+  bestModel = sliceModels[[lowestMAPE]]$fittedPars
+  bestModelp = sliceModels[[lowestMAPE]]$fittedPerf
+  
+  PerfVals = matrix(data = NA, nrow = length(bestModelp$days), ncol = nIntervals)
+  for (i in 1:nIntervals){
+    PerfVals[,i] = sliceModels[[i]]$fittedPerf$pHat
+  }
   
   # Summary statistics
   collateMatrix = matrix(data = NA, nrow = nIntervals, ncol = 14)
   for (i in 1:nIntervals){
-    collateMatrix[i,1:10] = as.numeric(sliceModels[[i]]$fittedModel[1,1:10])
-    collateMatrix[i,11:14] = as.numeric(sliceModels[[i]]$fittedStats[1,1:4])
+    collateMatrix[i,1:14] = as.numeric(sliceModels[[i]]$fittedPars)
   }
-  colnames(sliceSummary) = c("k_g", "k_h", "tau_g", "tau_h", "alpha", "beta",
+  sliceStats = apply(collateMatrix, 2, summary)
+  colnames(sliceStats) = c("kg", "kh", "Tg", "Th", "alpha", "beta",
                              "p0", "g0", "h0", "MSE", "RSQtrain", "RMSEtrain",
                              "RMSEtest", "MAPEtest")
-  sliceSummary = apply(collateMatrix, 1, summary)
+  colnames(collateMatrix) = c("kg", "kh", "Tg", "Th", "alpha", "beta",
+                              "p0", "g0", "h0", "MSE", "RSQtrain", "RMSEtrain",
+                              "RMSEtest", "MAPEtest")
   
   # Plot best set
-  
+  plot(bestModelp$days, bestModelp$loads, type = "h",
+       ylim = c(0,
+                max(c(bestModelp$G, bestModelp$H, bestModelp$pHat,
+                      bestModelp$p, bestModelp$loads),na.rm=TRUE)+10),
+       col = "grey85", ylab = "Arbitrary units (a.u)",
+       xlab = "Day", main = "Key results: Best set found (MAPE_test)")
+  points(bestModelp$days, bestModelp$p, pch = 10, col = "purple")
+  lines(bestModelp$days, bestModelp$pHat, col = "black")
+  lines(bestModelp$days, bestModelp$G, col = "blue")
+  lines(bestModelp$days, bestModelp$H, col = "red")
+  legend("topleft", c("Training load",
+                      "Measured performance",
+                      "Modelled performance",
+                      "Fitness trace",
+                      "Fatigue trace"),
+         fill = c("grey85", "purple", "black", "blue", "red"), cex = 0.7)
+
   # Plot all sets (interval/region plot)
+  dailymin = apply(PerfVals, 1, min)
+  dailymax = apply(PerfVals, 1, max)
+  nDays = length(bestModelp$days)
+  plot(bestModelp$days, bestModelp$loads, type = "h", col = "grey85",
+       ylim = c(0,
+                max(c(),na.rm = TRUE)+10),
+       xlab = "day",
+       ylab = "Arbitrary units (a.u)",
+       main = "All train/test sets (slices/windows)")
+  polygon(c(rev(nDays),nDays),c(rev(dailymax), dailymin),col="orange", 
+          border="black", lty = 2)
+  points(bestModelp$days, bestModelp$p, col = "purple", pch = 20)
+  legend("topright", c("Training load",
+                       "Measured perf",
+                       paste0("Modelled perf (all slices, n=",nIntervals,")")),
+         fill = c("grey85", "purple", "orange"), cex = 0.75)
   
   # Print results to console
+  print("Slice Parameter Sets:", quote = FALSE)
+  print("------------------------------------", quote = FALSE)
+  print(collateMatrix)
+  print("", quote = FALSE)
+  print("Summary Statistics (across slices)")
+  print("------------------------------------", quote = FALSE)
+  print(sliceStats)
+  print("", quote = FALSE)
+  print("Best Set Found", quote = FALSE)
+  print("------------------------------------", quote = FALSE)
+  print(bestModel)
   
   # Return fitted models to user
   returnObject = list("bestModel" = bestModel,
+                      "bestModelPerf" = bestModelp,
                       "sliceSummary" = collateMatrix,
-                      "sliceStats" = sliceSummary,
+                      "sliceStats" = sliceStats,
                       "sliceModels" = sliceModels)
   
   return(returnObject)
