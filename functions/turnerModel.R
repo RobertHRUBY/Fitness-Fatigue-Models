@@ -204,13 +204,14 @@ turnerModel = function(inputData,
     #                      constraints (not included here)
     
     require(GA)
+    popSize = 400
     fittedModel = ga(type = "real-valued", 
                      fitness = turnerMSE,
                      lower = constraints$lower,
                      upper = constraints$upper,
                      maxiter = 500,
                      monitor = doTrace, # monitor the optimization
-                     popSize = 400,
+                     popSize = popSize,
                      elitism = base::max(1, round(popSize*0.05)),
                      selection = gareal_tourSelection, # Tournament selection
                      crossover = gareal_blxCrossover,  # BLX (blend crossover)
