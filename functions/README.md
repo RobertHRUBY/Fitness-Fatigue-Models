@@ -2,5 +2,8 @@
 
 ### Files
 
-* [**standardModel.R**](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/functions/standardModel.R)  - Function to fit and cross-validate the standard fitness-fatigue model in R (expanding window CV applied).  Check out the [(documentation)](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/functions/documentation/standardModel.pdf)
-* [**turnerModel.R**](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/functions/turnerModel.R) - Function to fit and cross-validate the non-linear variant of Banister's model in R (expanding window CV applied). Check out the [(function documentation)](), the original author's research paper [(Turner et al. (2017))](https://jim.turner.link/downloads/BHK-2017-0013.pdf), their [repository and C code](https://github.com/jturner314/nl_perf_model_opt), and their [webpage](https://jim.turner.link/)
+| File            | Description                                                                                       |
+|-----------------|---------------------------------------------------------------------------------------------------|
+| [standardModel.R](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/functions/standardModel.R) | Function to train and test the standard fitness-fatigue model in R (expanding window CV)          |
+| [turnerModel.R](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/functions/turnerModel.R)   | Function to train and test the non-linear variant of  Banister's model in R (expanding window CV). See the original authors research paper [here](https://jim.turner.link/downloads/BHK-2017-0013.pdf), their C code repository [here] |
+| [inputData.csv](https://github.com/jturner314/nl_perf_model_opt), and their website [here](https://jim.turner.link/)   | An example mock dataset used across the various examples in [~/documentation](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation)                   |
