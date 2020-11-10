@@ -10,7 +10,7 @@ This repository has been put together to centralise fitness-fatigue model tools,
 | [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Notes, research papers, link directories, other docs and files                   |
 | [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Study code and data files from experimental simulations run as part of my PhD    |
 
-- Files in [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions) are primarily estimation functions which include cross-validation methods such as **expanding window**. 
+- Files in [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions) are primarily estimation functions which include cross-validation methods such as expanding-window. 
 - Functions are written to be as easy as possible to use out of the box, by researchers and practitioners. Most include input validation checks and error handling. 
 - I recommend that users review the accompanying documentation for each function
 
