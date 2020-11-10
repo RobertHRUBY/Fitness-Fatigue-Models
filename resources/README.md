@@ -44,5 +44,31 @@
 20. [Sands and McNeal (2000)](): Predicting athlete preparation and performance - a theoretical perspective
 21. [Perl (2001)](): PerPot - A metamodel for simulation of load
 22. [Busso et al. (2002)](): Effects of training frequency on the dynamics of performance response to a single training bout
-23. [Millet et al. (2002)]() - Modeling the transfers of training effects on performance in elite triathletes
-24. 
+23. [Millet et al. (2002)](): - Modeling the transfers of training effects on performance in elite triathletes
+24. [Busso (2003)](): Variable dose-response relationship between exercise training and performance
+25. [Chiu and Barnes (2003)](): Fitness Fatigue revisited
+26. [Taha and Thomas (2003)](): Systems modeling of the relationship between training and performance
+27. [Le Bris et al. (2004)](): Applying a systems model of training to a patient with coronary artery disease
+28. [Hellard et al. (2005)](): Modeling the residual effects and threshold saturation of training - A case study of olympic swimmers
+29. [Le Bris et al. (2005)](): High versus low training frequency in cardiac rehabilitation using a systems model of training
+30. [Millet et al. (2005)](): Modeling the relationships between training anxiety and fatigue in elite athletes
+31. [Wood et al. (2005)](): Applying a mathematical model to training adaptation in a distance runner
+32. [Busso and Thomas (2006)](): Using mathematical modeling in training planning
+33. [Hellard et al. (2006)](): Assessing the limitations of the Banister model in monitoring training
+34. [Le Bris et al. (2006)](): A systems model of training for patients in phase 2 cardiac rehabilitation
+35. [Suzuki et al. (2006)](): Program design based on a mathematical model using rating of perceived exertion for an elite Japanese sprinter - a case study
+36. [Busso and Mujika (2008)](): A model study of optimal training reduction during pre-event taper in elite swimmers
+37. []():
+38. []():
+39. []():
+40. []():
+41. []():
+42. []():
+43. []():
+44. []():
+45. []():
+46. []():
+47. []():
+48. []():
+49. []():
+50. []():
