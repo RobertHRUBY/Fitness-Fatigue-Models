@@ -58,17 +58,17 @@
 34. [Le Bris et al. (2006)](): A systems model of training for patients in phase 2 cardiac rehabilitation
 35. [Suzuki et al. (2006)](): Program design based on a mathematical model using rating of perceived exertion for an elite Japanese sprinter - a case study
 36. [Busso and Mujika (2008)](): A model study of optimal training reduction during pre-event taper in elite swimmers
-37. []():
-38. []():
-39. []():
-40. []():
-41. []():
-42. []():
-43. []():
-44. []():
-45. []():
-46. []():
-47. []():
-48. []():
-49. []():
+37. [Ishii et al. (2008)](): Prediction of swim performance in junior female swimmers by dynamic system model
+38. [Pfeiffer (2008)](): Modeling the relationship between training and performance - a comparison of two antagonistic concepts
+39. [Moxnes and Hausken (2008)](): The dynamics of athletic performance, fitness, and fatigue
+40. [Borreson and Lambert (2009)](): The quantification of training load, the training response, and the effect on performance
+41. [Jobson et al. (2009)](): The analysis and utilisation of cycling training data
+42. [Mujika and Busso (2009)](): Computer simulations assessing the potential performance benefit of a final increase in training during pre-event taper
+43. [Morton (2011)](): Banister Obituary
+44. [Chalencon et al. (2012)](): A model for the training effects in swimming demonstrates a strong relationship between parasympathetic activity
+45. [Clarke and Skiba (2013)](): Rationale and resources for teaching the mathematical modeling of athletic training and performance
+46. [Gouba et al. (2013)](): Applying a mathematical model to the performance of a female monofin swimmer
+47. [Sanchez et al. (2013)](): Modeling training response in elite female gymnasts and optimal strategies of overload in training and taper
+48. [Agostinho et al. (2015)](): Perceived training intensity and performance change quantification in Judo
+49. [Philippe et al. (2015)](): Modeling the responses to resistance training in an animal experiment study
 50. []():
