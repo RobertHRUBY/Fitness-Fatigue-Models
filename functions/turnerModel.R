@@ -7,17 +7,29 @@ turnerModel = function(inputData,
                        expandRate = NULL
                        ){
   
-  # (1) Check function dependencies
+  # (1) Check function dependencies (packages)
   
   require(caret)        # Handy time-interval slicer function for CV
+  
   if (useEvolution == TRUE){
-  require(DEoptim)      # Differential evolution optimiser
+    require(DEoptim)    # Differential evolution optimiser
   }
+  
   require(truncnorm)    # To generate random initial population member(s) for
                         # the optimisation routine with two heuristics used
+  
   require(deSolve)      # Numerical methods differential equation solver
   
   # (2) Function input validation checks
+  
+  # Put a check on the number of observed measurements in the dataset
+  if (sum(!is.na(inputData$performances)) < 40){
+    print("Number of observed measurements for fitting the model is small",
+          quote = FALSE)
+    print("Results likely to be poor. Are you sure you want to continue?",
+          quote = FALSE)
+    invisible(readline(prompt = "Press [enter] to continue"))
+  }
   
   # Set default expanding window cross-validation parameters (if not passed)
   # If initialWindow specified, make user also supply testHorizon and expandRate
@@ -95,7 +107,7 @@ turnerModel = function(inputData,
         
         t = 0:1
         out = ode(y = stateInit, times = t, func = turnerSolve, 
-                  parms = parmsAndICS)
+                  parms = parmsAndICS, method = "euler")
         
         if (j == 1){
           compData$G[j] <- unname(out[1,2])
@@ -382,9 +394,9 @@ turnerModel = function(inputData,
   sliceModels = list()
   for (i in 1:nIntervals){
     currentSlice = i
-    print(paste0("Training model ~ Slice ", currentSlice, " ..."))
+    print(paste0("Training model ~ Slice ", currentSlice, " ..."), quote =FALSE)
     sliceModels[[i]] = turnerCalibrate(sliceIntervals, currentSlice, inputData)
-    print(paste0("Slice ", currentSlice, " estimation complete"))
+    print(paste0("Slice ", currentSlice, " estimation complete"), quote = FALSE)
   }
   
   # (6) Tabulate results (print to console) and generate plots 
@@ -400,9 +412,12 @@ turnerModel = function(inputData,
   # Summary statistics
   collateMatrix = matrix(data = NA, nrow = nIntervals, ncol = 14)
   for (i in 1:nIntervals){
-    collateMatrix[i,1:10] = sliceModels[[i]]$fittedModel[1:10]
-    collateMatrix[i,11:14] = sliceModels[[i]]$fittedStats[1:4]
+    collateMatrix[i,1:10] = as.numeric(sliceModels[[i]]$fittedModel[1,1:10])
+    collateMatrix[i,11:14] = as.numeric(sliceModels[[i]]$fittedStats[1,1:4])
   }
+  colnames(sliceSummary) = c("k_g", "k_h", "tau_g", "tau_h", "alpha", "beta",
+                             "p0", "g0", "h0", "MSE", "RSQtrain", "RMSEtrain",
+                             "RMSEtest", "MAPEtest")
   sliceSummary = apply(collateMatrix, 1, summary)
   
   # Plot best set
@@ -413,7 +428,8 @@ turnerModel = function(inputData,
   
   # Return fitted models to user
   returnObject = list("bestModel" = bestModel,
-                      "sliceSummary" = sliceSummary,
+                      "sliceSummary" = collateMatrix,
+                      "sliceStats" = sliceSummary,
                       "sliceModels" = sliceModels)
   
   return(returnObject)
