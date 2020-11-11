@@ -1,10 +1,31 @@
-## Fitness-fatigue model functions and scripts
+## Fitness-fatigue model functions (toolbox)
 
 ### Files
 
+| Function        | File                | Type       | Description                                                                                                                                                                               | Initial conditions         | Optimisation     | Cross-validation |
+|-----------------|---------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|------------------|------------------|
+| standardModel() | [standardModel.R]() | Train/Test | Train and test the standard (explicit, discrete) fitness-fatigue model                                                                                                                    | Assumes g(0)=h(0)=0        | L-BFGS-B, or GA  | Expanding window |
+| banisterModel() | [banisterModel.R]() | Train/Test | Train and test the original model via traditional approach (Integration and cost wrapper)                                                                                                 | Estimates g(0), h(0)       | L-BFGS-B, or GA  | Expanding window |
+| turnerModel()   | [turnerModel.R]()   | Train/Test | Train and test the non-linear variant of Banister's model (Integration and cost wrapper)                                                                                                  | Estimates g(0), h(0)       | GA               | Expanding window |
+| calvertModel()  | [calvertModel.R]()  | Train/Test | Standard model with fitness delay                                                                                                                                                         | Assumes g(0)=h(0)=0        | L-BFGS-B, or GA  | Expanding window |
+| vdrModel        | [vdrModel.R]()      | Train/Test | Variable dose-response model                                                                                                                                                              | Assumes g(0)=h(0)=0        | L-BFGS-B, or GA  | Expanding window |
+| vdrHillModel    | [vdrHillModel.R]()  | Train/Test | Variable dose-response model with Hill transform on model input (Training load)                                                                                                           | Assumes g(0)=h(0)=0        |                  |                  |
+| initCompModel() | [initCompModel.R]() | Train/Test | Train and test the initial component model with two-components (i.e. the standard FFM)                                                                                                    | Assumed within IC          | L-BFGS-B, or GA  | Expanding window |
+| preloadModel()  | [preloadModel.R]()  | Train/Test | Train and test the pre-load model                                                                                                                                                         | Assumed within preload     | L-BFGS-B or GA   | Expanding window |
+| parScaling()    | [parScaling.R]()    | Compute    | Computes average unit change in cost function for each parameter by iterating over a grid (1 free, n fixed) to determine conditioning and appropriate scaling values for the optimisation | NA                         | NA               | NA               |
+| computeModel()  | [computeModels.R]() | Compute    | Compute any of the models described above given definite parameters and TL time series                                                                                                    | Passed to fn as applicable | NA - computation | NA               |
+
+### Documentation and data
+
+- Provide authors code and documentation where appropriate
+- Provide link to original research
+- Provide link to example code file (.R) with data file link
+- Provide link to text / markdown resource
+
+
 | Function            | Description                                                                                                            | Associated documentation |
 |---------------------|------------------------------------------------------------------------------------------------------------------------|--------------------------|
-| [standardModel.R]() | Function to train and test the standard fitness-fatigue model in R using expanding-window CV. Assumes that g(0)=h(0)=0 | TBC                      |
+| [standardModel.R]() | Function to train and test the standard fitness-fatigue model in R using expanding-window CV. Assumes initial conditions of g(0)=h(0)=0 | TBC                      |
 | [                   |                                                                                                                        |                          |
 
 | File            | Description                                                                                       |
