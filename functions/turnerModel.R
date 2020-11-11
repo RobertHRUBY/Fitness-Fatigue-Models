@@ -209,14 +209,14 @@ turnerModel = function(inputData,
                      fitness = turnerMSE,
                      lower = constraints$lower,
                      upper = constraints$upper,
-                     maxiter = 1500,
+                     maxiter = 10000,
                      monitor = doTrace, # monitor the optimization
                      popSize = popSize,
                      elitism = base::max(1, round(popSize*0.05)),
                      selection = gareal_tourSelection, # Tournament selection
                      crossover = gareal_blxCrossover,  # BLX (blend crossover)
                      mutation = gareal_rsMutation,     # Random around solution
-                     run = 50, # Halt if no. consecutive gens w/out improvement
+                     run = 150, # Halt if no. consecutive gens w/out improvement
                      parallel = doParallel, # Snow (windows), multicore (MacOS)
                      seed = 12345 # Seed for replication later
                      )
