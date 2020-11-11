@@ -87,8 +87,8 @@ Arguments for functions will vary slightly between different models. Documentati
 #### Project authors
 
 - Ben Stephens Hemingway | [github](github.com/bsh2)
-- Ben Ogorek | [twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek) | Estimation of FFM with Kalman filter feedback in R
-- Paul Swinton | [website](https://www3.rgu.ac.uk/dmstaff/swinton-paul)| Code review, theoretical support, general assistance
+- Ben Ogorek | [twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek)
+- Paul Swinton | [website](https://www3.rgu.ac.uk/dmstaff/swinton-paul)
 
 Note: *Code and README files in each directory reflect authorship in the event it differs from myself.*
 
