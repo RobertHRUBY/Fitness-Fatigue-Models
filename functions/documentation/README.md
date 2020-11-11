@@ -18,7 +18,7 @@ TODO
 
 #### Description and functionality
 
-* One component impulse-response model box-constrained optimisation (train/test) using quasi-Newton and genetic algorithms. It includes an option to estimate an initial trace for the model component when <img src="https://latex.codecogs.com/svg.latex?g(0)\neq&space;0" title="g(0)\neq 0" />. </br>
+* Box-constrained optimisation of the one-component impulse-response model using quasi-Newton and genetic algorithms, with walk-forward cross-validation (expanding window). Includes an option to estimate an initial trace for the model component in the case that* <img src="https://latex.codecogs.com/svg.latex?g(0)\neq&space;0" title="g(0)\neq 0" />. </br>
 
 The basic model is a one-component impulse-response model of the effect of training on performance arising from the following linear time-invariant system: </br></br>
 <img src="https://latex.codecogs.com/svg.latex?p(t)=p^*&space;&plus;&space;Kp(t)" title="p(t)=p^* + Kp(t)" /> </br></br>
