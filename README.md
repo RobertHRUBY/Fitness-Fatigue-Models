@@ -1,11 +1,40 @@
 ## The Fitness-Fatigue Model Project: A toolbox for implementing FFMs
 
-This project develops a flexible general-purpose toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and implementation of models and methods.
+This project offers a flexible general-purpose R toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and implementation of models and methods. The structure of the functions contained aims to appeal to researchers seeking to investigate the models within data-collection scenarios, and those looking to extend and test models 'in vitro'.
 
-This is how easy it is to use:
+As a brief example, fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
 
-    data <- read.csv("data.csv")
-    standardModel(data, constraints, )
+    # Import your experimental data set
+    experimentalData <- read.csv("experimentalData.csv")
+    
+    # Data set should be in following format
+    head(experimentalData)
+    days    |   performances  |   loads
+    1               100             50
+    2               NA              25
+    3               102             75
+    4               NA              0
+    5               82              105
+    
+    # Reasonable box constraints on parameter estimates c(p*, kg, Tg, kh, Th)
+    boxConstraints = data.frame("lower" = c(10, 0.01, 1, 0.01, 1),
+                                "upper" = c(150, 3, 50, 3, 50))
+    
+    # Call the fitting function using quasi-Newton method and         
+    fittedModel = standardModel(data = experimentalData,
+                                constraints = boxConstraints, 
+                                method = "bfgs",              # quasi-Newton
+                                doTrace = TRUE                # monitor optim()
+                                )
+
+With the example above, it is also possible to supply $startingValues$
+    
+    # It is possible to also supply startingValues for optim(), which are
+    # otherwise randomly generated with heuristics. Cross-validation is
+    # performed as expanding window as standard with a 60% initial window, 
+    # 
+    
+    
 
 ### Repository organisation
 
