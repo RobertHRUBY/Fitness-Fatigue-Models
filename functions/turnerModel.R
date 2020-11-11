@@ -13,9 +13,6 @@ turnerModel = function(inputData,
   
   require(GA)           # Genetic Evolution Optimiser
   
-  require(truncnorm)    # To generate random initial population member(s) for
-                        # the optimisation routine with two heuristics used
-  
   require(deSolve)      # Numerical methods differential equation solver
   
   # Packages required for parallelisation of GA
