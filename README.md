@@ -9,6 +9,7 @@ As a brief example, fitting the standard fitness-fatigue model (below) to experi
     
     # Data set should be in following format
     head(experimentalData)
+    
     days    |   performances  |   loads
     1               100             50
     2               NA              25
@@ -27,13 +28,17 @@ As a brief example, fitting the standard fitness-fatigue model (below) to experi
                                 doTrace = TRUE                # monitor optim()
                                 )
 
-With the example above, it is also possible to supply $startingValues$
-    
-    # It is possible to also supply startingValues for optim(), which are
-    # otherwise randomly generated with heuristics. Cross-validation is
-    # performed as expanding window as standard with a 60% initial window, 
-    # 
-    
+In the basic model fitting example above, it is also possible to supply startingValues for optim() which are otherwise generated from a truncated Gaussian distribution with some heuristic based constraints. Cross-validation is performed via the expanding window method shown below, with the following defaults:
+
+* 60% initial window
+* 20% test horizon
+* 5% expansion rate
+
+
+
+Arguments for functions will vary between different models, but follow a roughly similar framework. Documentation is provided for each function in the [documentation directory](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation).
+
+
     
 
 ### Repository organisation
