@@ -44,10 +44,10 @@ Data should be in following format, with NA values indicating no measurement on 
                                 method = "bfgs",              
                                 doTrace = TRUE
                                 )
-Furthermore, in the basic example above it is possible to supply further arguments to tune the implementation:
+Furthermore, in the basic example above it is possible to supply arguments to the function to tune the implementation further:
 
-A different method for fitting: the alternative is currently a genetic algorithm
-    
+Supply a different fitting method (see list [here](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions))
+
     method = "ga"
     
 A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with inequality constraints enforced such as Tg > Th. Starting values not required for the evolutionary strategy
