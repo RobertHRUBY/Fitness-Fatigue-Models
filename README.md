@@ -37,14 +37,13 @@ As a brief example, fitting the standard fitness-fatigue model (below) to experi
                                 method = "bfgs",              
                                 doTrace = TRUE
                                 )
+Furthermore, in the basic example above it is possible to supply further arguments to tune the implementation:
 
-In the basic fitting example above, it is also possible to supply additional arguments to the function
+- A different method for fitting: the alternative is currently a genetic algorithm
+- A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with inequality constraints enforced such as Tg > Th. Starting values not required for the evolutionary strategy
+- Parameters for the expanding window cross-validation method, which are currently as default a 60% initial window, 20% test horizon, and 5% expansion rate.
 
-* A different method for fitting: the alternative is currently a genetic algorithm
-* A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with inequality constraints enforced such as Tg > Th. Starting values not required for the evolutionary strategy
-* Parameters for the expanding window cross-validation method, which are currently as default a 60% initial window, 20% test horizon, and 5% expansion rate.
-
-Arguments for functions will vary slightly between different models, and the example above is only a simple illustration of the potential of these resources. Documentation is provided for each function within the [documentation directory](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation).
+Arguments for functions will vary slightly between different models. Documentation is provided for each function within the [documentation directory](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation).
 
 
 ### Repository organisation
