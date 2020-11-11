@@ -10,10 +10,12 @@ TODO
 
 ### The basic model
 
-|------------------------------------|------------------|
-| source file                        | [basicModel.R]() |
-| function call                      | `basicModel()`     |
-| `source_url()` call </br> *devtools* | `source_url()`     |
+| Key information                  | Further details  |
+|----------------------------------|------------------|
+| Source code                      | [basicModel.R]() |
+| Function call                    | `basicModel()`   |
+| Source function </br> `devtools` | `source_url()`   |
+| Dependencies </br> (packages)    |                  |
 
 #### Description and functionality
 
