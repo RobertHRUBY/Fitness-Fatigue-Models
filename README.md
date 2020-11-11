@@ -1,6 +1,11 @@
-## The fitness-fatigue model project: A hub for related resources
+## The Fitness-Fatigue Model Project: A toolbox for implementing FFMs
 
-This repository has been put together to centralise fitness-fatigue model tools, resources, and simulation experiments in the exercise sciences. Included are tools and links to resources that aim to assist in the development and implementation of models and methods in this area. All included files are updated from time-to-time so check back for updates. Please see the collaboration section below if you are interested in contributing.
+This project develops a flexible general-purpose toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and implementation of models and methods.
+
+This is how easy it is to use:
+
+    data <- read.csv("data.csv")
+    standardModel(data, constraints, )
 
 ### Repository organisation
 
