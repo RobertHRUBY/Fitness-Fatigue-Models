@@ -7,7 +7,7 @@ This project offers a flexible general-purpose R toolbox for investigating impul
 | Directory   | Description                                                                      |
 |-------------|----------------------------------------------------------------------------------|
 | [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions)   | R functions, scripts, and documentation |
-| [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Research papers, educational files and personal notes, links to other resources                   |
+| [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Research papers, educational files, notes, and links to other useful resources                  |
 | [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Code and some data files from experimental simulation research (part of my PhD thesis)    |
 
 ### Example
@@ -84,8 +84,9 @@ Arguments for functions will vary slightly between different models. Documentati
 
 - Issue Tracker: https://github.com/bsh2/Fitness-Fatigue-Models/issues
 
-#### Current contributers
+#### Project authors
 
+- Ben Stephens Hemingway | [github](github.com/bsh2)
 - Ben Ogorek | [twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek) | Estimation of FFM with Kalman filter feedback in R
 - Paul Swinton | [website](https://www3.rgu.ac.uk/dmstaff/swinton-paul)| Code review, theoretical support, general assistance
 
