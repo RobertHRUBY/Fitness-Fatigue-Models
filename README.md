@@ -6,9 +6,9 @@ This project offers a flexible general-purpose R toolbox for investigating impul
 
 | Directory   | Description                                                                      |
 |-------------|----------------------------------------------------------------------------------|
-| [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions)   | Cookbook for FFMs (bespoke R functions, scripts, and accompanying documentation) |
-| [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Notes, research papers, link directories, other docs and files                   |
-| [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Study code and data files from experimental simulations run as part of my PhD    |
+| [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions)   | R functions, scripts, and documentation |
+| [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Research papers, educational files and personal notes, links to other resources                   |
+| [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Code and some data files from experimental simulation research (part of my PhD thesis)    |
 
 ### Example
 
@@ -70,6 +70,7 @@ Arguments for functions will vary slightly between different models. Documentati
     # 1. Download from github.com/bsh2/Fitness-Fatigue-Models/functions
     # 2. Place file in working directory
     # 3. Source into your environment
+    
     source("standardModel.R")
     
 #### Option 2: Using the *devtools* package, obtain the 'raw' URL for the function and then source directly into R
