@@ -7,23 +7,19 @@ standardModel <- function(inputData,
                            expandRate = NULL,
                            doTrace = FALSE){
   
-  # Check function dependencies
-  # ----------------------------------------------------------------------------
-  if (!"caret" %in% rownames(installed.packages())){
-    install.packages("caret")} else{
-      library("caret")
-    }
-  if (!"ModelMetrics" %in% rownames(installed.packages()))
-    {install.packages("ModelMetrics")} else{
-      library("ModelMetrics")
-    }
-  if (method == "de" && !"DEoptim" %in% rownames(installed.packages())){
-    install.packages("DEoptim")} else{
-      library("DEoptim")
-    }
+  # (1) Check function dependencies (packages)
+  
+  require(caret)        # Handy time-interval slicer function for CV
+  require(ModelMetrics) # For computing some of the model metrics
+  if (method = 'de'){   # Differential evolution optimiser
+    require(DEoptim)
+  }
+  require(truncnorm)    # For generating starting values and initial populations
+                        # if not specified already
 
-  # Function input validation
-  # ----------------------------------------------------------------------------
+  # (2) Function input validation checks
+  
+  # Put a check on the number of observed measurements in the dataset
   if (sum(!is.na(inputData$performances)) < 40){
     print("Number of observed measurements for fitting the model is small",
           quote = FALSE)
@@ -32,11 +28,13 @@ standardModel <- function(inputData,
     invisible(readline(prompt = "Press [enter] to continue"))
   }
   
+  # Provides a bit more info if someone tries to call without input data
   if(missing(inputData)){
     stop("No input data supplied. Example provided in the documentation")
   }
   
-  # Make sure inputData has the correct columnames
+  # Make sure inputData has the correct column names
+  # Assumes that at least the data has come in the following order. Not ideal...
   colnames(inputData) <- c("days", "performances", "loads")
   
   # Check if box-constraints are supplied, if not set to default values
@@ -88,8 +86,8 @@ standardModel <- function(inputData,
           quote = FALSE)
   }
   
-  # The primary calibration function
-  # ----------------------------------------------------------------------------
+  # (3) Develop the primary calibration function
+  
   calibrateModel <- function(timeSlices, currentSlice){
     
     objectiveFn <- function(par){
@@ -151,7 +149,7 @@ standardModel <- function(inputData,
                                method = "L-BFGS-B",
                                control = list(trace = traceRef,
                                               maxit = 10000
-                                              # TODO: Parscale
+                                              # TODO: Parscale implement
                                )
       )
       
@@ -178,8 +176,11 @@ standardModel <- function(inputData,
                                    trace = doTrace,
                                    CR = 0.9,
                                    F = 0.9,
-                                   itermax = 250
-                                   # TODO: Parallelise the code
+                                   itermax = 250,
+                                   parallelType = 1,
+                                   parVar = list("measuredPerformance", 
+                                                 "trainingData", 
+                                                 "measureIndex")
                                  )
       )
       
