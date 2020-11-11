@@ -5,29 +5,34 @@ This project offers a flexible general-purpose R toolbox for investigating impul
 As a brief example, fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
 
     # Import your experimental data set
+    
     experimentalData <- read.csv("experimentalData.csv")
     
     # Data set should be in following format
+    
     head(experimentalData)
     
-    > days    |  performances  | loads
-      --------+-------------+------------
+    > --------+----------------+-------
+      days    |  performances  | loads
+      --------+----------------+-------
       1          100             50
       2          NA              25
       3          102             75
       4          NA              0
       5          82              105
       ...        ...             ...
-      --------+-----------------+--------
+      --------+-----------------+------
     
     # Reasonable box constraints on parameter estimates c(p*, kg, Tg, kh, Th)
+    
     boxConstraints = data.frame("lower" = c(10, 0.01, 1, 0.01, 1),
                                 "upper" = c(150, 3, 50, 3, 50))
     
-    # Call the fitting function using quasi-Newton method and         
+    # Call the fitting function using Broyden-Fletcher-Goldfarb-Shanno algo
+    
     fittedModel = standardModel(data = experimentalData,
                                 constraints = boxConstraints, 
-                                method = "bfgs",              # quasi-Newton
+                                method = "bfgs",              
                                 doTrace = TRUE                # monitor optim()
                                 )
 
