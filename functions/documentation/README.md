@@ -26,15 +26,15 @@ The first-order linear ODE above can be solved via the method of Laplace transfo
 <img src="https://latex.codecogs.com/svg.latex?P(s)=-\frac{W(s)}{(s&plus;\frac{1}{\tau})}" title="P(s)=-\frac{W(s)}{(s+\frac{1}{\tau})}" /> </br></br>
 Defining:</br></br>
 <img src="https://latex.codecogs.com/svg.latex?G(s)=-\frac{1}{(s&plus;\frac{1}{\tau})}" title="G(s)=-\frac{1}{(s+\frac{1}{\tau})}" /> </br>
-Allows us to write the product <img src="https://latex.codecogs.com/svg.latex?P(s)=G(s)W(s)" title="P(s)=G(s)W(s)" /> which can then be solved by the convolution theorem (inverse Laplace transform of the product is its convolution): </br>
-<img src="https://latex.codecogs.com/svg.latex?\mathcal{L}^{-1}[P(s)]=\mathcal{L}^{-1}[G(s)W(s)]=(g\ast&space;w)(t)" title="\mathcal{L}^{-1}[P(s)]=\mathcal{L}^{-1}[G(s)W(s)]=(g\ast w)(t)" /> </br>
-Which gives: </br>
-<img src="https://latex.codecogs.com/svg.latex?p(t)=(g\ast&space;w)(t)&space;=&space;\int&space;g(t-u)w(u)du" title="p(t)=(g\ast w)(t) = \int g(t-u)w(u)du" /> </br>
-Consulting inverse Laplace transform tables and substituting appropriately we get the solution: </br>
-<img src="https://latex.codecogs.com/svg.latex?p(t)=\int&space;e^{-\frac{t-u}{\tau}}w(u)du" title="p(t)=\int e^{-\frac{t-u}{\tau}}w(u)du" /> </br>
-That can then be discretised to give the one-component impulse-response model in the R function: </br>
+Allows us to write the product <img src="https://latex.codecogs.com/svg.latex?P(s)=G(s)W(s)" title="P(s)=G(s)W(s)" /> which can then be solved by the convolution theorem (inverse Laplace transform of the product is its convolution): </br></br>
+<img src="https://latex.codecogs.com/svg.latex?\mathcal{L}^{-1}[P(s)]=\mathcal{L}^{-1}[G(s)W(s)]=(g\ast&space;w)(t)" title="\mathcal{L}^{-1}[P(s)]=\mathcal{L}^{-1}[G(s)W(s)]=(g\ast w)(t)" /> </br></br>
+Which gives: </br></br>
+<img src="https://latex.codecogs.com/svg.latex?p(t)=(g\ast&space;w)(t)&space;=&space;\int&space;g(t-u)w(u)du" title="p(t)=(g\ast w)(t) = \int g(t-u)w(u)du" /> </br></br>
+Consulting inverse Laplace transform tables and substituting appropriately we get the solution: </br></br>
+<img src="https://latex.codecogs.com/svg.latex?p(t)=\int&space;e^{-\frac{t-u}{\tau}}w(u)du" title="p(t)=\int e^{-\frac{t-u}{\tau}}w(u)du" /> </br></br>
+That can then be discretised to give the one-component impulse-response model in the R function: </br></br>
 p(n) = \Delta_n \sum_{i=1}^{n-1} e^{-\frac{(n-i)}{\tau}}w(i) </br>
-<br>
+<br></br>
 We also include in the discrete function the option to include an initial component <img src="https://latex.codecogs.com/svg.latex?q" title="q" /> in the function to denote the initial level of the training component at <img src="https://latex.codecogs.com/svg.latex?n=0" title="n=0" />, which then decays away at the same rate as any future effects. Alternatively, you can use the function 'banisterModel()'[see documentation]() which estimates initial condition <img src="https://latex.codecogs.com/svg.latex?g(0)" title="g(0)" /> within the numerical approximation and subsequent optimisation routine.
 
 
