@@ -10,7 +10,6 @@ TODO
 
 ### The basic model
 
-| device                             | information      |
 |------------------------------------|------------------|
 | source file                        | [basicModel.R]() |
 | function call                      | `basicModel()`     |
