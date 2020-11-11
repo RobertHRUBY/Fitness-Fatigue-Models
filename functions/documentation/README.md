@@ -45,7 +45,29 @@ Alternatively, you can try the function `banisterModel()` [(see documentation)](
 
 #### Usage
 
+    basicModel(inputData, 
+               constraints, 
+               method = "bfgs",
+               startingValues = NULL,
+               doTrace = FALSE,
+               initialComponent = FALSE,
+               initialWindow = NULL, 
+               testHorizon = NULL, 
+               expandRate = NULL)
+
 #### Arguments
+
+| Argument           | Details |
+|--------------------|---------|
+| `inputData`        |         |
+| `constraints`      |         |
+| `method`           |         |
+| `startingValues`   |         |
+| `doTrace`          |         |
+| `initialComponent` |         |
+| `initialWindow`    |         |
+| `testHorizon`      |         |
+| `expandRate`       |         |
 
 #### Details
 
@@ -53,10 +75,10 @@ Alternatively, you can try the function `banisterModel()` [(see documentation)](
 
 #### Example implementation
 
-| File | Location                  |
-|------|---------------------------|
-| code | [/Directory/codeFile.R]() |
-| data | [/Directory/codeFile.R]() |
+| File              | Location                  |
+|-------------------|---------------------------|
+| example code file | [/Directory/codeFile.R]() |
+| example data file | [/Directory/codeFile.R]() |
 
 #### Author(s)
 
