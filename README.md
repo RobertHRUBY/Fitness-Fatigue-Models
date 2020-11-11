@@ -24,16 +24,15 @@ Fitting the standard fitness-fatigue model (below) to experimental data is as si
     
     head(experimentalData)
     
-    > --------+----------------+-------
-      days    |  performances  | loads
-      --------+----------------+-------
-      1          100             50
-      2          NA              25
-      3          102             75
-      4          NA              0
-      5          82              105
-      ...        ...             ...
-      --------+-----------------+------
+| days | performances | loads |
+|------|--------------|-------|
+| 1    | 100          | 50    |
+| 2    | NA           | 25    |
+| 3    | 102          | 75    |
+| 4    | NA           | 0     |
+| 5    | 82           | 105   |
+| 6    | 98           | 25    |
+| ...  | ..           | ...   |
     
     # Reasonable box constraints on parameter estimates c(p*, kg, Tg, kh, Th)
     
