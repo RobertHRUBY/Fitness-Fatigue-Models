@@ -4,9 +4,11 @@ This project offers a flexible general-purpose R toolbox for investigating impul
 
 As a brief example, fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
 
+<img src="https://latex.codecogs.com/svg.latex?\hat{p}(t)&space;=&space;p^*&space;&plus;&space;k_g&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" title="\hat{p}(t) = p^* + k_g \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" />
+
     # Import your experimental data set
     
-    experimentalData <- read.csv("experimentalData.csv")
+    experimentalData = read.csv("experimentalData.csv")
     
     # Data set should be in following format
     
@@ -33,13 +35,13 @@ As a brief example, fitting the standard fitness-fatigue model (below) to experi
     fittedModel = standardModel(data = experimentalData,
                                 constraints = boxConstraints, 
                                 method = "bfgs",              
-                                doTrace = TRUE                # monitor optim()
+                                doTrace = TRUE
                                 )
 
 In the basic fitting example above, it is also possible to supply additional arguments to the function
 
-* A different method for the fitting process: the alternative is currently a genetic algorithm
-* A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with constraints enforced such as Tg > Th. These are not required for the evolutionary strategy
+* A different method for fitting: the alternative is currently a genetic algorithm
+* A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with inequality constraints enforced such as Tg > Th. Starting values not required for the evolutionary strategy
 * Parameters for the expanding window cross-validation method, which are currently as default a 60% initial window, 20% test horizon, and 5% expansion rate.
 
 Arguments for functions will vary slightly between different models, and the example above is only a simple illustration of the potential of these resources. Documentation is provided for each function within the [documentation directory](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation).
