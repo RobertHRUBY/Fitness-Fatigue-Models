@@ -19,7 +19,7 @@ TODO
 #### Description and functionality
 
 The basic model is a one-component impulse-response model of the effect of training on performance arising from the following linear time-invariant system: </br></br>
-<img src="https://latex.codecogs.com/svg.latex?p(t)=p^*&space;&plus;&space;Kp(t)" title="p(t)=p^* + Kp(t)" /></br>
+<img src="https://latex.codecogs.com/svg.latex?p(t)=p^*&space;&plus;&space;Kp(t)" title="p(t)=p^* + Kp(t)" /> </br></br>
 <img src="https://latex.codecogs.com/svg.latex?\frac{dP(t)}{dt}=\omega(t)-\frac{1}{\tau}p(t)" title="\frac{dP(t)}{dt}=\omega(t)-\frac{1}{\tau}p(t)" />
 </br></br>
 The first-order linear ODE above can be solved via the method of Laplace transform applied to each term, and then rearranging the substituted transforms (assuming <img src="https://latex.codecogs.com/svg.latex?p(0)=0" title="p(0)=0" />) in terms of P(s) to derive it's transfer function (relationship of the system input to output): </br>
