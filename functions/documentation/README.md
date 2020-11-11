@@ -40,7 +40,7 @@ That can then be discretised to give the one-component impulse-response model in
 We also include in the discrete function the option to include an initial component <img src="https://latex.codecogs.com/svg.latex?q" title="q" /> in the function to denote the initial level of the training component at <img src="https://latex.codecogs.com/svg.latex?n=0" title="n=0" />, which then decays away at the same rate as any future effects. </br></br>
 <img src="https://latex.codecogs.com/svg.latex?\hat{p}(n)&space;=&space;p^*&space;&plus;&space;q\cdot&space;(e^{-\frac{n}{\tau}})&space;&plus;&space;K&space;\sum_{i=1}^{n-1}&space;e^{-\frac{(n-i)}{\tau}}w(i)\cdot&space;\Delta_n" title="\hat{p}(n) = p^* + q\cdot (e^{-\frac{n}{\tau}}) + K \sum_{i=1}^{n-1} e^{-\frac{(n-i)}{\tau}}w(i)\cdot \Delta_n" />
 <br></br>
-Alternatively, you can use the function `banisterModel()` [(see documentation)]() which estimates initial condition <img src="https://latex.codecogs.com/svg.latex?g(0)" title="g(0)" /> within the numerical approximation of the ODE and subsequent optimisation routine.
+Alternatively, you can try the function `banisterModel()` [(see documentation)]() which solves the underlying ODE using numerical methods (`lsoda()` within the `deSolve` package that automatically switches between the Adams method and BDF method to cope with initial value problems for stiff or non-stiff systems of first-order ODE's) and thus estimates the initial condition within the optimisation framework
 
 #### Usage
 
