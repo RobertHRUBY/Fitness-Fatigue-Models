@@ -2,6 +2,11 @@
 
 ### Files
 
+| Function            | Description                                                                                                            | Associated documentation |
+|---------------------|------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| [standardModel.R]() | Function to train and test the standard fitness-fatigue model in R using expanding-window CV. Assumes that g(0)=h(0)=0 | TBC                      |
+| [                   |                                                                                                                        |                          |
+
 | File            | Description                                                                                       |
 |-----------------|---------------------------------------------------------------------------------------------------|
 | [standardModel.R](https://github.com/bsh2/Fitness-Fatigue-Model/blob/main/functions/standardModel.R) | Function to train and test the standard fitness-fatigue model in R (expanding window CV)          |
