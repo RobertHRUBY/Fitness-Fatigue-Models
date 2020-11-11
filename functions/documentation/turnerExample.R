@@ -1,7 +1,7 @@
 # Source turnerModel.R function directly from github
 library(devtools)
 source_url(
-  "https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/turnerModel.R?token=AGTSF7KLPI27T2Z64RQFCN27WRFOO"
+  "https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/turnerModel.R?token=AGTSF7M743XC3ZH5XHJPV6C7WTYJU"
 )
 
 # Source 'true' data built within the Turner function using a defined par set
