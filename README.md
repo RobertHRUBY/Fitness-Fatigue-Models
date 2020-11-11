@@ -66,7 +66,10 @@ Arguments for functions will vary slightly between different models. Documentati
 ### Installation / use
 
 #### Option 1: Download the R-scripts from the github website, and load manually in R
-
+    
+    # 1. Download from github.com/bsh2/Fitness-Fatigue-Models/functions
+    # 2. Place file in working directory
+    # 3. Source into your environment
     source("standardModel.R")
     
 #### Option 2: Using the *devtools* package, obtain the 'raw' URL for the function and then source directly into R
