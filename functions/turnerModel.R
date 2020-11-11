@@ -370,7 +370,8 @@ turnerModel = function(inputData,
   nDays = length(bestModelp$days)
   plot(bestModelp$days, bestModelp$loads, type = "h", col = "grey85",
        ylim = c(0,
-                max(c(),na.rm = TRUE)+10),
+                max(c(dailymin,dailymax,bestModelp$loads,
+                      bestModelp$p),na.rm = TRUE)+10),
        xlab = "day",
        ylab = "Arbitrary units (a.u)",
        main = "All train/test sets (slices/windows)")
