@@ -2,7 +2,17 @@
 
 This project offers a flexible general-purpose R toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and implementation of models and methods. The structure of the functions contained aims to appeal to researchers seeking to investigate the models within data-collection scenarios, and those looking to extend and test models 'in vitro'.
 
-As a brief example, fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
+### Repository organisation
+
+| Directory   | Description                                                                      |
+|-------------|----------------------------------------------------------------------------------|
+| [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions)   | Cookbook for FFMs (bespoke R functions, scripts, and accompanying documentation) |
+| [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Notes, research papers, link directories, other docs and files                   |
+| [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Study code and data files from experimental simulations run as part of my PhD    |
+
+### Example
+
+Fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
 
 <img src="https://latex.codecogs.com/svg.latex?\hat{p}(t)&space;=&space;p^*&space;&plus;&space;k_g&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" title="\hat{p}(t) = p^* + k_g \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" />
 
@@ -45,7 +55,7 @@ A different method for fitting: the alternative is currently a genetic algorithm
     
 A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with inequality constraints enforced such as Tg > Th. Starting values not required for the evolutionary strategy
 
-    startingValues = c(75, 1, 20, 1.5, 10) # p*, kg, Tg, kh, Th
+    startingValues = c(75, 1, 20, 1.5, 10)               # c(p*, kg, Tg, kh, Th)
   
 Parameters for the expanding window cross-validation method, which are currently as default a 60% initial window, 20% test horizon, and 5% expansion rate.
 
@@ -53,14 +63,17 @@ Parameters for the expanding window cross-validation method, which are currently
 
 Arguments for functions will vary slightly between different models. Documentation is provided for each function within the [documentation directory](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation).
 
+### Installation / use
 
-### Repository organisation
+#### Option 1: Download the R-scripts from the github website, and load manually in R
 
-| Directory   | Description                                                                      |
-|-------------|----------------------------------------------------------------------------------|
-| [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions)   | Cookbook for FFMs (bespoke R functions, scripts, and accompanying documentation) |
-| [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Notes, research papers, link directories, other docs and files                   |
-| [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Study code and data files from experimental simulations run as part of my PhD    |
+    source("standardModel.R")
+    
+#### Option 2: Using the *devtools* package, obtain the 'raw' URL for the function and then source directly into R
+
+    library(devtools)
+    source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/standardModel.R)
+
 
 - Files in [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions) are primarily estimation functions which include cross-validation methods such as expanding-window. 
 - Functions are written to be as easy as possible to use out of the box, by researchers and practitioners. Most include input validation checks and error handling. 
