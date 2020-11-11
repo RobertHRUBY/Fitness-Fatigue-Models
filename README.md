@@ -20,10 +20,8 @@ Fitting the standard fitness-fatigue model (below) to experimental data is as si
     
     experimentalData = read.csv("experimentalData.csv")
     
-    # Data set should be in following format
-    
-    head(experimentalData)
-    
+Data should be in following format, with NA values indicating no measurement on a given day. Zero indicates no training occurred.
+  
 | days | performances | loads |
 |------|--------------|-------|
 | 1    | 100          | 50    |
