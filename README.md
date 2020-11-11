@@ -40,8 +40,16 @@ As a brief example, fitting the standard fitness-fatigue model (below) to experi
 Furthermore, in the basic example above it is possible to supply further arguments to tune the implementation:
 
 - A different method for fitting: the alternative is currently a genetic algorithm
+    
+    method = "ga"
+    
 - A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with inequality constraints enforced such as Tg > Th. Starting values not required for the evolutionary strategy
+
+    startingValues = c(75, 1, 20, 1.5, 10) # p*, kg, Tg, kh, Th
+  
 - Parameters for the expanding window cross-validation method, which are currently as default a 60% initial window, 20% test horizon, and 5% expansion rate.
+
+    initialWindow = 50; testHorizon = 30; expandRate = 3
 
 Arguments for functions will vary slightly between different models. Documentation is provided for each function within the [documentation directory](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation).
 
