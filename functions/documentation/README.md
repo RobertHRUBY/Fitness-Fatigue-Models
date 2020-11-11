@@ -13,8 +13,8 @@ TODO
 | device                             | information      |
 |------------------------------------|------------------|
 | source file                        | [basicModel.R]() |
-| function call                      | basicModel()     |
-| source_url() call </br> *devtools* | source_url()     |
+| function call                      | ''basicModel()''     |
+| ''source_url()'' call </br> *devtools* | ''source_url()''     |
 
 #### Description and functionality
 
@@ -34,11 +34,8 @@ Consulting inverse Laplace transform tables and substituting appropriately we ge
 <img src="https://latex.codecogs.com/svg.latex?p(t)=\int&space;e^{-\frac{t-u}{\tau}}w(u)du" title="p(t)=\int e^{-\frac{t-u}{\tau}}w(u)du" /> </br></br>
 That can then be discretised to give the one-component impulse-response model in the R function: </br></br>
 <img src="https://latex.codecogs.com/svg.latex?p(n)&space;=&space;\Delta_n&space;\sum_{i=1}^{n-1}&space;e^{-\frac{(n-i)}{\tau}}w(i)" title="p(n) = \Delta_n \sum_{i=1}^{n-1} e^{-\frac{(n-i)}{\tau}}w(i)" /> </br>
-<br></br>
-We also include in the discrete function the option to include an initial component <img src="https://latex.codecogs.com/svg.latex?q" title="q" /> in the function to denote the initial level of the training component at <img src="https://latex.codecogs.com/svg.latex?n=0" title="n=0" />, which then decays away at the same rate as any future effects. Alternatively, you can use the function 'banisterModel()'[see documentation]() which estimates initial condition <img src="https://latex.codecogs.com/svg.latex?g(0)" title="g(0)" /> within the numerical approximation and subsequent optimisation routine.
-
-
-
+<br>
+We also include in the discrete function the option to include an initial component <img src="https://latex.codecogs.com/svg.latex?q" title="q" /> in the function to denote the initial level of the training component at <img src="https://latex.codecogs.com/svg.latex?n=0" title="n=0" />, which then decays away at the same rate as any future effects. Alternatively, you can use the function ''banisterModel()'' [(see documentation)]() which estimates initial condition <img src="https://latex.codecogs.com/svg.latex?g(0)" title="g(0)" /> within the numerical approximation and subsequent optimisation routine.
 
 #### Usage
 
