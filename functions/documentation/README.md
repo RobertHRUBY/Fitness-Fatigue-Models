@@ -71,7 +71,22 @@ Alternatively, you can try the function `banisterModel()` [(see documentation)](
 
 #### Details
 
+* method "bfgs"
+* method "ga"
+* starting values developed via...
+* Expanding window parameters initialWindow, testHorizon, expandRate
+* Bounding constraints
+* Format of input data
+
 #### Value (output)
+
+For 'basicModel()', a list with components:
+
+| List component | Details |
+|----------------|---------|
+| component1     |         |
+| component2     |         |
+| component3     |         |
 
 #### Example implementation
 
@@ -80,7 +95,11 @@ Alternatively, you can try the function `banisterModel()` [(see documentation)](
 | example code file | [/Directory/codeFile.R]() |
 | example data file | [/Directory/codeFile.R]() |
 
+Implementation example with screenshots here (use /img folder for pics)
+
 #### Author(s)
+
+Ben Stephens Hemingway
 
 #### Further resources
 
