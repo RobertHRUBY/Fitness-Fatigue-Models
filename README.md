@@ -79,17 +79,20 @@ Arguments for functions will vary slightly between different models. Documentati
     source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/standardModel.R)
 
 
-- Files in [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions) are primarily estimation functions which include cross-validation methods such as expanding-window. 
-- Functions are written to be as easy as possible to use out of the box, by researchers and practitioners. Most include input validation checks and error handling. 
-- I recommend that users review the accompanying documentation for each function
 
-### Get involved (contribute) or raise an issue with one of the files
+### Contribute
 
-If you would like to contribute a code file, related link (for one of the lists) or related document to this repository, have suggestions, or have found bugs or errors please raise an issue via github on this repository (leave a contact email address if you would like) and I will get back to you.
+- Issue Tracker: https://github.com/bsh2/Fitness-Fatigue-Models/issues
 
+#### Current contributers
 
-#### Current contributors:
-* [Ben Ogorek](https://twitter.com/benogorek?lang=en): Estimation of FFM with Kalman filter feedback in R
-* [Paul Swinton](https://www3.rgu.ac.uk/dmstaff/swinton-paul): Code review and general assistance
+- Ben Ogorek | [twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek) | Estimation of FFM with Kalman filter feedback in R
+- Paul Swinton | [website](https://www3.rgu.ac.uk/dmstaff/swinton-paul)| Code review, theoretical support, general assistance
 
 Note: *Code and README files in each directory reflect authorship in the event it differs from myself.*
+
+### Support
+
+If you are having issues, please let us know. You can email us at
+
+b.stephens-hemingway [at] rgu [dot] ac [dot] uk
