@@ -82,15 +82,15 @@ We also include in the option to include an initial component denoted <img src="
 * **Appropriately bounding the parameter space** is a problem individual to the users data set, however there are a few rules you can use that might work in most cases to adequately constrain the free-parameters to reasonable values. The baseline performance value p* is unlikely to be larger than the maximum measured performance value in your data set, so you could set it just above this by a magnitude of 10%. The tau values on components are unlikely (physiologically) to be reasonable if less than 1, or more than 50 (days). The scaling values will depend on the relationship between your quantified training load values and the measured performance values. Work out the magnitude of difference and you get some insight into some reasonable bounds for these values.
 * **Format of input data** should be consistent, with a three column dataframe representing the time series as follows from left to right: "days", "performances", "loads". NA values should be used to represent days on which measured performances do not exist at a specific row (day), and 0 used to indicate no training occured. Below is an example that makes this clear. The function will rename columns appropriately if exact names above are not supplied, but will break if the columns are not in the correct format or order.
 
-| days | performances | loads |
-|------|--------------|-------|
-| 1    | 100          | 50    |
-| 2    | NA           | 25    |
-| 3    | 102          | 75    |
-| 4    | NA           | 0     |
-| 5    | 82           | 105   |
-| 6    | 98           | 25    |
-| ...  | ..           | ...   |
+    | days | performances | loads |
+    |------|--------------|-------|
+    | 1    | 100          | 50    |
+    | 2    | NA           | 25    |
+    | 3    | 102          | 75    |
+    | 4    | NA           | 0     |
+    | 5    | 82           | 105   |
+    | 6    | 98           | 25    |
+    | ...  | ..           | ...   |
 
 
 #### Value (output)
