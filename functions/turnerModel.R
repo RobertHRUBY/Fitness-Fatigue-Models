@@ -5,14 +5,21 @@ turnerModel = function(inputData,
                        testHorizon = NULL,
                        expandRate = NULL,
                        doParallel = FALSE,   # Not parallel by default
-                       maxIt = 10000
+                       maxIt = 10000,
+                       popSize = 120
                        ){
   # Load dependencies
-  library(caret, GA, deSolve)
+  library(caret)
+  library(GA)
+  library(deSolve)
   
   # Load dependencies (parallel implementation)
   if (doParallel == TRUE){
-    library(parallel, foreach, iterators, doParallel, doRNG)
+    library(parallel)
+    library(foreach)
+    library(iterators)
+    library(doParallel)
+    library(doRNG)
   }
   
   # Validation tests
@@ -58,15 +65,13 @@ turnerModel = function(inputData,
       expandRate = round(length(inputData$days) * expandRate/100, 0)
     }
   
-  # Check that the input data has the right colnames
-  colnames(inputData) <- c("days", "performances", "loads")
+    # Check that the input data has the right colnames
+    colnames(inputData) <- c("days", "performances", "loads")
   
-  # (3) Develop calibration function
-  
+  # Calibration function development starts here
   turnerCalibrate = function(sliceIntervals, currentSlice, inputData){
     
     # Model computation function (i.e. given known parameters)
-    
     turnerCompute = function(parmsAndICS, inputData){
       
       compData = data.frame("days" = 0:length(inputData$days),
@@ -122,11 +127,9 @@ turnerModel = function(inputData,
     } # End of turnerCompute
     
     # Mean-squared error (objective) function (i.e. used in optimization)
-    
     turnerMSE = function(parmsAndICS){
       
       # Create data structure for the solver
-      
       compData = data.frame("days" = 0:length(trainingData$days),
                             "G" = c(rep(0, length(trainingData$days)+1)),
                             "H" = c(rep(0, length(trainingData$days)+1)),
@@ -183,7 +186,6 @@ turnerModel = function(inputData,
     } # End of turnerMSE function
     
     # Subset user input into training and testing data for current slice
-    
     trainingData = inputData[sliceIntervals$train[[currentSlice]],]
     testingData = inputData[sliceIntervals$test[[currentSlice]],]
     
@@ -194,7 +196,6 @@ turnerModel = function(inputData,
     #                      constraints (not included here)
     
     require(GA)
-    popSize = 120
     fittedModel = ga(type = "real-valued", 
                      fitness = turnerMSE,
                      lower = constraints$lower,
@@ -224,7 +225,6 @@ turnerModel = function(inputData,
     # Compute modeled values, forecast errors
     
       # Compute modeled performance values and isolate for train/test
-    
       fittedPerf = turnerCompute(parmsAndICS = as.numeric(fittedPars[1,1:9]),
                                  inputData = inputData)
       
@@ -259,13 +259,11 @@ turnerModel = function(inputData,
         }
       
       # Training set statistics
-        
       RSQtrain = RSQfunc(x = fittedPerfTrain$pHat, y = fittedPerfTrain$p)
       RMSEtrain = RMSEfunc(x = fittedPerfTrain$pHat, y = fittedPerfTrain$p,
                            n = length(fittedPerfTrain$days))
       
       # Test set statistics
-      
       RMSEtest = RMSEfunc(x = fittedPerfTest$pHat, y = fittedPerfTest$p,
                           n = length(fittedPerfTest$days))
       MAPEtest = MAPEfunc(x = fittedPerfTest$p, y= fittedPerfTest$pHat,
@@ -287,8 +285,7 @@ turnerModel = function(inputData,
   
   } # End of turnerCalibrate() function
   
-  
-  # (4) Slice data into expanding windows (Cross-validation split)
+  # Slice data into expanding windows (Cross-validation split)
   sliceIntervals = createTimeSlices(inputData$days,
                                      initialWindow = initialWindow,
                                      horizon = testHorizon,
@@ -297,7 +294,7 @@ turnerModel = function(inputData,
   
   nIntervals = length(sliceIntervals$train)
   
-  # (5) Implement model - loop over the slices by calling turnerCalibrate()
+  # Implement model - loop over the slices by calling turnerCalibrate()
   sliceModels = list()
   for (i in 1:nIntervals){
     currentSlice = i
@@ -306,7 +303,7 @@ turnerModel = function(inputData,
     print(paste0("Slice ", currentSlice, " estimation complete"), quote = FALSE)
   }
   
-  # (6) Tabulate results (print to console) and generate plots 
+  # Tabulate results (print to console) and generate plots 
   
   # Best set found (by lowest MAPE_test)
   MAPEvals = c()
