@@ -10,7 +10,7 @@ This project offers a flexible general-purpose R toolbox for investigating impul
 | [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Research papers, educational files, notes, and links to other useful resources                  |
 | [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Code and some data files from experimental simulation research (part of my PhD thesis)    |
 
-### Example
+### An introductory example
 
 Fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
 
