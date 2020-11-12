@@ -107,12 +107,12 @@ For `basicModel()`, a list with components:
 
 #### Example implementation
 
-| File              | Location                  | Source into R using `RCurl()` |
-|-------------------|---------------------------|---------------|
-| example code file | [/Directory/codeFile.R]() |               |
-| example data file | [/Directory/codeFile.R]() |               |
+| File              | Location                  |
+|-------------------|---------------------------|
+| example code file | [/Directory/codeFile.R]() |
+| example data file | [/Directory/codeFile.R]() |
 
-Implementation example with screenshots here (use /img folder for pics)
+Implementation example with screenshots here (use /img folder for pics) including how to source the data file into R with RCurl.
 
 #### Author(s)
 
