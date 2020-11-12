@@ -35,7 +35,7 @@ Which gives: </br></br>
 <img src="https://latex.codecogs.com/svg.latex?p(t)=(g\ast&space;w)(t)&space;=&space;\int&space;g(t-u)w(u)du" title="p(t)=(g\ast w)(t) = \int g(t-u)w(u)du" /> </br></br>
 Consulting inverse Laplace transform tables and substituting appropriately we get the solution: </br></br>
 <img src="https://latex.codecogs.com/svg.latex?p(t)=\int&space;e^{-\frac{t-u}{\tau}}w(u)du" title="p(t)=\int e^{-\frac{t-u}{\tau}}w(u)du" /> </br></br>
-That can then be discretised to give the one-component impulse-response model in the R function: </br></br>
+That can then be discretised to give the one-component impulse-response model used to fit the FFM in this R function: </br></br>
 <img src="https://latex.codecogs.com/svg.latex?\hat{p}(n)&space;=&space;p^*&space;&plus;&space;K&space;\sum_{i=1}^{n-1}&space;e^{-\frac{(n-i)}{\tau}}w(i)\cdot&space;\Delta_n" title="\hat{p}(n) = p^* + K \sum_{i=1}^{n-1} e^{-\frac{(n-i)}{\tau}}w(i)\cdot \Delta_n" /> </br>
 <br>
 We also include in the discrete function the option to include an initial component <img src="https://latex.codecogs.com/svg.latex?q" title="q" /> in the function to denote the initial level of the training component at <img src="https://latex.codecogs.com/svg.latex?n=0" title="n=0" />, which then decays away at the same rate as any future effects. </br></br>
