@@ -64,13 +64,13 @@ We also include in the option to include an initial component denoted <img src="
 |--------------------|---------|
 | `inputData`        | The time series of training load values and measured performances. Data frame of three columns in order ("days","performances","loads"). NA values in performance column represent days on which performance not measured. 0 values in loads column represent days where training was not performed        |
 | `constraints`      | Box constraints on the parameter space. Supplied as a data frame of two columns ("lower" = c(p1,p2,p3,p4,...), "upper" = c(p1,p2,p3,p4,...))        |
-| `method`           | An optional argument to supply starting values for gradient method. If not supplied, by default the function will compute random starting values that satisfy typical relationships between the scaling factors and tau parameters, and are sampled from a Gaussian distribution with mean at the middle of the bounds.        |
-| `startingValues`   |         |
-| `doTrace`          |         |
-| `initialComponent` | Supplied as percentage (i.e. 60 is equivalent to 60%)        |
-| `initialWindow`    | Supplied as percentage (i.e. 20 is equivalent to 20%)        |
-| `testHorizon`      | Supplied as percentage (i.e. 5 is equivalent to 5%)       |
-| `expandRate`       |         |
+| `method`           | The optimisation method, either L-BFGS-B (default) or GA. See [details](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation#details) for further information         |
+| `startingValues`   | An optional argument to supply starting values for gradient method. If not supplied, by default the function will compute random starting values that satisfy typical relationships between the scaling factors and tau parameters, and are sampled from a Gaussian distribution with mean at the middle of the bounds.        |
+| `doTrace`          | TRUE/FALSE argument: Monitor the progress of the optimisation routine (default FALSE). Prints to console        |
+| `initialComponent` |         |
+| `initialWindow`    | CV initial window size. Supplied as percentage (i.e. 60 is equivalent to 60%). See [details](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation#details) for more information on initialWindow, testHorizon and expandRate        |
+| `testHorizon`      | CV testing window size. Supplied as percentage (i.e. 60 is equivalent to 20%)       |
+| `expandRate`       | CV initial window expansion rate. Supplied as percentage (i.e. 60 is equivalent to 5%)        |
 
 #### Details
 
