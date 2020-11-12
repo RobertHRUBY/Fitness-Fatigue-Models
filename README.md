@@ -1,6 +1,6 @@
 ## The Fitness-Fatigue Model Project: A toolbox for implementing FFMs
 
-This project offers a flexible general-purpose R toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and experimentation of models and methods. The structure of the functions contained aims to appeal to researchers seeking to investigate the structure and validity of models in theoretical and experimental (i.e. data collection) scenarios. Please note this is not an endorsement of the models use in day-to-day practice to inform decision making, but rather a toolbox to enhance scientific discourse, understanding, and development. It is also hoped that this repository might also provide educational value to academics, practitioners, and students.
+This project offers a flexible R toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and experimentation of models and methods. The structure of the functions contained aims to appeal to researchers seeking to investigate the structure and validity of models in both theoretical and experimental (i.e. data collection) scenarios. Please note this is not an endorsement of the models as 'ready to use' in day-to-day sport science practice (particularly not to inform decision making), but rather a toolbox to enhance scientific discourse, understanding, and development in the area of performance modeling. It is also hoped that this repository might also provide educational value to academics, practitioners, and students.
 
 ### Repository organisation
 
@@ -75,8 +75,6 @@ Arguments for functions will vary slightly between different models. Documentati
     library(devtools)
     source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/standardModel.R)
 
-
-
 ### Contribute
 
 - Issue Tracker: https://github.com/bsh2/Fitness-Fatigue-Models/issues
@@ -87,7 +85,7 @@ Arguments for functions will vary slightly between different models. Documentati
 - Ben Ogorek | [twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek)
 - Paul Swinton | [website](https://www3.rgu.ac.uk/dmstaff/swinton-paul)
 
-Note: *Code and README files in each directory reflect authorship in the event it differs from myself.*
+Note: *Code and README files in each directory reflect authorship if appropriate*
 
 ### Support
 
