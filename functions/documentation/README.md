@@ -74,7 +74,7 @@ Alternatively, you can try the function `banisterModel()` [(see documentation)](
 * method "bfgs"
 * method "ga"
 * starting values developed via...
-* Expanding window parameters initialWindow, testHorizon, expandRate
+* Describe cross-validation, in particular the Expanding window parameters initialWindow, testHorizon, expandRate
 * Bounding constraints
 * Format of input data
 
