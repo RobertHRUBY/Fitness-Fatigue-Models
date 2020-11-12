@@ -63,7 +63,7 @@ We also include in the option to include an initial component denoted <img src="
 | Argument           | Details |
 |--------------------|---------|
 | `inputData`        | The time series of training load values and measured performances. Data frame of three columns in order ("days","performances","loads"). NA values in performance column represent days on which performance not measured. 0 values in loads column represent days where training was not performed        |
-| `constraints`      | Box constraints on the parameter space. Supplied as a data frame of two columns </br> `data.frame("lower" = c(p*,K,T,q), "upper" = c(p*,K,T,q))`        |
+| `constraints`      | Box constraints on the parameter space. Supplied as a data frame of two columns </br> `data.frame("lower" = c(p*,K,T,q), "upper" = c(p*,K,T,q))`. Only include `q` at the end if `initialComponent = TRUE`        |
 | `method`           | The optimisation method, either `L-BFGS-B` (`method = "bfgs"` default) or `GA` (`method = "ga"`). See [details](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation#details) for further information         |
 | `startingValues`   | An optional argument to supply starting values as an ordered numeric vector `startingValues = c(p*,K,T,q)` for the gradient optimisation method. If not supplied, by default the function will compute random starting values that satisfy typical relationships between the scaling factors and tau parameters, and are sampled from a Gaussian distribution with mean at the middle of the bounds.        |
 | `doTrace`          | `TRUE/FALSE` argument: Monitor the progress of the optimisation routine (default `doTrace = FALSE`). Prints to console        |
