@@ -1,6 +1,6 @@
 ## The toolbox
 
-### Calibration (fitting) functions
+### Calibration (i.e. estimation) functions
 
 | Code File              | Functionality                                                                                                                                                                                    | Documentation |
 |-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -14,8 +14,9 @@
 | vdrModelHill.R    | The variable dose-response model with external Hill transform applied to the training load series (with and without two initial components) - TBC with BenO and his work on this                                           |               |
 | **TBC**: Kalman   | **TBC**: standard model estimation with Kalman filter feedback                                                                                                                                   |               |
 
-### Other functions and files
-| Code file         | Functionality   |
-|-------------------|-----------------|
+### Other files and functions
+
+| File        | Functionality   | Documentation   |
+|-------------------|-----------------|-----------|
 | parScaling.R      | Function to determine (optional) scaling values for the parameters given a set of data                                                                                                           |               |
 | computeModel.R    | Compute various FFMs given a definite set of parameter values (& initial conditions if appropriate) and a training load series                                                                   |               |
