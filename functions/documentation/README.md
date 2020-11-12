@@ -1,6 +1,6 @@
 # Documentation
 
-This README includes
+This README introduces all of the functions and scripts included within the repository.
 
 # Table of Contents
 
@@ -124,8 +124,3 @@ Ben Stephens Hemingway
 |---------------------------------------------------|--------------------|
 | Research (author/year)                            | [link to Research title]() |
 | Any other code, documentation, or online resource | [link to code resource]()  |
-
-
-# References
-1. 
-2. 
