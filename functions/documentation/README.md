@@ -1,6 +1,6 @@
 # Documentation
 
-This README introduces all of the functions and scripts included within the repository.
+Documentation for all the functions and other tools/scripts contained within the repository.
 
 # Table of Contents
 
