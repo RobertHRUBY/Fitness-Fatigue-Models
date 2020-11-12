@@ -81,7 +81,7 @@ We also include in the option to include an initial component denoted <img src="
 
 #### Value (output)
 
-For 'basicModel()', a list with components:
+For `basicModel()`, a list with components:
 
 | List component | Details |
 |----------------|---------|
