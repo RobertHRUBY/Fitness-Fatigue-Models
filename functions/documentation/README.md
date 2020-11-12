@@ -15,7 +15,7 @@ TODO
 | Source code                      | [basicModel.R]() |
 | Function call                    | `basicModel()`   |
 | Source function </br> `devtools` | `source_url()`   |
-| Dependencies </br> (packages)    | ``stats``, ``ga``                |
+| Dependencies </br> (packages)    | ``stats``, ``caret``, ``ga``                |
 
 #### Description and functionality
 
@@ -72,20 +72,26 @@ We also include in the option to include an initial component denoted <img src="
 
 #### Details
 
-* The loss function is mean-squared error (MSE) (i.e. mean(squared residuals)). This is used to provide a comparable metric of model fit between folds (where n data points increases and thus RSS would be expected to also increase without normalisation).
+* The loss function used to assess model fit is mean-squared error (MSE) (i.e. mean(squared residuals)). This is preferred to provide a comparable metric of model fit between cross-validation folds (where n data points increases and thus RSS would be expected to also increase without normalisation).
 * The default optimisation algorithm used to estimate the parameters is ``L-BFGS-B``, called by `method = 'bfgs'`. This algorithm is a box-constrained limited-memory modification of the quasi-Newton algorithm ``BFGS``, developed by Broydon, Fletcher, Goldfarb and Shanno in 1970. This algorithm is included in the ``optim`` toolbox as part of the R ``stats`` package shipped with the R kernel. The algorithm uses both the function values and gradients to iteratively search the surface of the cost function to find the minimum value.
 * An alternative optimisation algorithm available is a genetic algorithm (GA), from the package ``GA`` available on CRAN. The ``GA`` package provides a number of genetic algorithms for stochastic optimisation of real-valued problems. The tuning parameters selected for the problem are as default tournament selection, BLX (blend) crossover, random mutation around the solution, and a population size minimum 10x the number of free parameters in the model. These options can be changed but require adjustment of the function call `ga()` within the function code file itself, and cannot be passed as arguments to the function `banisterModel()`. For simple models, it is best to first try the gradient approach implemented here, as this often faster.
-* The cross-validation approach
+* The cross-validation approach used as standard across all functions is a manual implementation of a walk forward approach (expanding-window) [described here]() and illustrated below. Default settings assuming that no argument is passed to the function are as follows: size of initial window ``initialWindow`` is 60% of time-series, the test window ``testHorizon`` is 20%, and the expansion rate on the initial window across slices is 5% ``expandRate``. These can be changed and users should refer to the arguments section above.
 
 
 
+* Appropriately bounding the parameter space is a problem individual to the users data set, however there are a few rules you can use that might work in most cases to adequately constrain the free-parameters to reasonable values. The baseline performance value p* is unlikely to be larger than the maximum measured performance value in your data set, so you could set it just above this by a magnitude of 10%. The tau values on components are unlikely (physiologically) to be reasonable if less than 1, or more than 50 (days). The scaling values will depend on the relationship between your quantified training load values and the measured performance values. Work out the magnitude of difference and you get some insight into some reasonable bounds for these values.
+* Format of input data should be consistent, three columns representing the time series as follows from left to right: "days", "performances", "loads". NA values should be used to represent days on which measured performances do not exist, and 0 used to indicate no training occured on a specific day. Below is an example:
 
-* method "bfgs"
-* method "ga"
-* starting values developed via...
-* Describe cross-validation, in particular the Expanding window parameters initialWindow, testHorizon, expandRate
-* Bounding constraints
-* Format of input data
+| days | performances | loads |
+|------|--------------|-------|
+| 1    | 100          | 50    |
+| 2    | NA           | 25    |
+| 3    | 102          | 75    |
+| 4    | NA           | 0     |
+| 5    | 82           | 105   |
+| 6    | 98           | 25    |
+| ...  | ..           | ...   |
+
 
 #### Value (output)
 
