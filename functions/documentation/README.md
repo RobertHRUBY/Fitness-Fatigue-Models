@@ -2,7 +2,7 @@
 
 # Table of Contents
 
-TODO
+1. [The basic model](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation#the-basic-model): `basicModel()` [source]()
 
 # Functions
 
