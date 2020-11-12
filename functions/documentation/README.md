@@ -1,8 +1,10 @@
 # Documentation
 
+This README includes
+
 # Table of Contents
 
-1. [The basic model](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation#the-basic-model): `basicModel()` [source]()
+1. [The basic model](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation#the-basic-model): `basicModel()` [(source)]()
 
 # Functions
 
