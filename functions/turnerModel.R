@@ -4,7 +4,8 @@ turnerModel = function(inputData,
                        initialWindow = NULL,
                        testHorizon = NULL,
                        expandRate = NULL,
-                       doParallel = FALSE   # Not parallel by default
+                       doParallel = FALSE,   # Not parallel by default
+                       maxIt = 10000
                        ){
   
   # (1) Check function dependencies (packages)
@@ -201,12 +202,12 @@ turnerModel = function(inputData,
     #                      constraints (not included here)
     
     require(GA)
-    popSize = 400
+    popSize = 120
     fittedModel = ga(type = "real-valued", 
                      fitness = turnerMSE,
                      lower = constraints$lower,
                      upper = constraints$upper,
-                     maxiter = 10000,
+                     maxiter = maxIt,
                      monitor = doTrace, # monitor the optimization
                      popSize = popSize,
                      elitism = base::max(1, round(popSize*0.05)),
@@ -368,17 +369,17 @@ turnerModel = function(inputData,
   plot(bestModelp$days, bestModelp$loads, type = "h", col = "grey85",
        ylim = c(0,
                 max(c(dailymin,dailymax,bestModelp$loads,
-                      bestModelp$p),na.rm = TRUE)+10),
+                      bestModelp$p),na.rm = TRUE)+30),
        xlab = "day",
        ylab = "Arbitrary units (a.u)",
        main = "All train/test sets (slices/windows)")
-  polygon(c(rev(nDays),nDays),c(rev(dailymax), dailymin),col="orange", 
+  polygon(c(rev(1:nDays),1:nDays),c(rev(dailymax), dailymin),col="orange", 
           border="black", lty = 2)
   points(bestModelp$days, bestModelp$p, col = "purple", pch = 20)
   legend("topright", c("Training load",
                        "Measured perf",
                        paste0("Modelled perf (all slices, n=",nIntervals,")")),
-         fill = c("grey85", "purple", "orange"), cex = 0.75)
+         fill = c("grey85", "purple", "orange"), cex = 0.6)
   
   # Print results to console
   print("Slice Parameter Sets:", quote = FALSE)
