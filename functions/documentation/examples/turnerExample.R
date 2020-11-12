@@ -1,12 +1,12 @@
 # Source turnerModel.R function directly from github
 library(devtools)
 source_url(
-  "https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/turnerModel.R?token=AGTSF7M743XC3ZH5XHJPV6C7WTYJU"
+  "https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/turnerModel.R"
 )
 
 # Source 'true' data built within the Turner function using a defined par set
 library(RCurl)
-trueData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/data/turner_testing/trueData.csv?token=AGTSF7NPHMTS3TLOTVZUURK7WRAVO")
+trueData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/documentation/data/turner_testing/trueData.csv")
 trueData = read.csv(textConnection(trueData))
 
 # Note the true parameters used to construct this set
@@ -48,20 +48,29 @@ rm(measurements, measureIndex)
 #          probably be safe bounding at 250 or so, but to not constrain too
 #          tightly we bound at 300
 
-#   g0/h0: Initial conditions are a bit trickier. So we leave these a bit wider
-#          as below. Up to the same as p0
+#   g0/h0: Initial conditions
 
-boxConstraints = data.frame("lower"=c(0.01, 0.01, 1, 1, 0.1, 0.1, 25, 0.1, 0.1),
-                            "upper"=c(3, 3, 50, 50, 2, 2, 300, 200, 200))
+# Order of vectors (kg, kh, Tg, Th, alpha, beta, p0, g0, h0)
+boxConstraints = data.frame("lower"=c(0.01, 0.01, 1, 1, 0.5, 0.5, 100, 0.1, 0.1),
+                            "upper"=c(3, 3, 50, 50, 2, 2, 300, 100, 100))
 
 # Now we see if we can recover close to the true parameters with the true data 
 # as input. This forms the first basic test.
 
-test1 = turnerModel(inputData = trueData, constraints = boxConstraints,
-                    doTrace = TRUE, doParallel = TRUE)
+test1 = turnerModel(inputData = trueData,
+                    constraints = boxConstraints,
+                    doTrace = TRUE,
+                    doParallel = TRUE,
+                    maxIt = 5000,
+                    popSize = 120)
 
-# Second, we see what sort of results we get back for the mockData when fitting
-# noisy data that should be somewhat close to the true data
+# Next, we see what sort of results we can get back for the mockData (i.e. 
+# the true data with noise and sampled at a measurement frequency equivalent to
+# every 2 days). Do we get back something close to the true data?
 
-test2 = turnerModel(inputData = mockData, constraints = boxConstraints,
-                    doTrace = TRUE, doParallel = TRUE)
+test2 = turnerModel(inputData = mockData,
+                    constraints = boxConstraints,
+                    doTrace = TRUE,
+                    doParallel = TRUE,
+                    maxIt = 5000,
+                    popSize = 120)
