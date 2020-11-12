@@ -349,7 +349,7 @@ turnerModel = function(inputData,
        ylim = c(0,
                 max(c(bestModelp$G, bestModelp$H, bestModelp$pHat,
                       bestModelp$p, bestModelp$loads),na.rm=TRUE)+10),
-       col = "grey85", ylab = "Arbitrary units (a.u)",
+       col = "grey50", ylab = "Arbitrary units (a.u)",
        xlab = "Day", main = "Key results: Best set found (MAPE_test)")
   points(bestModelp$days, bestModelp$p, pch = 10, col = "purple")
   lines(bestModelp$days, bestModelp$pHat, col = "black")
@@ -360,13 +360,13 @@ turnerModel = function(inputData,
                       "Modelled performance",
                       "Fitness trace",
                       "Fatigue trace"),
-         fill = c("grey85", "purple", "black", "blue", "red"), cex = 0.7)
+         fill = c("grey50", "purple", "black", "blue", "red"), cex = 0.7)
 
   # Plot all sets (interval/region plot)
   dailymin = apply(PerfVals, 1, min)
   dailymax = apply(PerfVals, 1, max)
   nDays = length(bestModelp$days)
-  plot(bestModelp$days, bestModelp$loads, type = "h", col = "grey85",
+  plot(bestModelp$days, bestModelp$loads, type = "h", col = "grey50",
        ylim = c(0,
                 max(c(dailymin,dailymax,bestModelp$loads,
                       bestModelp$p),na.rm = TRUE)+30),
@@ -379,7 +379,7 @@ turnerModel = function(inputData,
   legend("topright", c("Training load",
                        "Measured perf",
                        paste0("Modelled perf (all slices, n=",nIntervals,")")),
-         fill = c("grey85", "purple", "orange"), cex = 0.6)
+         fill = c("grey50", "purple", "orange"), cex = 0.6)
   
   # Print results to console
   print("Slice Parameter Sets:", quote = FALSE)
