@@ -4,11 +4,11 @@
 
 TODO
 
-## Functions
+# Functions
 
 ---
 
-### The basic model
+## The basic model
 
 | Key information                  | Further details  |
 |----------------------------------|------------------|
