@@ -7,64 +7,56 @@ turnerModel = function(inputData,
                        doParallel = FALSE,   # Not parallel by default
                        maxIt = 10000
                        ){
+  # Load dependencies
+  library(caret, GA, deSolve)
   
-  # (1) Check function dependencies (packages)
-  
-  require(caret)        # Handy time-interval slicer function for CV
-  
-  require(GA)           # Genetic Evolution Optimiser
-  
-  require(deSolve)      # Numerical methods differential equation solver
-  
-  # Packages required for parallelisation of GA
+  # Load dependencies (parallel implementation)
   if (doParallel == TRUE){
-    require(parallel)
-    require(foreach)
-    require(iterators)
-    require(doParallel)
-    require(doRNG)        # allows to seed GA search to facilitate replication
+    library(parallel, foreach, iterators, doParallel, doRNG)
   }
   
-  # (2) Function input validation checks
+  # Validation tests
   
-  # Put a check on the number of observed measurements in the dataset
-  if (sum(!is.na(inputData$performances)) < 40){
-    print("Number of observed measurements for fitting the model is small",
-          quote = FALSE)
-    print("Results likely to be poor. Are you sure you want to continue?",
-          quote = FALSE)
-    invisible(readline(prompt = "Press [enter] to continue"))
-  }
+    # Check number of observed measurements in the dataset
+    if (sum(!is.na(inputData$performances)) < 40){
+      print("Number of observed measurements for fitting the model is small",
+            quote = FALSE)
+      print("Results likely to be poor. Are you sure you want to continue?",
+            quote = FALSE)
+      invisible(readline(prompt = "Press [enter] to continue"))
+    }
   
-  # Set default expanding window cross-validation parameters (if not passed)
-  # If initialWindow specified, make user also supply testHorizon and expandRate
-  if(!is.null(initialWindow) && (is.null(testHorizon) || is.null(expandRate))){
-    stop(paste0("Please also supply testHorizon and expandRate arguments with",
-                " initialWindow"))
-  }
+    # If user supplies initialWindow but not testHorizon or expandRate
+    if(!is.null(initialWindow) && (is.null(testHorizon)||is.null(expandRate))){
+      stop("If supplying initialWindow, testHorizon and expandRate must
+                   also be supplied")
+    }
   
-  # If no initialWindow specified, or just testHorizon or expandRate arguments
-  # supplied. Just use following default(s)
-  if(is.null(initialWindow)){
-    initialWindow = round(length(inputData$days) * 0.60, 0)   # 60% of data
-    testHorizon = round(length(inputData$days) * 0.2, 0)      # 20% of data
-    expandRate = round(length(inputData$days) * 0.04, 0)      # 4% of data
-    print("No initialWindow argument supplied", quote = FALSE)
-    print("Defaults used for initialWindow, testHorizon and expandRate",
-          quote = FALSE)
-    print("-----------------------------------------------------------",
-          quote = FALSE)
-    print(paste0("initialWindow = ", initialWindow, " days | (60%)"),
-          quote = FALSE)
-    print(paste0("testHorizon = ", testHorizon, " days | (20%)"),
-          quote = FALSE)
-    print(paste0("expandRate = ", expandRate, " days | (4%)"),
-          quote = FALSE)
-    print("-----------------------------------------------------------",
-          quote = FALSE)
-    print("Check these are appropriate for your implementation",
-          quote = FALSE)
-  }
+    # If no expanding window arguments specified, use following defaults
+    if(is.null(initialWindow)){
+      initialWindow = round(length(inputData$days) * 0.60, 0)   # 60% of data
+      testHorizon = round(length(inputData$days) * 0.2, 0)      # 20% of data
+      expandRate = round(length(inputData$days) * 0.04, 0)      # 4% of data
+      print("No initialWindow argument supplied", quote = FALSE)
+      print("Defaults used for initialWindow, testHorizon and expandRate",
+            quote = FALSE)
+      print("-----------------------------------------------------------",
+            quote = FALSE)
+      print(paste0("initialWindow = ", initialWindow, " days | (60%)"),
+            quote = FALSE)
+      print(paste0("testHorizon = ", testHorizon, " days | (20%)"),
+            quote = FALSE)
+      print(paste0("expandRate = ", expandRate, " days | (4%)"),
+            quote = FALSE)
+      print("-----------------------------------------------------------",
+            quote = FALSE)
+      print("Check these are appropriate for your implementation",
+            quote = FALSE)
+    } else{
+      initialWindow = round(length(inputData$days) * initialWindow/100, 0)
+      testHorizon = round(length(inputData$days) * testHorizon/100, 0)
+      expandRate = round(length(inputData$days) * expandRate/100, 0)
+    }
   
   # Check that the input data has the right colnames
   colnames(inputData) <- c("days", "performances", "loads")
