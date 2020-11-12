@@ -8,7 +8,7 @@
 
 ---
 
-## The basic model
+## 1. The basic model
 
 | Key information                  | Further details  |
 |----------------------------------|------------------|
