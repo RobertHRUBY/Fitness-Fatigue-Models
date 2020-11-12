@@ -11,7 +11,7 @@
 | turnerModel.R     | The non-linear variant of original model system                |               |
 | calvertModel.R    | TBC                                                                                                                                                                                              |               |
 | vdrModel.R        | The variable dose-response model (with and without two initial components)                                                                                                            |               |
-| vdrModelHill.R    | The variable dose-response model with external Hill transform applied to the training load series (with and without two initial components) - TBC with BenO and his work on this                                           |               |
+| **TBC**: vdrModelHill.R    | **TBC**: The variable dose-response model with external Hill transform applied to the training load series (with and without two initial components) - TBC with BenO and his work on this                                           |               |
 | **TBC**: Kalman   | **TBC**: standard model estimation with Kalman filter feedback                                                                                                                                   |               |
 
 ### Other files and functions
