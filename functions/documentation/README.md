@@ -124,3 +124,57 @@ Ben Stephens Hemingway
 |---------------------------------------------------|--------------------|
 | Research (author/year)                            | [link to Research title]() |
 | Any other code, documentation, or online resource | [link to code resource]()  |
+
+
+## 1. The Kalman Filter
+
+| Key information                  | Further details  |
+|----------------------------------|------------------|
+| Source code                      | [kalmanModel.R](../../kalmanModel.R) |
+| Dependencies </br> (packages)    | ``stats``, ``MASS``                |
+
+#### Description and functionality
+TODO
+
+#### Usage
+
+The following is a demonstration of simulating from the Kalman Filter model and
+then performing Maximum Likelihood-based estimation. Note that the user may run
+`increase_likelihood` for as many times as desired.
+
+```
+kalman_model <- create_kalman_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50, tau_h = 15,
+                                    xi = 20,
+                                    sigma_g = 8, sigma_h = 4, rho_gh = -.3,
+                                    initial_g = 35, initial_h = 20,
+                                    initial_sd_g = 10, initial_sd_h = 5,
+                                    initial_rho_gh = 0)
+print(kalman_model)
+
+w <- rep(c(seq(10, 70), rep(0, 14)), 15)
+sim_df <- simulate(kalman_model, w)
+plot(sim_df$w)
+plot(sim_df$y)
+
+
+kf_mod <- initialize_kalman_from_data(sim_df)
+print(kf_mod)
+
+kf_orig <- kf_mod
+kf_mod <- increase_likelihood(kf_mod, sim_df, reps = 10)
+print(kf_mod)
+
+filtered <- filter(kf_mod, sim_df)
+sim_df$fitness_pred <- filtered$X[, 1]
+sim_df$fatigue_pred <- filtered$X[, 2]
+
+# NOTE: Better predict function
+sim_df$pred <- (kf_mod$p_0 + kf_mod$C[1, 1] * sim_df$fitness_pred
+                           + kf_mod$C[1, 2] * sim_df$fatigue_pred)
+
+plot(sim_df$fitness_pred, main = "fitness")
+plot(sim_df$fatigue_pred, main = "fatigue")
+
+plot(sim_df$y)
+points(sim_df$pred, col = 'blue')
+```
