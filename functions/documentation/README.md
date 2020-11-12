@@ -44,8 +44,6 @@ We also include in the option to include an initial component denoted <img src="
 
 > Alternatively, you can try the function `banisterModel()` [(link to documentation)]() which repeatedly approximates the solution of the associated IVP for new candidate estimates (parameters and ICS) and which are chosen by the optimisation algorithm to iteratively reduce the objective function. The ODE solver used in this approach is `lsoda()` within the `deSolve` package: a method that automatically switches between the Adams and BDF method to cope with IVP's for stiff and non-stiff first-order systems.
 
-iteratively estimates the initial condition and model parameters within an optimisation wrapper
-
 #### Usage
 
     basicModel(inputData, 
