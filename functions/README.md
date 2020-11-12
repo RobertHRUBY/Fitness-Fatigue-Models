@@ -5,8 +5,8 @@
 | Code File              | Functionality                                                                                                                                                                                    | Documentation |
 |-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
 | basicModel.R      | The discrete one-component FFM (with and without an initial component)                                                                                                                   |               |
-| standardModelX1.R | The standard discrete two-component model reduced to one scaling constant (with and without two initial components)                                                                            |               |
 | standardModel.R   | The standard discrete two-component model (with and without two initial components)                                                                                                            |               |
+| standardModelK.R | The standard discrete two-component model reduced to one scaling constant (with and without two initial components)                                                                            |               |
 | banisterModel.R   | The original first-order linear system of ODEs (with one or two components) |               |
 | [turnerModel.R](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/functions/turnerModel.R)     | The non-linear variant of original model system                |               |
 | calvertModel.R    | TBC                                                                                                                                                                                              |               |
