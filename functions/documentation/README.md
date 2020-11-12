@@ -130,7 +130,7 @@ Ben Stephens Hemingway
 
 | Key information                  | Further details  |
 |----------------------------------|------------------|
-| Source code                      | [kalmanModel.R](../../kalmanModel.R) |
+| Source code                      | [kalmanModel.R](../kalmanModel.R) |
 | Dependencies </br> (packages)    | ``stats``, ``MASS``                |
 
 #### Description and functionality
