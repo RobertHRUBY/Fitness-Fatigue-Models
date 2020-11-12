@@ -62,14 +62,14 @@ We also include in the option to include an initial component denoted <img src="
 
 | Argument           | Details |
 |--------------------|---------|
-| `inputData`        |         |
-| `constraints`      |         |
+| `inputData`        | The time series of training load values and measured performances. Data frame of three columns in order ("days","performances","loads"). NA values in performance column represent days on which performance not measured. 0 values in loads column represent days where training was not performed        |
+| `constraints`      | Box constraints         |
 | `method`           |         |
 | `startingValues`   |         |
 | `doTrace`          |         |
-| `initialComponent` |         |
-| `initialWindow`    |         |
-| `testHorizon`      |         |
+| `initialComponent` | Supplied as percentage (i.e. 60 is equivalent to 60%)        |
+| `initialWindow`    | Supplied as percentage (i.e. 20 is equivalent to 20%)        |
+| `testHorizon`      | Supplied as percentage (i.e. 5 is equivalent to 5%)       |
 | `expandRate`       |         |
 
 #### Details
