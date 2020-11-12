@@ -15,7 +15,7 @@ TODO
 | Source code                      | [basicModel.R]() |
 | Function call                    | `basicModel()`   |
 | Source function </br> `devtools` | `source_url()`   |
-| Dependencies </br> (packages)    |                  |
+| Dependencies </br> (packages)    | ``stats``, ``ga``                |
 
 #### Description and functionality
 
@@ -28,7 +28,7 @@ The basic model is a one-component impulse-response model of the effect of train
 The first-order linear ODE above can be solved via the method of Laplace transform applied to each term, and then rearranging the substituted transforms - assuming <img src="https://latex.codecogs.com/svg.latex?p(0)=0" title="p(0)=0" /> - in terms of <img src="https://latex.codecogs.com/svg.latex?P(s)" title="P(s)" /> to derive it's transfer function (i.e. the relationship of the system input to output): </br></br>
 <img src="https://latex.codecogs.com/svg.latex?P(s)=-\frac{W(s)}{(s&plus;\frac{1}{\tau})}" title="P(s)=-\frac{W(s)}{(s+\frac{1}{\tau})}" /> </br></br>
 Defining:</br></br>
-<img src="https://latex.codecogs.com/svg.latex?G(s)=-\frac{1}{(s&plus;\frac{1}{\tau})}" title="G(s)=-\frac{1}{(s+\frac{1}{\tau})}" /> </br>
+<img src="https://latex.codecogs.com/svg.latex?G(s)=-\frac{1}{(s&plus;\frac{1}{\tau})}" title="G(s)=-\frac{1}{(s+\frac{1}{\tau})}" /> </br></br>
 Allows us to write the product <img src="https://latex.codecogs.com/svg.latex?P(s)=G(s)W(s)" title="P(s)=G(s)W(s)" /> which can then be solved by the convolution theorem (inverse Laplace transform of the product is its convolution): </br></br>
 <img src="https://latex.codecogs.com/svg.latex?\mathcal{L}^{-1}[P(s)]=\mathcal{L}^{-1}[G(s)W(s)]=(g\ast&space;w)(t)" title="\mathcal{L}^{-1}[P(s)]=\mathcal{L}^{-1}[G(s)W(s)]=(g\ast w)(t)" /> </br></br>
 Which gives: </br></br>
@@ -42,7 +42,7 @@ We also include in the option to include an initial component denoted <img src="
 <img src="https://latex.codecogs.com/svg.latex?\hat{p}(n)&space;=&space;p^*&space;&plus;&space;q\cdot&space;(e^{-\frac{n}{\tau}})&space;&plus;&space;K&space;\sum_{i=1}^{n-1}&space;e^{-\frac{(n-i)}{\tau}}w(i)\cdot&space;\Delta_n" title="\hat{p}(n) = p^* + q\cdot (e^{-\frac{n}{\tau}}) + K \sum_{i=1}^{n-1} e^{-\frac{(n-i)}{\tau}}w(i)\cdot \Delta_n" />
 <br></br>
 
-> Alternatively, you can try the function `banisterModel()` [(link to documentation)]() which repeatedly approximates the solution of the associated IVP for new candidate estimates (parameters and ICS) and which are chosen by the optimisation algorithm to iteratively reduce the objective function. The ODE solver used in this approach is `lsoda()` within the `deSolve` package: a method that automatically switches between the Adams and BDF method to cope with IVP's for stiff and non-stiff first-order systems.
+> Alternatively, you can try the function `banisterModel()` [(link to documentation)](). This function approximates the solution of the associated IVP for each new set of candidates provided by the optimisation algorithm, assessed by iterative reduction of the objective function (MSE). The ODE solver used is `lsoda()` within the `deSolve` package, and is a method that automatically switches between Adams and BDF to cope with IVPs for stiff and non-stiff first-order systems.
 
 #### Usage
 
@@ -71,6 +71,14 @@ We also include in the option to include an initial component denoted <img src="
 | `expandRate`       |         |
 
 #### Details
+
+* The loss function is mean-squared error (MSE) (i.e. mean(squared residuals)). This is used to provide a comparable metric of model fit between folds (where n data points increases and thus RSS would be expected to also increase without normalisation).
+* The default optimisation algorithm used to estimate the parameters is ``L-BFGS-B``, called by `method = 'bfgs'`. This algorithm is a box-constrained limited-memory modification of the quasi-Newton algorithm ``BFGS``, developed by Broydon, Fletcher, Goldfarb and Shanno in 1970. This algorithm is included in the ``optim`` toolbox as part of the R ``stats`` package shipped with the R kernel. The algorithm uses both the function values and gradients to iteratively search the surface of the cost function to find the minimum value.
+* An alternative optimisation algorithm available is a genetic algorithm (GA), from the package ``GA`` available on CRAN. The ``GA`` package provides a number of genetic algorithms for stochastic optimisation of real-valued problems. The tuning parameters selected for the problem are as default tournament selection, BLX (blend) crossover, random mutation around the solution, and a population size minimum 10x the number of free parameters in the model. These options can be changed but require adjustment of the function call `ga()` within the function code file itself, and cannot be passed as arguments to the function `banisterModel()`. For simple models, it is best to first try the gradient approach implemented here, as this often faster.
+* The cross-validation approach
+
+
+
 
 * method "bfgs"
 * method "ga"
@@ -108,3 +116,8 @@ Ben Stephens Hemingway
 |---------------------------------------------------|--------------------|
 | Research (author/year)                            | [link to Research title]() |
 | Any other code, documentation, or online resource | [link to code resource]()  |
+
+
+# References
+1. 
+2. 
