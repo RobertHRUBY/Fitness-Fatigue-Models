@@ -143,6 +143,7 @@ then performing Maximum Likelihood-based estimation. Note that the user may run
 `increase_likelihood` for as many times as desired.
 
 ```
+source("../kalmanModel.R")
 kalman_model <- create_kalman_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50, tau_h = 15,
                                     xi = 20,
                                     sigma_g = 8, sigma_h = 4, rho_gh = -.3,
