@@ -1,4 +1,6 @@
-# The Fitness-Fatigue Model Project: A toolbox for implementing FFMs
+# The Fitness-Fatigue Model Project
+
+## A toolbox for implementing FFMs
 
 This project is a flexible R toolbox for investigating impulse-response models in sport and exercise science. It provides functions and resources to assist with the development and experimentation of models and methods in this area. The structure of the functions contained herein aim to be useful to researchers investigating the structure and validity of these models in theoretical and experimental data-collection scenarios. This repository does not represent an endorsement of these models as 'ready to use' for practitioners. Instead it should be thought of as a toolbox to enhance scientific discussion, understanding, and development in the area of performance modeling. It is hoped the repository will also provide educational value to lecturers, students, and practitioners who wish to learn more or are looking for rich resources to integrate into courses on quantitative methods for sport science.
 
