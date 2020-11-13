@@ -1,10 +1,12 @@
 # Documentation
 
+## Written documentation
+
 | File | Description |
 |-|-|
 | [FFM_documentation.pdf]() | In depth documentation complete for all code files within the functions directory of this repository. |
 
-Nested directories
+## Nested directories
 
 | Directory | Contains |
 |-|-|
