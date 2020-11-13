@@ -6,7 +6,8 @@ source_url(
 
 # Source 'true' data built within the Turner function using a defined par set
 library(RCurl)
-trueData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/documentation/data/turner_testing/trueData.csv?token=AGTSF7KYFZOYZF5KPSXIEB27W6VG6")
+trueData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/
+                  main/functions/documentation/data/turner_testing/trueData.csv")
 trueData = read.csv(textConnection(trueData))
 
 # Note the true parameters used to construct this set
@@ -15,14 +16,13 @@ truePars = c(k1 = 1, k2 = 1.5, T1 = 19, T2 = 11, alpha = 1.3, beta = 1.5,
 
 # Construct a 'noisy' set of data from our true set, we will use this later on
 set.seed(101)
-
 noise = 5
 mockData = data.frame("days" = 1:100,
                        "performances" = trueData$performances + 
                                         rnorm(100, 0, noise),
                        "loads" = trueData$loads)
 
-# Further subset this data set to represent a set of data without a daily value
+# Subset the data to demonstrate a measured value every 2 days
 freq = 2  # As in every 2 days
 measureIndex = seq(1, 100, by = freq)
 measurements = rep(NA, 100)
