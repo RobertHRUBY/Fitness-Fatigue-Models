@@ -62,7 +62,9 @@ The above example only scratches the surface with this particular function, and 
     
     source("standardModel.R")
     
-### Option 2: Using the *devtools* package, obtain the 'raw' URL for the function (can also be found in the [documentation]()) and then source the function directly into R from github.
+### Option 2: Using the *devtools* package
+
+Obtain the 'raw' URL for the function (can also be found in the [documentation]()) and then source the function directly into R from github.
 
     library(devtools)
     source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/standardModel.R)
