@@ -6,7 +6,7 @@ source_url(
 
 # Source 'true' data built within the Turner function using a defined par set
 library(RCurl)
-trueData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/documentation/data/turner_testing/trueData.csv")
+trueData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/documentation/data/turner_testing/trueData.csv?token=AGTSF7KYFZOYZF5KPSXIEB27W6VG6")
 trueData = read.csv(textConnection(trueData))
 
 # Note the true parameters used to construct this set
@@ -61,7 +61,7 @@ test1 = turnerModel(inputData = trueData,
                     constraints = boxConstraints,
                     doTrace = TRUE,
                     doParallel = TRUE,
-                    maxIt = 5000,
+                    maxIt = 2500,
                     popSize = 120)
 
 # Next, we see what sort of results we can get back for the mockData (i.e. 
