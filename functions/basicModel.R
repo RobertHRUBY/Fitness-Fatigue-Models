@@ -6,7 +6,8 @@ basicModel = function(inputData,
                       initialComponent = FALSE,
                       initialWindow = NULL,
                       testHorizon = NULL,
-                      expandRate = NULL){
+                      expandRate = NULL,
+                      doParallel = FALSE){
   
   # Global function dependencies
   
@@ -54,7 +55,7 @@ basicModel = function(inputData,
         }
         # If user has not supplied starting values, generate them (p*,K,Tau)
         if (is.null(startingValues)){
-          
+          # TODO 
         }
       }
   
@@ -76,7 +77,7 @@ basicModel = function(inputData,
         }
         # If user has not supplied starting values, generate them (p*,K,Tau,q)
         if (is.null(startingValues)){
-          
+          # TODO
         }
       }
   
@@ -144,59 +145,218 @@ basicModel = function(inputData,
   
   # Calibration function
     
-    calibrateModel = function(){
+    calibrateModel = function(slices, currentSlice){
       
-      # Loss function
+      # If including the initial component
       if (initialComponent == TRUE){
-        
-      }
       
-      # Loss function
+        # Note to self, order of pars is c(p0,K,T,q)
+        objectiveFn = function(par){
+          # Initialize the vector containing the squared residuals
+          squaredResiduals = numeric(length(measuredPerformance))
+          for (i in 1:length(measuredPerformance)){
+            inputSubset = trainingData[1:measureIndex[i], ]
+            modelledPerformance = par[1] + 
+                                   par[4]*(exp (- (measureIndex[i]/par[3]))) +
+                                   par[2]*(sum(inputSubset$loads *
+                                               exp( - (measureIndex[i] - 
+                                                       inputSubset$days
+                                                       ) / 
+                                                    par[3]
+                                                   )
+                                               )
+                                           )
+            squaredResiduals[i] = (modelledPerformance - 
+                                      measuredPerformance[i]
+                                    )^2  
+          }
+          if (method == "bfgs"){
+            return(mean(squaredResiduals))
+          }
+          if (method == "ga"){
+            return(- mean(squaredResiduals))
+          }
+        } # End of objective/cost function
+        
+        # Performance computation function
+        # TODO
+
+      } # End of if initialComponent == TRUE
+      
+      # If not including the initial component
       if (initialComponent == FALSE){
         
-      }
+        # Note to self, order of pars is c(p0,K,T,q)
+        objectiveFn = function(par){
+          # Initialize the vector containing the squared residuals
+          squaredResiduals = numeric(length(measuredPerformance))
+          for (i in 1:length(measuredPerformance)){
+            inputSubset = trainingData[1:measureIndex[i], ]
+            modelledPerformance <- par[1] + 
+                                   par[2]*(sum(inputSubset$loads *
+                                                exp( - (measureIndex[i] - 
+                                                          inputSubset$days
+                                                ) / 
+                                                  par[3]
+                                                )
+                                              )
+                                           )
+            squaredResiduals[i] = (modelledPerformance - 
+                                      measuredPerformance[i]
+            )^2  
+          }
+          if (method == "bfgs"){
+            return(mean(squaredResiduals))
+          }
+          if (method == "ga"){
+            return(- mean(squaredResiduals))
+          }
+        } # End of objective/cost function
+        
+        # Performance computation function
+        # TODO
+        
+      } # End of if initialComponent == FALSE
       
       # Subset input data into training and testing data for current slice
+      trainingData = inputData[slices$train[[currentSlice]],]
+      testingData = inputData[slices$test[[currentSlice]],]
       
       # Isolate the measurement index and associated performance values
+      
+      # Days on which measurements were taken over the training interval
+      measureIndex = subset(trainingData$days, 
+                             !is.na(trainingData$performances))
+      
+      # Measured performance values over the training interval
+      measuredPerformance = subset(trainingData$performances, 
+                                    !is.na(trainingData$performances))
+      
+      # Measured performance values over the testing interval
+      measuredPerformanceTest = subset(testingData$performances, 
+                                       !is.na(trainingData$performances))
       
       # Fit the model
       
       if (method = "bfgs"){
         require(stats)
         
-        # Extract values, compute performance values
+        fittedModel = optim(par = startingValues,
+                            fn = objectiveFn,
+                            lower = constraints$lower,
+                            upper = constraints$upper,
+                            method = "L-BFGS-B",
+                            control = list(trace = doTrace,
+                                            maxit = 10000)
+                                            # TODO: Make use of parscale
+                            )
+        
+        # Extract and order values
+        fittedModel = unlist(fittedModel)
         if (initialComponent == TRUE){
-          
+          fittedPars = as.numeric(fittedModel[1:4])
+          fittedModel = as.data.frame(t(fittedModel))
+          colnames(fittedModel) = c("p0","K","T","q","MSE","counts_fn",
+                                    "counts_gn","convcode","convergence_message")
         }
-        
         if (initialComponent == FALSE){
-          
+          fittedPars = as.numeric(fittedModel[1:3])
+          fittedModel = as.data.frame(t(fittedModel))
+          colnames(fittedModel) = c("p0","K","T","MSE","counts_fn",
+                                    "counts_gn","convcode","convergence_message")
         }
         
-        
-      }
+      } # End of BFGS Method
       
       if (method = "ga"){
         require(GA)
+        # Includes stochastic local search
+        fittedModel = ga(type = "real-valued",
+                         fitness = objectiveFn,
+                         lower = constraints$lower,
+                         upper = constraints$upper,
+                         maxiter = 10000,
+                         monitor = doTrace,
+                         popSize = 50,
+                         optim = TRUE,
+                         optimArgs = list(method = "L-BFGS-B",
+                                          poptim = 0.1,
+                                          pressel = 0.5,
+                                          control = list(maxit = 1500)
+                                          ),
+                         elitism = 5,
+                         selection = gareal_tourSelection, # Tournament selection
+                         crossover = gareal_blxCrossover,  # BLX (blend crossover)
+                         mutation = gareal_rsMutation,     # Random around solution
+                         run = 150, # Halt if no. consecutive gens w/out improvement
+                         parallel = doParallel, # Snow (windows), multicore (MacOS)
+                         seed = 12345 # Seed for replication later
+                         )
         
-        # Extract values, compute performance values
-        if (initialComponent == TRUE){
-          
-        }
-        
-        if (initialComponent == FALSE){
-          
-        }
+        # Extract values
         
       }
       
+      # Compute performance values across full time series
+      nDays = tail(inputData$days, n = 1)
+      fittedPerf = computePerformance(fittedPars, nDays)
+      
       # Compute prediction errors and descriptive statistics (RSQ, RMSE, MAPE)
-    
+      
+        # Isolate the performance values just for the days that observed values
+        # exist in the testing interval
+        fittedPerfTest = fittedPerf[head(testingData$days, n = 1):
+                                      tail(testingData$days, n = 1)]
+        fittedPerfTest = subset(fittedPerfTest, 
+                                !is.na(testingData$performances))
+      
+        # Functions to compute modeling statistics
+          
+          # R-squared function
+          RSQfunc = function(predicted,actual){
+            rsq = 1 - ( (sum((actual-predicted)^2))  / 
+                        (sum((actual-mean(actual))^2))
+                      ) 
+            return(round(rsq*100,3))
+          }
+          
+          # RMSE function
+          RMSEfunc = function(predicted,actual,days){
+            z = (predicted - actual)^2
+            return(sqrt(sum(z)/days))
+          }
+          
+          # MAPE function
+          MAPEfunc = function(actual,predicted){
+            return(mean(abs((actual-predicted)/actual))*100)
+          }
+        
+        # Compute descriptive statistics
+          
+          # For the training interval
+          RSQTrain = RSQfunc(predicted = fittedPerf[measureIndex],
+                             actual = measuredPerformance)
+          RMSETrain = RMSEfunc(predicted = fittedPerf[measureIndex],
+                               actual = measuredPerformance)
+          
+          # For the testing interval
+          RMSETest = RMSEfunc(predicted = fittedPerfTest,
+                              actual = measuredPerformanceTest)
+          MAPETest = MAPEfunc(actual = measuredPerformanceTest,
+                              predicted = fittedPerfTest)
+          
+          # Compile results
+          fittedPars[1, "RSQTrain"] = RSQTrain
+          fittedPars[2, "RMSETrain"] = RMSETrain
+          fittedPars[3, "RMSETest"] = RMSETest
+          fittedPars[4, "MAPETest"] = MAPETest
+      
       # Create function object to return
-      calibrationObject = list()
+      returnObject = list("fittedPars" = fittedPars,
+                          "fittedPerf" = fittedPerf,
+                          "fittedModel" = fittedModel)
     
-    return(calibrationObject)
+    return(returnObject)
     } # End of calibration function
     
   # Create expanding-window slices
