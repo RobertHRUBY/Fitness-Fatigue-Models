@@ -478,10 +478,10 @@ basicModel = function(inputData,
          col = "grey50", ylab = "Arbitrary units (a.u)",
          xlab = "Day", main = "Fitted model (primary set)")
     lines(inputData$days, primaryPerformances, lty = 1, col = "red", lwd = 2)
-    points(inputData$days, inputData$performances, pch = 20, col = "black")
+    points(inputData$days, inputData$performances, pch = 18, col = "black")
     legend(1, ylimP*1.025,
            c("training load", "fitted model", "observed data"),
-           pch = c(NA,NA,20), lty = c(1,1,NA), 
+           pch = c(NA,NA,18), lty = c(1,1,NA), 
            lwd = c(1,2,NA),
            col = c("grey50","red","black"),
            text.col = c("black","red","black"), cex = .8,
