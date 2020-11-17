@@ -10,9 +10,6 @@
 | [turnerModel.R](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/functions/turnerModel.R)     | The non-linear variant of original model system                |               |
 | calvertModel.R    | TBC                                                                                                                                                                                              |               |
 | vdrModel.R        | The variable dose-response model (with and without two initial components)                                                                                                            |               |
-| **TBC**: vdrModelHill.R    | **TBC**: The variable dose-response model with external Hill transform applied to the training load series (with and without two initial components) - TBC with BenO and his work on this                                           |               |
-| [kalmanModel.R](./kalmanModel.R) | Functions to model fitness and fatigue as latent state vector in Kalman Filter framework     |               |
-
 ### Other
 
 | File        | Functionality   | Documentation   |

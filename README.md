@@ -1,15 +1,18 @@
-## The Fitness-Fatigue Model Project: A toolbox for implementing FFMs
+The Fitness-Fatigue Model Project: A toolbox for implementing FFMs
+==================================================================
 
 This project offers a flexible R toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and experimentation of models and methods. The structure of the functions contained aims to appeal to researchers seeking to investigate the structure and validity of models in both theoretical and experimental (i.e. data collection) scenarios. Please note this is not an endorsement of the models as 'ready to use' in day-to-day sport science practice (particularly not to inform decision making), but rather a toolbox to enhance scientific discourse, understanding, and development in the area of performance modeling. It is also hoped that this repository might also provide educational value to academics, practitioners, and students.
 
-### Repository organisation
+## Repository organisation
 
 | Directory   | Description                                                                      |
 |-------------|----------------------------------------------------------------------------------|
 | [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions)   | R functions, scripts, and documentation |
 | [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Research papers, educational files, notes, and links to other useful resources                  |
 | [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Code and some data files from experimental simulation research (part of my PhD thesis)    |
+| [didactic](./didactic)   | minimal R code with an emphasis on the mathematics underlying the models |
 
+## The Utilities
 ### An introductory example
 
 Fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
@@ -74,6 +77,17 @@ Arguments for functions will vary slightly between different models. Documentati
 
     library(devtools)
     source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/standardModel.R)
+
+## The Didactic Code
+
+Code is written as to be as close to math as possible.
+The response variable is always called `y` and the impulse vector `w`.
+
+For loops are used instead of applys. 
+
+Models exist independently of data. Functions will link the two together:w
+
+
 
 ### Contribute
 
