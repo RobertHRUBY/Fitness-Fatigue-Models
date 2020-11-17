@@ -16,7 +16,6 @@ standardModel = function(inputData,
   # Global function dependencies
   
   require(caret)
-  require(truncnorm)
   require(stats)
   
   # Individual function dependencies
