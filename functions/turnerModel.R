@@ -8,12 +8,13 @@ turnerModel = function(inputData,
                        maxIt = 10000,
                        popSize = 120
                        ){
-  # Load dependencies
+  
+  # Dependencies (main)
   library(caret)
   library(GA)
   library(deSolve)
   
-  # Load dependencies (parallel implementation)
+  # Dependencies (parallel implementation)
   if (doParallel == TRUE){
     library(parallel)
     library(foreach)
@@ -57,7 +58,7 @@ turnerModel = function(inputData,
             quote = FALSE)
       print("-----------------------------------------------------------",
             quote = FALSE)
-      print("Check these are appropriate for your implementation",
+      print("Check these are appropriate for you",
             quote = FALSE)
     } else{
       initialWindow = round(length(inputData$days) * initialWindow/100, 0)
@@ -65,8 +66,8 @@ turnerModel = function(inputData,
       expandRate = round(length(inputData$days) * expandRate/100, 0)
     }
   
-    # Check that the input data has the right colnames
-    colnames(inputData) <- c("days", "performances", "loads")
+  # Check that the input data has the right colnames
+  colnames(inputData) <- c("days", "performances", "loads")
   
   # Calibration function development starts here
   turnerCalibrate = function(sliceIntervals, currentSlice, inputData){
@@ -254,7 +255,7 @@ turnerModel = function(inputData,
         }
           
         # MAPE function
-        MAPEfunc = function(x,y,n){
+        MAPEfunc = function(x,y){
           return(mean(abs((x-y)/x))*100)
         }
       
