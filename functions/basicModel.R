@@ -8,10 +8,29 @@ basicModel = function(inputData,
                       testHorizon = NULL,
                       expandRate = NULL,
                       doParallel = FALSE){
-  
+
+# ------------------------------------------------------------------------------
+# BASIC INPUT VALIDATION AND LOAD DEPENDENCIES
+# ------------------------------------------------------------------------------
+
   # Global function dependencies
   
     require(caret)
+    require(truncnorm)
+    require(stats)
+  
+  # Individual function dependencies
+  
+    if (method == "ga"){
+      require(GA)
+    }
+    if (method == "ga" && "doParallel" == TRUE){
+      require(parallel)
+      require(foreach)
+      require(iterators)
+      require(doParallel)
+      require(doRNG)
+    }
   
   # Validation checks on function call, and subsequently establish conditions
   
@@ -38,7 +57,7 @@ basicModel = function(inputData,
     # Starting values
   
       # Basic model
-      if (initialComponent == FALSE){
+      if (initialComponent == FALSE && method == "bfgs"){
         # If user supplied starting Values
         if (!is.null(startingValues)){
           # Check that starting value vector length is correct
@@ -54,13 +73,16 @@ basicModel = function(inputData,
           }
         }
         # If user has not supplied starting values, generate them (p*,K,Tau)
+        # from random sampling from truncated normal distribution with mean
+        # at middle of constraints
         if (is.null(startingValues)){
-          # TODO 
+          stop("Please supply starting values in order 
+           (p*,K,tau")
         }
       }
   
       # With initial component
-      if (initialComponent == TRUE){
+      if (initialComponent == TRUE && method == "bfgs"){
         # If user supplied starting Values
         if (!is.null(startingValues)){
           # Check that starting value vector length is correct
@@ -77,22 +99,23 @@ basicModel = function(inputData,
         }
         # If user has not supplied starting values, generate them (p*,K,Tau,q)
         if (is.null(startingValues)){
-          # TODO
+          stop("Please supply starting values in order 
+           (p*,K,Tau,q")
         }
       }
   
     # Load series
-    if (!all(is.na(inputData$loads))){
+    if (all(is.na(inputData$loads))){
       stop("Loads cannot contain NA values. Use 0 to indicate no training")
     }
   
     # Time point column (days)
-    if (!all(is.na(inputData$days))){
+    if (all(is.na(inputData$days))){
       stop("Days column in input cannot contain NA values. Use sequential vals")
     }
     
     # Method
-    if (method != "bfgs" || method != "ga"){
+    if (method != "bfgs" && method != "ga"){
       stop("Method supplied incorrectly. Options are 'bfgs' or 'ga'")
     }
   
@@ -141,225 +164,350 @@ basicModel = function(inputData,
     # Optimisation tracing
     if (isTRUE(doTrace) && method == "bfgs"){
       doTrace == 6                              # Optim control argument
+      # if left as true / false value that is argument ready to supply to GA
     }
   
-  # Calibration function
+# ------------------------------------------------------------------------------
+# DEFINE FUNCTIONS USED IN THE PROCESS
+# ------------------------------------------------------------------------------
     
-    calibrateModel = function(slices, currentSlice){
+  # Note:
+  # While some of these functions are 'common', it adds more complexity to have
+  # common file dependencies than to have everything self contained. This
+  # unfortunately leads to more repetition of basic code, but I prefer this in
+  # some sense as it reduces user issues.
+    
+  # Model computation
+    
+    computeModel = function(loads, pars){
       
-      # If including the initial component
+      p = numeric(length = length(loads))
+      s = 1:length(loads)
+      df0 = data.frame(s, "ws" = loads)
+      
+      # With initial component
       if (initialComponent == TRUE){
-      
-        # Note to self, order of pars is c(p0,K,T,q)
-        objectiveFn = function(par){
-          # Initialize the vector containing the squared residuals
-          squaredResiduals = numeric(length(measuredPerformance))
-          for (i in 1:length(measuredPerformance)){
-            inputSubset = trainingData[1:measureIndex[i], ]
-            modelledPerformance = par[1] + 
-                                   par[4]*(exp (- (measureIndex[i]/par[3]))) +
-                                   par[2]*(sum(inputSubset$loads *
-                                               exp( - (measureIndex[i] - 
-                                                       inputSubset$days
-                                                       ) / 
-                                                    par[3]
-                                                   )
-                                               )
-                                           )
-            squaredResiduals[i] = (modelledPerformance - 
-                                      measuredPerformance[i]
-                                    )^2  
-          }
-          if (method == "bfgs"){
-            return(mean(squaredResiduals))
-          }
-          if (method == "ga"){
-            return(- mean(squaredResiduals))
-          }
-        } # End of objective/cost function
-        
-        # Performance computation function
-        # TODO
-
-      } # End of if initialComponent == TRUE
-      
-      # If not including the initial component
-      if (initialComponent == FALSE){
-        
-        # Note to self, order of pars is c(p0,K,T,q)
-        objectiveFn = function(par){
-          # Initialize the vector containing the squared residuals
-          squaredResiduals = numeric(length(measuredPerformance))
-          for (i in 1:length(measuredPerformance)){
-            inputSubset = trainingData[1:measureIndex[i], ]
-            modelledPerformance <- par[1] + 
-                                   par[2]*(sum(inputSubset$loads *
-                                                exp( - (measureIndex[i] - 
-                                                          inputSubset$days
-                                                ) / 
-                                                  par[3]
-                                                )
-                                              )
-                                           )
-            squaredResiduals[i] = (modelledPerformance - 
-                                      measuredPerformance[i]
-            )^2  
-          }
-          if (method == "bfgs"){
-            return(mean(squaredResiduals))
-          }
-          if (method == "ga"){
-            return(- mean(squaredResiduals))
-          }
-        } # End of objective/cost function
-        
-        # Performance computation function
-        # TODO
-        
-      } # End of if initialComponent == FALSE
-      
-      # Subset input data into training and testing data for current slice
-      trainingData = inputData[slices$train[[currentSlice]],]
-      testingData = inputData[slices$test[[currentSlice]],]
-      
-      # Isolate the measurement index and associated performance values
-      
-      # Days on which measurements were taken over the training interval
-      measureIndex = subset(trainingData$days, 
-                             !is.na(trainingData$performances))
-      
-      # Measured performance values over the training interval
-      measuredPerformance = subset(trainingData$performances, 
-                                    !is.na(trainingData$performances))
-      
-      # Measured performance values over the testing interval
-      measuredPerformanceTest = subset(testingData$performances, 
-                                       !is.na(trainingData$performances))
-      
-      # Fit the model
-      
-      if (method = "bfgs"){
-        require(stats)
-        
-        fittedModel = optim(par = startingValues,
-                            fn = objectiveFn,
-                            lower = constraints$lower,
-                            upper = constraints$upper,
-                            method = "L-BFGS-B",
-                            control = list(trace = doTrace,
-                                            maxit = 10000)
-                                            # TODO: Make use of parscale
-                            )
-        
-        # Extract and order values
-        fittedModel = unlist(fittedModel)
-        if (initialComponent == TRUE){
-          fittedPars = as.numeric(fittedModel[1:4])
-          fittedModel = as.data.frame(t(fittedModel))
-          colnames(fittedModel) = c("p0","K","T","q","MSE","counts_fn",
-                                    "counts_gn","convcode","convergence_message")
+        for (n in 1:length(s)){
+          df1 <- df0[1:s[n], ]
+          p[n] <- pars[1] + pars[4]*(exp (- (i/pars[3]))) +
+            pars[2]* sum(df1$ws * exp(-(n-df1$s) / pars[3]))
         }
-        if (initialComponent == FALSE){
-          fittedPars = as.numeric(fittedModel[1:3])
-          fittedModel = as.data.frame(t(fittedModel))
-          colnames(fittedModel) = c("p0","K","T","MSE","counts_fn",
-                                    "counts_gn","convcode","convergence_message")
-        }
-        
-      } # End of BFGS Method
-      
-      if (method = "ga"){
-        require(GA)
-        # Includes stochastic local search
-        fittedModel = ga(type = "real-valued",
-                         fitness = objectiveFn,
-                         lower = constraints$lower,
-                         upper = constraints$upper,
-                         maxiter = 10000,
-                         monitor = doTrace,
-                         popSize = 50,
-                         optim = TRUE,
-                         optimArgs = list(method = "L-BFGS-B",
-                                          poptim = 0.1,
-                                          pressel = 0.5,
-                                          control = list(maxit = 1500)
-                                          ),
-                         elitism = 5,
-                         selection = gareal_tourSelection, # Tournament selection
-                         crossover = gareal_blxCrossover,  # BLX (blend crossover)
-                         mutation = gareal_rsMutation,     # Random around solution
-                         run = 150, # Halt if no. consecutive gens w/out improvement
-                         parallel = doParallel, # Snow (windows), multicore (MacOS)
-                         seed = 12345 # Seed for replication later
-                         )
-        
-        # Extract values
-        
       }
       
-      # Compute performance values across full time series
-      nDays = tail(inputData$days, n = 1)
-      fittedPerf = computePerformance(fittedPars, nDays)
+      # Without initial component
+      if (initialComponent == FALSE){
+        for (n in 1:length(s)){
+          df1 <- df0[1:s[n], ]
+          p[n] <- pars[1] + pars[2]*sum(df1$ws * exp(-(n-df1$s) / pars[3]))
+        }
+      }
       
-      # Compute prediction errors and descriptive statistics (RSQ, RMSE, MAPE)
+    return(p)  
       
-        # Isolate the performance values just for the days that observed values
-        # exist in the testing interval
-        fittedPerfTest = fittedPerf[head(testingData$days, n = 1):
-                                      tail(testingData$days, n = 1)]
-        fittedPerfTest = subset(fittedPerfTest, 
-                                !is.na(testingData$performances))
-      
-        # Functions to compute modeling statistics
-          
-          # R-squared function
-          RSQfunc = function(predicted,actual){
-            rsq = 1 - ( (sum((actual-predicted)^2))  / 
-                        (sum((actual-mean(actual))^2))
-                      ) 
-            return(round(rsq*100,3))
-          }
-          
-          # RMSE function
-          RMSEfunc = function(predicted,actual,days){
-            z = (predicted - actual)^2
-            return(sqrt(sum(z)/days))
-          }
-          
-          # MAPE function
-          MAPEfunc = function(actual,predicted){
-            return(mean(abs((actual-predicted)/actual))*100)
-          }
-        
-        # Compute descriptive statistics
-          
-          # For the training interval
-          RSQTrain = RSQfunc(predicted = fittedPerf[measureIndex],
-                             actual = measuredPerformance)
-          RMSETrain = RMSEfunc(predicted = fittedPerf[measureIndex],
-                               actual = measuredPerformance)
-          
-          # For the testing interval
-          RMSETest = RMSEfunc(predicted = fittedPerfTest,
-                              actual = measuredPerformanceTest)
-          MAPETest = MAPEfunc(actual = measuredPerformanceTest,
-                              predicted = fittedPerfTest)
-          
-          # Compile results
-          fittedPars[1, "RSQTrain"] = RSQTrain
-          fittedPars[2, "RMSETrain"] = RMSETrain
-          fittedPars[3, "RMSETest"] = RMSETest
-          fittedPars[4, "MAPETest"] = MAPETest
-      
-      # Create function object to return
-      returnObject = list("fittedPars" = fittedPars,
-                          "fittedPerf" = fittedPerf,
-                          "fittedModel" = fittedModel)
+    } # End of computeModel function
     
-    return(returnObject)
-    } # End of calibration function
     
-  # Create expanding-window slices
+  # ----------------------------------------------------------------------------
+  # Select appropriate global objective function
+  # ----------------------------------------------------------------------------
+    
+    # With initial component
+    # --------------------------------------------------------------------------
+    if (initialComponent == TRUE){
+      # Note to self, order of pars is c(p0,K,T,q)
+      objectiveFn = function(par){
+        # Initialize the vector containing the squared residuals
+        squaredResiduals = numeric(length(measuredPerformance))
+        for (i in 1:length(measuredPerformance)){
+          inputSubset = trainingData[1:measureIndex[i], ]
+          modelledPerformance = par[1] + 
+            par[4]*(exp (- (measureIndex[i]/par[3]))) +
+            par[2]*(sum(inputSubset$loads * 
+                        exp(-(measureIndex[i]-inputSubset$days)/par[3])))
+          squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
+        }
+        if (method == "bfgs"){
+          return(mean(squaredResiduals))
+        }
+        if (method == "ga"){
+          return(- mean(squaredResiduals))
+        }
+      } # End of objective/cost function
+    }
+    
+    # Without initial component
+    # --------------------------------------------------------------------------
+    if (initialComponent == FALSE){
+      # Note to self, order of pars is c(p0,K,T,q)
+      objectiveFn = function(par){
+        # Initialize the vector containing the squared residuals
+        squaredResiduals = numeric(length(measuredPerformance))
+        for (i in 1:length(measuredPerformance)){
+          inputSubset = trainingData[1:measureIndex[i], ]
+          modelledPerformance <- par[1] + 
+            par[2]*(sum(inputSubset$loads *
+                          exp(-(measureIndex[i]-inputSubset$days)/par[3])))
+          squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
+        }
+        if (method == "bfgs"){
+          return(mean(squaredResiduals))
+        }
+        if (method == "ga"){
+          return(- mean(squaredResiduals))
+        }
+      } # End of objective/cost function
+    }
+
+    
+  # ----------------------------------------------------------------------------
+  # Cross validation fitting function
+  # ----------------------------------------------------------------------------
+  
+  crossValidate = function(slices, currentSlice){
+    
+    # Fit the model
+    if (method == "bfgs"){
+      
+      # Call optimiser
+      sliceModel = optim(par = startingValues,
+                         fn = objectiveFn,
+                         lower = constraints$lower,
+                         upper = constraints$upper,
+                         method = "L-BFGS-B",
+                         control = list(trace = doTrace,
+                                        maxit = 10000)
+                         # TODO: Make use of parscale at some point
+                         )
+      
+      # Extract values and summary object
+      sliceModel = unlist(sliceModel)
+      if (initialComponent == TRUE){
+        slicePars = as.numeric(sliceModel[1:4])
+        sliceSummary = as.data.frame(t(sliceModel))
+        colnames(sliceSummary) = c("p0","K","Tau","q","MSE","counts_fn",
+                                     "counts_gn","convcode","convergence")
+      }
+      if (initialComponent == FALSE){
+        slicePars = as.numeric(sliceModel[1:3])
+        sliceSummary = as.data.frame(t(sliceModel))
+        colnames(sliceSummary) = c("p0","K","Tau","MSE","counts_fn",
+                                   "counts_gn","convcode","convergence")
+      }
+    }
+    
+    if (method == "ga"){
+      
+      # Call optimiser
+      sliceModel = ga(type = "real-valued",
+                      fitness = objectiveFn,
+                      lower = constraints$lower,
+                      upper = constraints$upper,
+                      maxiter = 10000,
+                      monitor = doTrace,
+                      popSize = 90,
+                      optim = TRUE,
+                      optimArgs = list(method = "L-BFGS-B",
+                                       poptim = 0.1,
+                                       pressel = 0.5,
+                                       control = list(maxit = 1500)
+                      ),
+                      elitism = 5,
+                      selection = gareal_tourSelection, # Tournament
+                      crossover = gareal_blxCrossover,  # BLX (blend)
+                      mutation = gareal_rsMutation,     # Random
+                      run = 150, # Halt value
+                      parallel = doParallel, # multi-platform
+                      seed = 12345 # Seed for replication later
+                      ) # End of GA call
+      
+      # Extract values and summary object
+      slicePars = as.numeric(sliceModel@solution[1,])
+      sliceSummary = summary(primaryModel)
+      
+    }
+    
+    # Compute model performance values (i.e. predictions) over whole time series
+    
+      slicePerf = computeModel(loads = inputData$loads,
+                               pars = slicePars)
+    
+      # Compute model metrics (Train + Test blocks) - RSQ, RMSE, MAPE
+      # For the training interval
+      RSQtrain = RSQfunc(predicted = slicePerf[measureIndex],
+                         actual = measuredPerformance)
+      RMSEtrain = RMSEfunc(predicted = slicePerf[measureIndex],
+                           actual = measuredPerformance,
+                           days = length(measuredPerformance))
+      MAPEtrain = MAPEfunc(actual = measuredPerformance,
+                           predicted = slicePerf[measureIndex])
+      
+      # For the testing interval
+      RMSEtest = RMSEfunc(predicted = slicePerf[testingIndex],
+                          actual = measuredPerformanceTest, 
+                          days = length(measuredPerformanceTest))
+      MAPEtest = MAPEfunc(actual = measuredPerformanceTest,
+                          predicted = slicePerf[testingIndex])
+      
+      # Compile results
+      sliceStats = data.frame("RSQtrain" = RSQtrain,
+                              "RMSEtrain" = RMSEtrain,
+                              "MAPEtrain" = MAPEtrain,
+                              "RMSEtest" = RMSEtest,
+                              "MAPEtest" = MAPEtest)
+  
+    # Return object
+    returnObject = list("sliceSummary" = sliceSummary,
+                        "slicePars" = slicePars,
+                        "sliceStats" = sliceStats,
+                        "slicePerf" = slicePerf,
+                        "optim" = sliceModel)
+    
+  return(returnObject)
+  } # End of crossValidate function
+  
+  # --------------------------------------------------------------------------
+  # Model Metrics functions
+  # --------------------------------------------------------------------------
+    
+    # RSQ (R-squared)
+    RSQfunc = function(predicted,actual){
+      rsq = 1 - ( (sum((actual-predicted)^2))  / 
+                    (sum((actual-mean(actual))^2))
+      ) 
+      return(round(rsq*100,3))
+    }
+    
+    # RMSE (Root mean squared error)
+    RMSEfunc = function(predicted,actual,days){
+      z = (predicted - actual)^2
+      return(sqrt(sum(z)/days))
+    }
+    
+    # MAPE (Mean absolute percentage error)
+    MAPEfunc = function(actual,predicted){
+      return(mean(abs((actual-predicted)/actual))*100)
+    }
+    
+# ------------------------------------------------------------------------------
+# FIRST OPERATION: Fitting to all available data
+# ------------------------------------------------------------------------------
+
+    trainingData = inputData
+    measureIndex = subset(inputData$days, 
+                          !is.na(inputData$performances))
+    measuredPerformance = subset(inputData$performances, 
+                                 !is.na(inputData$performances))
+    
+    if (method == "ga"){
+      
+      # Fit model
+      primaryModel = ga(type = "real-valued",
+                        fitness = objectiveFn,
+                        lower = constraints$lower,
+                        upper = constraints$upper,
+                        maxiter = 10000,
+                        monitor = doTrace,
+                        popSize = 90,
+                        optim = TRUE,
+                        optimArgs = list(method = "L-BFGS-B",
+                                         poptim = 0.1,
+                                         pressel = 0.5,
+                                         control = list(maxit = 1500)
+                        ),
+                        elitism = 5,
+                        selection = gareal_tourSelection, # Tournament
+                        crossover = gareal_blxCrossover,  # BLX (blend)
+                        mutation = gareal_rsMutation,     # Random
+                        run = 150, # Halt value
+                        parallel = doParallel, # multi-platform
+                        seed = 12345 # Seed for replication later
+                        ) # End of GA call
+      
+      # Optimization related plotting (See GA package documentation)
+      # https://cran.r-project.org/web/packages/GA/GA.pdf
+      plot(primaryModel)
+      # TODO: Explore plotting functionality further
+      
+      # Extract values and create summary object (primarySummary)
+      primaryPars = as.numeric(primaryModel@solution[1,])
+      primarySummary = summary(primaryModel)
+    }
+    
+    if (method == "bfgs"){
+      
+      # Fit model
+      primaryModel = optim(par = startingValues,
+                           fn = objectiveFn,
+                           lower = constraints$lower,
+                           upper = constraints$upper,
+                           method = "L-BFGS-B",
+                           control = list(trace = doTrace,
+                                          maxit = 10000)
+                           # TODO: Make use of parscale at some point
+                           )
+      
+      # Extract values and create summary object (primarySummary)
+      primaryModel = unlist(primaryModel)
+      if (initialComponent == TRUE){
+        primaryPars = as.numeric(primaryModel[1:4])
+        primarySummary = as.data.frame(t(primaryModel))
+        primarySummary[,c(-6,-7,-8,-9)] = 
+          round(as.numeric(primarySummary[,c(-6,-7,-8,-9)]),3)
+        colnames(primarySummary) = c("p0","K","Tau","q","MSE","counts_fn",
+                                     "counts_gn","convcode","convergence")
+      }
+      if (initialComponent == FALSE){
+        primaryPars = as.numeric(primaryModel[1:3])
+        primarySummary = as.data.frame(t(primaryModel))
+        primarySummary[,c(-5,-6,-7,-8)] = 
+          round(as.numeric(primarySummary[,c(-5,-6,-7,-8)]),3)
+        colnames(primarySummary) = c("p0","K","Tau","MSE","counts_fn",
+                                     "counts_gn","convcode","convergence")
+      }
+      
+    }
+    
+    # Compute model predicted performance (primaryPerformances) - Vector
+    primaryPerformances = computeModel(loads = inputData$loads, 
+                                       pars = primaryPars)
+    
+    # Plot model predicted performance
+    ylimP =  max(c(primaryPerformances, inputData$loads,
+                   inputData$performances), na.rm = TRUE)
+    plot(inputData$days, inputData$loads, type = "h", 
+         ylim = c(0,ylimP*1.05),
+         col = "grey50", ylab = "Arbitrary units (a.u)",
+         xlab = "Day", main = "Fitted model (primary set)")
+    lines(inputData$days, primaryPerformances, lty = 1, col = "red", lwd = 2)
+    points(inputData$days, inputData$performances, pch = 20, col = "black")
+    legend(1, ylimP*1.025,
+           c("training load", "fitted model", "observed data"),
+           pch = c(NA,NA,20), lty = c(1,1,NA), 
+           lwd = c(1,2,NA),
+           col = c("grey50","red","black"),
+           text.col = c("black","red","black"), cex = .8,
+           x.intersp = 2,
+           y.intersp = 1.5, bty = "n")
+    
+    # Compute model statistics (primaryStats) - RSQ, RMSE, MAPE
+    RSQPrimary = RSQfunc(predicted = primaryPerformances[measureIndex],
+                         actual = measuredPerformance)
+    RMSEPrimary = RMSEfunc(predicted = primaryPerformances[measureIndex],
+                           actual = measuredPerformance, 
+                           days = length(measuredPerformance))
+    MAPEPrimary = MAPEfunc(actual = primaryPerformances[measureIndex],
+                           predicted = measuredPerformance)
+    
+    primaryStats = data.frame("RSQ" = RSQPrimary,
+                     "RMSE" = RMSEPrimary,
+                     "MAPE" = MAPEPrimary)
+    
+    rm(measureIndex, measuredPerformance, trainingData)
+    
+# ------------------------------------------------------------------------------ 
+# SECOND OPERATION: Cross validating using expanding-window
+# ------------------------------------------------------------------------------
+  # Create the expanding-window slices
   
     slices = createTimeSlices(inputData$days,
                             initialWindow = initialWindow,
@@ -367,33 +515,145 @@ basicModel = function(inputData,
                             fixedWindow = FALSE,
                             skip = expandRate)
   
-    nSlices = length(slice$train)
+    nSlices = length(slices$train)
   
-  # Fit the slices
+  # Fit the expanding window slices
   
     sliceModels <- list()
+    cvMetrics = matrix(data = NA, ncol = 5, nrow = nSlices)
+    cvPerf = matrix(data = NA, ncol = nSlices, nrow = length(inputData$days))
     for (i in 1:nSlices){
+      
       print(paste0("Training model | Slice ", i), quote = FALSE)
-      sliceModels[[i]] = calibrateModel(slices, currentSlice = i)
+      currentSlice = i
+      # Subset input data into training and validation data for current slice
+      trainingData = inputData[slices$train[[currentSlice]],]
+      testingData = inputData[slices$test[[currentSlice]],]
+      # Isolate the measurement index and associated performance values
+      measureIndex = subset(trainingData$days, 
+                            !is.na(trainingData$performances))
+      testingIndex = subset(testingData$days,
+                            !is.na(testingData$performances))
+      # Measured performance values over the training interval
+      measuredPerformance = subset(trainingData$performances, 
+                                   !is.na(trainingData$performances))
+      measuredPerformanceTest = subset(testingData$performances, 
+                                       !is.na(testingData$performances))
+      
+      sliceModels[[i]] = crossValidate(slices, currentSlice)
+      
+      cvMetrics[i,] = as.numeric(sliceModels[[i]]$sliceStats[1,])
+      cvPerf[,i] = as.numeric(sliceModels[[i]]$slicePerf)
     }
+    
+    # Compute results
+
+      # Averages across all the slices
+      colnames(cvMetrics) = c("RSQtrain","RMSEtrain","MAPEtrain","RMSEtest",
+                              "MAPEtest")
+      cvSummary = apply(cvMetrics, 2, summary)
+      sliceNames = c()
+      for (i in 1:nSlices){
+        sliceNames[i] = paste0("slice_",i)
+      }
+      rownames(cvMetrics) = sliceNames
+      colnames(cvPerf) = sliceNames
+      
+      # Model summary (parameter values + optim ref) - Loop depending on IC
+      if (initialComponent == TRUE){
+        cvParms = matrix(data = NA, nrow = nSlices, ncol = 4)
+        for (i in 1:nSlices){
+          cvParms[i,] = as.numeric(sliceModels[[i]]$slicePars)
+        }
+        colnames(cvParms) = c("p*","K","Tau","q")
+        rownames(cvParms) = sliceNames
+      }
+      if (initialComponent == FALSE){
+        cvParms = matrix(data = NA, nrow = nSlices, ncol = 3)
+        for (i in 1:nSlices){
+          cvParms[i,] = as.numeric(sliceModels[[i]]$slicePars)
+        }
+        colnames(cvParms) = c("p*","K","Tau")
+        rownames(cvParms) = sliceNames
+      }
+      
+      # Plot cross-validation interval
+      
+      dailymin = apply(cvPerf, 1, min)
+      dailymax = apply(cvPerf, 1, max)
+      ylimP = max(c(dailymax,inputData$performances,
+                    inputData$loads), na.rm = TRUE)
+      nDays = length(inputData$days)
+      plot(inputData$days, inputData$loads, type = "h", col = "grey50",
+           ylim = c(0,ylimP*1.05),
+           xlab = "Day",
+           ylab = "Arbitrary units (a.u)",
+           main = "Fitted set with CV estimates")
+      polygon(c(rev(1:nDays),1:nDays),c(rev(dailymax), dailymin),col="orange", 
+              border="grey30", lty = 2, lwd = 0.5)
+      lines(inputData$days, primaryPerformances, lty = 1, col = "red", lwd = 2)
+      points(inputData$days, inputData$performances, pch = 18, 
+             col = "black", cex = 0.8)
+      legend(1, ylimP*1.025,
+             c("training load", "cv models", "fitted model", "observed data"),
+             pch = c(NA,NA,NA,20), lty = c(1,1,1,NA), 
+             lwd = c(1,4,2,NA),
+             col = c("grey50","orange","red","black"),
+             text.col = c("grey50","orange","red","black"), cex = .8,
+             x.intersp = 2,
+             y.intersp = 1.5, bty = "n")
+      
+      
+# ------------------------------------------------------------------------------
+# THIRD OPERATION: Results tabulation, plotting, printing to console
+# ------------------------------------------------------------------------------  
   
-  # Tabulate results, print these to console, and generate plots
+  # Print output
+    
+    print("Process completed: Printing main summary information", quote = FALSE)
+    print("------------------------------------------------------------------",
+          quote = FALSE)
+    print("Optimisation summary (Main Set):", quote = FALSE)
+    print("", quote = FALSE)
+    print(primarySummary)
+    print("", quote = FALSE)
+    print("Model fit metrics (Main set):", quote = FALSE)
+    print(primaryStats)
+    print("", quote = FALSE)
+    print("------------------------------------------------------------------",
+          quote = FALSE)
+    print("", quote = FALSE)
+    print("Printing cross-validation information")
+    print("------------------------------------------------------------------",
+          quote = FALSE)
+    print("Summary statistics across expanding windows:", quote = FALSE)
+    print(cvSummary)
+    print("", quote = FALSE)
+    print("Model metrics for each expanding window", quote = FALSE)
+    print(cvMetrics)
+    print("", quote = FALSE)
+    print("Fitted parameter values across expanding windows:", quote = FALSE)
+    print(cvParms)
+    print("", quote = FALSE)
+    print("------------------------------------------------------------------",
+          quote = FALSE)
+    print("COMPLETE. Returning object", quote = FALSE)
   
-    # Collate all performance values across slices for region plot
+  # Structure object to return to user
     
-    # Best set found (by lowest MAPE_test, between slices)
+    mainSet = list("summary" = primarySummary,
+                   "stats" = primaryStats,
+                   "predictions" = primaryPerformances,
+                   "optim" = primaryModel)
     
-    # Summary statistics
+    crossValidation = list("summary" = cvSummary,
+                           "metrics" = cvMetrics,
+                           "parameters" = cvParms,
+                           "predictions" = cvPerf,
+                           "raw" = sliceModels)
     
-    # Plot best set
-    
-    # Plot all slices (region plot)
-    
-    # Print results to console (all slices, summary statistics, best set)
+    returnObject = list("main" = mainSet,
+                        "cv" = crossValidation)
   
-  # Structure object to return
-    
-    mainObject = list()
-  
-return(mainObject)  
+return(returnObject)  
 } # End of basicModel() function
