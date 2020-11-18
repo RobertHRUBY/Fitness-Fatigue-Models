@@ -6,8 +6,8 @@ basicModel = function(inputData,
                       initialComponent = FALSE,
                       initialWindow = NULL,
                       testHorizon = NULL,
-                      expandRate = NULL,
-                      doParallel = FALSE){
+                      expandRate = NULL
+                      ){
 
 # ------------------------------------------------------------------------------
 # BASIC INPUT VALIDATION AND LOAD DEPENDENCIES
@@ -23,16 +23,13 @@ basicModel = function(inputData,
     if (method == "ga"){
       require(GA)
     }
-    if (method == "ga" && "doParallel" == TRUE){
-      require(parallel)
-      require(foreach)
-      require(iterators)
-      require(doParallel)
-      require(doRNG)
-    }
   
   # Validation checks on function call, and subsequently establish conditions
   
+    if (dim(inputData)[2] != 3){
+      stop("Are you sure the input data is of 3 column form in order from L to R:
+           days, performances, loads?")
+    }
     # Column names of input data
     colnames(inputData) <- c("days", "performances", "loads")
     
@@ -315,7 +312,7 @@ basicModel = function(inputData,
                       crossover = gareal_blxCrossover,  # BLX (blend)
                       mutation = gareal_rsMutation,     # Random
                       run = 150, # Halt value
-                      parallel = doParallel, # multi-platform
+                      parallel = FALSE, # multi-platform
                       seed = 12345 # Seed for replication later
                       ) # End of GA call
       
@@ -418,7 +415,7 @@ basicModel = function(inputData,
                         crossover = gareal_blxCrossover,  # BLX (blend)
                         mutation = gareal_rsMutation,     # Random
                         run = 150, # Halt value
-                        parallel = doParallel, # multi-platform
+                        parallel = FALSE, # multi-platform
                         seed = 12345 # Seed for replication later
                         ) # End of GA call
       
@@ -494,8 +491,8 @@ basicModel = function(inputData,
     RMSEPrimary = RMSEfunc(predicted = primaryPerformances[measureIndex],
                            actual = measuredPerformance, 
                            days = length(measuredPerformance))
-    MAPEPrimary = MAPEfunc(actual = primaryPerformances[measureIndex],
-                           predicted = measuredPerformance)
+    MAPEPrimary = MAPEfunc(actual = measuredPerformance,
+                           predicted = primaryPerformances[measureIndex])
     
     primaryStats = data.frame("RSQ" = RSQPrimary,
                      "RMSE" = RMSEPrimary,
