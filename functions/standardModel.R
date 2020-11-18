@@ -33,7 +33,11 @@ standardModel = function(inputData,
   
   # Validation checks on function call, and subsequently establish conditions
   
-  # Column names of input data
+  # Column dim and names of input data
+  if (dim(inputData)[2] != 3){
+    stop("Are you sure the input data is of 3 column form in order from L to R:
+         days, performances, loads?")
+  }
   colnames(inputData) <- c("days", "performances", "loads")
   
   # Box constraints
@@ -165,9 +169,9 @@ standardModel = function(inputData,
     # if left as true / false value that is argument ready to supply to GA
   }
   
-  # ------------------------------------------------------------------------------
-  # DEFINE FUNCTIONS USED IN THE PROCESS
-  # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# DEFINE FUNCTIONS USED IN THE PROCESS
+# ------------------------------------------------------------------------------
   
   # Note:
   # While some of these functions are 'common', it adds more complexity to have
@@ -399,9 +403,9 @@ standardModel = function(inputData,
     return(mean(abs((actual-predicted)/actual))*100)
   }
   
-  # ------------------------------------------------------------------------------
-  # FIRST OPERATION: Fitting to all available data
-  # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# FIRST OPERATION: Fitting to all available data
+# ------------------------------------------------------------------------------
   
   trainingData = inputData
   measureIndex = subset(inputData$days, 
@@ -508,8 +512,8 @@ standardModel = function(inputData,
   RMSEPrimary = RMSEfunc(predicted = primaryPerformances[measureIndex],
                          actual = measuredPerformance, 
                          days = length(measuredPerformance))
-  MAPEPrimary = MAPEfunc(actual = primaryPerformances[measureIndex],
-                         predicted = measuredPerformance)
+  MAPEPrimary = MAPEfunc(actual = measuredPerformance,
+                         predicted = primaryPerformances[measureIndex])
   
   primaryStats = data.frame("RSQ" = RSQPrimary,
                             "RMSE" = RMSEPrimary,
@@ -517,9 +521,9 @@ standardModel = function(inputData,
   
   rm(measureIndex, measuredPerformance, trainingData)
   
-  # ------------------------------------------------------------------------------ 
-  # SECOND OPERATION: Cross validating using expanding-window
-  # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ 
+# SECOND OPERATION: Cross validating using expanding-window
+# ------------------------------------------------------------------------------
   # Create the expanding-window slices
   
   slices = createTimeSlices(inputData$days,
@@ -617,9 +621,9 @@ standardModel = function(inputData,
          y.intersp = 1.5, bty = "n")
   
   
-  # ------------------------------------------------------------------------------
-  # THIRD OPERATION: Results tabulation, plotting, printing to console
-  # ------------------------------------------------------------------------------  
+# ------------------------------------------------------------------------------
+# THIRD OPERATION: Results tabulation, plotting, printing to console
+# ------------------------------------------------------------------------------  
   
   # Print output
   
