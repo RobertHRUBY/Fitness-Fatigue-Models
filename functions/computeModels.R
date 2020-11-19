@@ -197,8 +197,18 @@ computeModels = function(model = NULL,
         stop("Incorrect parameters supplied. Please supply a vector of 
              c(kg,kh,Tg,Th,alpha,beta,p0,g0,h0")
       }
-      library(deSolve)
+      require(deSolve)
       computedModel = turnerCompute(parms, loadSeries)
+    }
+  
+  # Banister model
+    if (model == "banister"){
+      if (length(parms) != 7){
+        stop("Incorrect parameters supplied. Please supply a vector of 
+             c(kg,kh,Tg,Th,p0,g0,h0")
+      }
+      require(deSolve)
+      computedModel = banisterCompute(parms, loadSeries)
     }
   
   # Return computed model of choice
