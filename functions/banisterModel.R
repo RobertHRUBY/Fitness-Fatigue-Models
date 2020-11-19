@@ -1,20 +1,20 @@
-turnerModel = function(inputData,
-                       constraints,
-                       doTrace = FALSE,
-                       initialWindow = NULL,
-                       testHorizon = NULL,
-                       expandRate = NULL,
-                       doParallel = FALSE,
-                       maxIt = 1000,
-                       popSize = 120,
-                       gaSelection = 'gareal_tourSelection',
-                       gaCrossover = 'gareal_blxCrossover',
-                       gaMutation = 'gareal_rsMutation',
-                       gaElitism = 7.5
-                       ){
+banisterModel = function(inputData,
+                         constraints,
+                         doTrace = FALSE,
+                         initialWindow = NULL,
+                         testHorizon = NULL,
+                         expandRate = NULL,
+                         doParallel = FALSE,
+                         maxIt = 1000,
+                         popSize = 120,
+                         gaSelection = 'gareal_tourSelection',
+                         gaCrossover = 'gareal_blxCrossover',
+                         gaMutation = 'gareal_rsMutation',
+                         gaElitism = 7.5
+                         ){
   
   # Basic reference info, parameter order through code file:
-  # c(kg, kh, Tg, Th, alpha, beta, p*, g0, h0)
+  # c(kg, kh, Tg, Th, p*, g0, h0)
   
   # Dependencies (main)
   require(caret)
@@ -50,7 +50,7 @@ turnerModel = function(inputData,
     stop("Bounds incorrectly specified. Check values")
   }
   
-  if (dim(constraints)[1] != 9){
+  if (dim(constraints)[1] != 7){
     stop("Box constraints of incorrect dimension")
   }
 
@@ -123,17 +123,17 @@ turnerModel = function(inputData,
     turnerSolve = function(t, y, parms){
       r = c()
       r[1] = (parms[1]*currentLoad) - 
-        ((1/parms[3]) * y["G"]^(parms[5]))
+        ((1/parms[3]) * y["G"])
       r[2] = (parms[2]*currentLoad) - 
-        ((1/parms[4]) * y["H"]^(parms[6]))
+        ((1/parms[4]) * y["H"])
       return(list(r))
     } # end of turnerSolve
     # Solve model
     for (j in 1:length(compData$days)){
       currentLoad = compData$loads[j]
       if (j == 1){
-        stateInit = c(G = parms[8],     # Fitness
-                      H = parms[9])     # Fatigue
+        stateInit = c(G = parms[6],     # Fitness
+                      H = parms[7])     # Fatigue
       } else{
         # Initialize based on previous value
         stateInit = c(G = compData$G[j-1],    # Fitness 
@@ -149,7 +149,7 @@ turnerModel = function(inputData,
         compData$G[j] = unname(out[2,2])
         compData$H[j] = unname(out[2,3])
       }
-      compData$pHat[j] = parms[7] + compData$G[j] - compData$H[j]
+      compData$pHat[j] = parms[5] + compData$G[j] - compData$H[j]
     } # End of solve loop
     return(compData)
   } # End of turnerCompute
@@ -169,9 +169,9 @@ turnerModel = function(inputData,
     turnerSolve = function(t, y, parmsAndICS){
       r = c()
       r[1] = (parmsAndICS[1]*currentLoad) - 
-        ((1/parmsAndICS[3]) * y["G"]^(parmsAndICS[5]))
+        ((1/parmsAndICS[3]) * y["G"])
       r[2] = (parmsAndICS[2]*currentLoad) - 
-        ((1/parmsAndICS[4]) * y["H"]^(parmsAndICS[6]))
+        ((1/parmsAndICS[4]) * y["H"])
       return(list(r))
     } # end of turnerSolve
     
@@ -181,8 +181,8 @@ turnerModel = function(inputData,
       currentLoad = compData$loads[j]
       
       if (j == 1){
-        stateInit = c(G = parmsAndICS[8],     # Fitness
-                      H = parmsAndICS[9])     # Fatigue
+        stateInit = c(G = parmsAndICS[6],     # Fitness
+                      H = parmsAndICS[7])     # Fatigue
       } else{
         # Initialize based on previous value
         stateInit = c(G = compData$G[j-1],    # Fitness 
@@ -201,7 +201,7 @@ turnerModel = function(inputData,
         compData$H[j] = unname(out[2,3])
       }
       
-      compData$pHat[j] = parmsAndICS[7] + compData$G[j] - compData$H[j]
+      compData$pHat[j] = parmsAndICS[5] + compData$G[j] - compData$H[j]
       
     } # End of solve loop
     
@@ -428,7 +428,7 @@ turnerModel = function(inputData,
   cvMetrics = matrix(data = NA, ncol = 5, nrow = nSlices)
   cvPerf = matrix(data = NA, ncol = nSlices+1, nrow = length(inputData$days)+1)
   cvPerf[,1] = 0:length(inputData$days)
-  cvParms = matrix(data = NA, nrow = nSlices, ncol = 9)
+  cvParms = matrix(data = NA, nrow = nSlices, ncol = 7)
   sliceNames = c()
   for (i in 1:nSlices){
     

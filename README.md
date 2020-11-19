@@ -1,4 +1,4 @@
-# The Fitness-Fatigue Model Project
+# The Fitness-Fatigue Model Software Project
 
 ## A toolbox for implementing FFMs
 
