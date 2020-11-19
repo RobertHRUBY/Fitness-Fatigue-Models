@@ -453,7 +453,7 @@ banisterModel = function(inputData,
   cvSummary = apply(cvMetrics, 2, summary)
   
   colnames(cvPerf) = c("days",sliceNames)
-  colnames(cvParms) = c("kg","kh","Tg","Th","alpha","beta","p0","g0","h0")
+  colnames(cvParms) = c("kg","kh","Tg","Th","p0","g0","h0")
   colnames(cvSummary) = c("RSQtrain","RMSEtrain","MAPEtrain","RMSEtest",
                           "MAPEtest")
   rownames(cvParms) = sliceNames
