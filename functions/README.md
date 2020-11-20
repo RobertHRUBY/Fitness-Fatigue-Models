@@ -6,9 +6,9 @@ Currently available functions:
 
 | Function | File | Description | Function | File | Description |
 |-|-|-|-|-|-|
-| **basicModel()** | [basicModel.R](basicModel.R) | Fit the one-component model | **banisterModel()** | [banisterModel.R](banisterModel.R) | Solve and fit the original model system |
-| **standardModel()** | [standardModel.R](standardModel.R) | Fit the two-component model | **turnerModel()** | [turnerModel.R](turnerModel.R) | Solve and fit non-linear variant of original system |
-| **calvertModel()** | [calvertModel.R](calvertModel.R) | Fit the two-component model with exponential delay on fitness | **computeModels()** | [computeModels.R](computeModels.R) | Wrapper function to compute the models for given parameters |
+| `basicModel()` | [basicModel.R](basicModel.R) | Fit the one-component model | `banisterModel()` | [banisterModel.R](banisterModel.R) | Solve and fit the original model system |
+| `standardModel()` | [standardModel.R](standardModel.R) | Fit the two-component model | `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve and fit non-linear variant of original system |
+| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fit the two-component model with exponential delay on fitness | `computeModels()` | [computeModels.R](computeModels.R) | Wrapper function to compute the models for given parameters |
 
 <insert table>
 
