@@ -8,7 +8,7 @@ The goal of this project is to expedite research and development of fitness-fati
 
 ## Navigating this repository
 
-TODO - Decision tree
+![navigate](software/utilities/documentation/img/navigate.svg)
 
 ## Contribute
 
