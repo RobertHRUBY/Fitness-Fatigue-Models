@@ -2,9 +2,9 @@
 
 Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for each. Furthermore, code files with examples are provided [here](documentation/code_examples).
 
-An introductory example is provided further down in this README.
+*An introductory example is provided further down in this README.*
 
-Currently available functions:
+## Currently available functions:
 
 | Function | File | Description | Function | File | Description |
 |-|-|-|-|-|-|
