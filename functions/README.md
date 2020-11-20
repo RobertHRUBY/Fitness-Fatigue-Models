@@ -96,7 +96,7 @@ Various progress info is provided during the fitting process if argument `doTrac
 
 Once the process has finished, output is provided in the console and plotting window to assist in quantifying model fit and average model performance (i.e. via out-of-sample assessment). This information is also saved to the object assigned to the function call.
 
-![plot](documentation/img/introductory_example.svg)
+![plot](documentation/img/introductory_example.eps)
 
     [1] Process completed: Printing main summary information
     [1] ------------------------------------------------------------------
