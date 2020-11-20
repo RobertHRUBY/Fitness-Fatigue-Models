@@ -1,6 +1,6 @@
 # Utilities: An R toolbox
 
-Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for all the functions. Furthemore, raw code examples provided [here](documentation/code_examples). Listed below are the currently available functions:
+Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for all the functions. Furthemore, code files with examples are provided [here](documentation/code_examples). Listed below are the currently available functions:
 
 | Function | File | Description | Function | File | Description |
 |-|-|-|-|-|-|
