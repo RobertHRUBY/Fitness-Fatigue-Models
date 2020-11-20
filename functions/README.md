@@ -1,4 +1,15 @@
-# The R toolbox
+# Utilities: An R toolbox
+
+Bespoke functions written in R for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking.
+
+## Getting started
+
+We give an example use of these resources to fit the standard fitness-fatigue model to a set of experimental training and measured performance data. First, recall the model of interest is stated as follows:
+
+<img src="https://latex.codecogs.com/svg.latex?\hat{p}(t)&space;=&space;p^*&space;&plus;&space;k_g&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" title="\hat{p}(t) = p^* + k_g \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" />
+
+The first step is to 
+
 
 ## Model fitting resources
 
