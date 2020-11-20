@@ -22,5 +22,3 @@ Get in touch if you have a resource you think would fit here. To do this open an
 ### Support
 
 Issue Tracker: https://github.com/bsh2/Fitness-Fatigue-Models/issues
-
-If you are having issues, please do let us know.
