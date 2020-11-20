@@ -8,7 +8,7 @@ Bespoke functions, written in [R](https://www.r-project.org/), for fitting and e
 
 Consider a researcher looking to fit a fitness-fatigue model to a set of experimental data (i.e. a time-series of quantified training load and measured performance values).
 
-Note, you will need to install the following packages (`RCurl`,`devtools`) to follow along in your own R interpreter (e.g. [R-studio](https://rstudio.com/)). You can do this by running the following code:
+*Note, you will need to install the following packages (`RCurl`,`devtools`) to follow along in your own R interpreter (e.g. [R-studio](https://rstudio.com/)). You can do this by running the following code:*
 
     install.packages("RCurl")
     install.packages("devtools")
