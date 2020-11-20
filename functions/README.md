@@ -12,8 +12,6 @@ Bespoke functions, written in [R](https://www.r-project.org/), for fitting and e
 | `standardModel()` | [standardModel.R](standardModel.R) | Fit the two-component model | `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve and fit non-linear variant of original system |
 | `calvertModel()` | [calvertModel.R](calvertModel.R) | Fit the two-component model with exponential delay on fitness | `computeModels()` | [computeModels.R](computeModels.R) | Wrapper function to compute the models for known parameters |
 
-<insert table>
-
 ## Getting started: An introductory example
 
 Consider a researcher looking to fit a fitness-fatigue model to a set of experimental data (i.e. a time-series of quantified training load and measured performance values).
