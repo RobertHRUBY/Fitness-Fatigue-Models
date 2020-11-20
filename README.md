@@ -1,4 +1,4 @@
-# The Fitness-Fatigue Model Software Project
+# The Fitness-Fatigue Model Project
 
 ## Introduction
 
