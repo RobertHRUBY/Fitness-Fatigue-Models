@@ -7,3 +7,4 @@ fittedModel = standardModel(inputData = mockData,
                             constraints = boxConstraints,
                             startingValues = startAt,
                             doTrace = TRUE)
+
