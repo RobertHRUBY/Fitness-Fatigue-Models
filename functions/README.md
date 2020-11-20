@@ -11,13 +11,15 @@ Note, you will need to install the following packages (`RCurl`,`devtools`) to re
     install.packages("RCurl")
     install.packages("devtools")
 
-1. To begin with, the researcher imports their data into the environment. For the purposes of the example, we load a set of mock data provided [in the repository](documentation/data/mockData.csv):
+### 1. Load data
+
+To begin with, the researcher imports or loads their data into the environment. For the purposes of the example, we import a set of mock data provided [here](documentation/data/mockData.csv) using the code below:
 
     library(RCurl)
-    mockData = getURL() #TODO ONCE DIRECTORIES ARE SORTED
+    mockData = getURL()
     mockData = read.csv(textConnection(mockData))
 
-Inspect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training occurred on a given day.
+Inspect the structure of the dataset. It should be in three column form, in order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training occurred on a given day.
 
     head(mockData)
     days   performances    loads
@@ -28,8 +30,7 @@ Inspect the structure of the dataset. It should be in three column form, in the 
        5          402.3     0.00
        6          418.9     0.00
     
-*Note*: The order of the data, and appropriate use of NA and zero values matters, but column names do not. However it is a good habit to get into formatting it as shown above when using these functions.
-
+*Note*: The order of the data, and appropriate use of NA and zero values as described is important, and this format is consistent across all the functions.
 
 2. 
 
