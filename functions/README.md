@@ -1,14 +1,37 @@
 # Utilities: An R toolbox
 
-Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking.
+Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation]() with examples is provided for all the functions.
 
-## Getting started
+## Getting started: An introductory example
 
-Consider the example that a researcher wishes to fit the standard fitness-fatigue model to a set of experimental data (i.e. quantified training load and measured performances). 
+Consider a researcher looking to fit the standard fitness-fatigue model to a set of experimental data (i.e. a time-series of quantified training load and measured performance values).
 
-1. The first step is to import your data into the environment. 
+Note, you will need to install the following packages (`RCurl`,`devtools`) to reproduce the example below in your own R interpreter (e.g. [R-studio](https://rstudio.com/)). You can do this by running the following code:
+
+    install.packages("RCurl")
+    install.packages("devtools")
+
+1. To begin with, the researcher imports their data into the environment. For the purposes of the example, we load a set of mock data provided [in the repository](documentation/data/mockData.csv):
+
+    library(RCurl)
+    mockData = getURL() #TODO ONCE DIRECTORIES ARE SORTED
+    mockData = read.csv(textConnection(mockData))
+
+Inspect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training occurred on a given day.
+
+    head(mockData)
+    days   performances    loads
+       1          466.2    56.35
+       2             NA     0.00
+       3          440.5    59.15
+       4             NA   110.60
+       5          402.3     0.00
+       6          418.9     0.00
+    
+*Note*: The order of the data, and appropriate use of NA and zero values matters, but column names do not. However it is a good habit to get into formatting it as shown above when using these functions.
 
 
+2. 
 
 We give an example use of these resources to fit the standard fitness-fatigue model to a set of experimental training and measured performance data. First, recall the model of interest is stated as follows:
 
