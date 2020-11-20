@@ -1,6 +1,6 @@
 # Utilities: An R toolbox
 
-Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for each. Furthermore, code files with examples are provided [here](documentation/code_examples).
+Includes easy to use functions for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking in [R](https://www.r-project.org/). Complete [documentation](documentation/utilities_documentation.pdf) is provided for each. Furthermore, code files with reproducible examples are provided [here](documentation/code_examples).
 
 *An introductory example is provided further down in this README.*
 
@@ -16,7 +16,7 @@ Bespoke functions, written in [R](https://www.r-project.org/), for fitting and e
 
 Consider a researcher looking to fit a fitness-fatigue model to a set of experimental data (i.e. a time-series of quantified training load and measured performance values).
 
-*Note, you will need to install the following packages (`RCurl`,`devtools`) to follow along in your own R interpreter (e.g. [R-studio](https://rstudio.com/)). You can do this by running the following code:*
+*Note, you will need to install the following packages* (`RCurl`,`devtools`) *to follow along in your own R interpreter (e.g. [R-studio](https://rstudio.com/)). You can do this by running the following code:*
 
     install.packages("RCurl")
     install.packages("devtools")
