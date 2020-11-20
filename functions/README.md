@@ -1,8 +1,14 @@
 # Utilities: An R toolbox
 
-Bespoke functions written in R for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking.
+Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking.
 
 ## Getting started
+
+Consider the example that a researcher wishes to fit the standard fitness-fatigue model to a set of experimental data (i.e. quantified training load and measured performances). 
+
+1. The first step is to import your data into the environment. 
+
+
 
 We give an example use of these resources to fit the standard fitness-fatigue model to a set of experimental training and measured performance data. First, recall the model of interest is stated as follows:
 
