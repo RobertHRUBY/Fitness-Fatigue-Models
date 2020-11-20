@@ -42,7 +42,7 @@ Inspect the structure of the dataset. It should be in three column form, in orde
     
 *Note: The order of the data, and appropriate use of NA and zero values as described is important, and this format is consistent across all the functions.*
 
-### 2. Import the model function
+### 2. Import the model fitting function
 
 You can read more about the available functions and associated code files in the [documentation](documentation/utilities.pdf). However, for this example we will consider the standard fitness-fatigue model, described as follows:
 
@@ -63,7 +63,7 @@ In the case of the standard model (without initial components), there are 5 free
       
     # Order of vector: p*, kg, Tg, kh, Th
     boxConstraints = data.frame("lower" = c(150, 0.8, 1, 0.8, 1),
-                                  "upper" = c(800, 3, 50, 3, 50))
+                                "upper" = c(800, 3, 50, 3, 50))
 
 When fitting the standard model via a gradient-descent approach (default), starting values for the optimizer must be provided. This is as simple as assigning the following vector:
 
