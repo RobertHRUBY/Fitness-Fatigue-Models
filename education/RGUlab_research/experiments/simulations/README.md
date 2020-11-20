@@ -8,6 +8,6 @@ The effects of measurement error and testing frequency on the standard fitness-f
 
 ### Simulation 2: [optim-initialValues](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations/optim-initialValues)
 
-Investigating parameter estimation approaches for the standard fitness-fatigue model: From exhaustive grid-search to calibration-based simulation using gradient-based and evolutionary strategies
+Investigating parameter estimation approaches for the standard fitness-fatigue model: From exhaustive grid-search to fitting simulation using gradient-based and evolutionary strategies
 
 **RESEARCH PAPER COMING SOON**
