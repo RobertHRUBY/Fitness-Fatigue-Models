@@ -1,15 +1,11 @@
-# Documentation
+# Documentation: Utilities
 
-## Written documentation
+Written documentation
 
-| File | Description |
-|-|-|
-| [FFM_documentation.pdf]() | In depth documentation complete for all code files within the functions directory of this repository. |
+* [utilities_documentation.pdf](utilities_documentation.pdf) | In depth documentation complete for all code files within the utilities directory of the software repository
 
-## Nested directories
+Nested directories:
 
-| Directory | Contains |
-|-|-|
-| data | Various data files used in the [documentation]() to demonstrate example function implementations |
-| examples | Code files relating to the examples provided in the [documentation]() |
-| img | Image files relevant to the documentation or repository |
+* [data](data/) | Various data sets used in the written documentation and code examples to demonstrate function implementation
+* [img](img/) | Container for misc screenshots/figures relevant to the documentation or whole repository. Can be largely ignored
+* [code_examples](code_examples/) | Self-contained reproducible code examples for each utility function
