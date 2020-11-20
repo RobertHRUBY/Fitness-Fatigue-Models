@@ -40,7 +40,12 @@ You can read more about the available functions and associated code files in the
 
 <img src="https://latex.codecogs.com/svg.latex?\hat{p}(t)&space;=&space;p^*&space;&plus;&space;k_g&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" title="\hat{p}(t) = p^* + k_g \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" />
 
+As a user, you can choose to [download](standardModel.R) and source the code file into your environment yourself. But arguably the more convenient method is to use the package `devtools` to source the file directly into R. To do the latter we first find the 'raw' URL for the code file (see [this guide](https://help.data.world/hc/en-us/articles/115006300048-GitHub-how-to-find-the-sharable-download-URL-for-files-on-GitHub)). Once we have this, we just run the following code:
 
+    library(devtools)
+    source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/code/utilities/standardModel.R)
+    
+    
 
 
 ## Model fitting resources
