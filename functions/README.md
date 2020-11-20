@@ -1,6 +1,8 @@
 # Utilities: An R toolbox
 
-Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation]() with examples is provided for all the functions. Below are the listed functions:
+Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation]() with examples is provided for all the functions. Listed below are the currently available functions:
+
+
 
 <insert table>
 
@@ -94,7 +96,7 @@ Various progress info is provided during the fitting process if argument `doTrac
 
 Once the process has finished, output is provided in the console and plotting window to assist in quantifying model fit and average model performance (i.e. via out-of-sample assessment). This information is also saved to the object assigned to the function call.
 
-![plot](documentation/img/introductory_plot.jpeg)
+![plot](documentation/img/introductory_example.svg)
 
     [1] Process completed: Printing main summary information
     [1] ------------------------------------------------------------------
