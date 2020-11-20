@@ -1,6 +1,8 @@
 # Utilities: An R toolbox
 
-Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for all the functions. Furthemore, code files with examples are provided [here](documentation/code_examples). Listed below are the currently available functions:
+Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for all the functions. Furthemore, code files with examples are provided [here](documentation/code_examples). 
+
+Currently available functions:
 
 | Function | File | Description | Function | File | Description |
 |-|-|-|-|-|-|
@@ -63,7 +65,7 @@ In the case of the standard model (without initial components), there are 5 free
     boxConstraints = data.frame("lower" = c(150, 0.8, 1, 0.8, 1),
                                   "upper" = c(800, 3, 50, 3, 50))
 
-When fitting the standard model via a gradient-descent approach (default), starting values for the optimizer must be provided (not required with a genetic algorithm with stochastic local-search approach). This is as simple as assigning the following vector:
+When fitting the standard model via a gradient-descent approach (default), starting values for the optimizer must be provided. This is as simple as assigning the following vector:
 
     # Order of vector: p*, kg, Tg, kh, Th
     startAt = c(400, 1, 30, 1.3, 15)
