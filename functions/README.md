@@ -45,23 +45,101 @@ As a user, you can choose to [download](standardModel.R) and source the code fil
     library(devtools)
     source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/code/utilities/standardModel.R)
     
+You will then notice the function `standardModel()` appears in your global environment. This is the function we will use shortly.
+
+### 3. Set up constraints and fit the model
+
+Most of the functions included in this repository provide some useful customisation (e.g. optimisation approach, out-of-sample assessment parameters, parallel optimisation, initial traces for fitness/fatigue), so its important that as a user you look through the [documentation]() to assess the right arguments for your use-case. However, a consistent requirement is the specification of box constraints for the model parameters. 
+
+In the case of the standard model (without initial components), there are 5 free parameters (p*, kg, Tg, kh, Th), and so we specify constraints for these as follows:
+      
+    # Order of vector: p*, kg, Tg, kh, Th
+    boxConstraints = data.frame("lower" = c(150, 0.8, 1, 0.8, 1),
+                                  "upper" = c(800, 3, 50, 3, 50))
+
+When fitting the standard model via a gradient-descent approach (default), starting values for the optimizer must be provided (not required with a genetic algorithm with stochastic local-search approach). This is as simple as assigning the following vector:
+
+    # Order of vector: p*, kg, Tg, kh, Th
+    startAt = c(400, 1, 30, 1.3, 15)
+
+Call the fitting function (gradient-descent optimisation as default) with out-of-sample assessment via an expanding-window approach
+
+    fittedModel = standardModel(inputData = mockData,
+                                constraints = boxConstraints,
+                                startingValues = startAt,
+                                doTrace = TRUE)
+
+Various progress info is provided during the fitting process if argument `doTrace = TRUE`.
+
+    [1] No initialWindow argument supplied
+    [1] Defaults used for initialWindow, testHorizon and expandRate
+    [1] -----------------------------------------------------------
+    [1] initialWindow = 67 days | (60%)
+    [1] testHorizon = 22 days | (20%)
+    [1] expandRate = 4 days | (4%)
+    [1] -----------------------------------------------------------
+    [1] Check these are appropriate for your implementation
+    iter   10 value 3282.025078
+    iter   20 value 3075.110966
+    iter   30 value 2992.355807
+    iter   40 value 521.848620
+    iter   50 value 130.772137
+    iter   60 value 121.758553
+    iter   70 value 114.062328
+    iter   80 value 10.139348
+    iter   90 value 0.472754
+    final  value 0.472754 
+    converged
+    ...
+
+Once the process has finished, output is provided in the console and plotting window to assist in quantifying model fit and average model performance (i.e. via out-of-sample assessment). This information is also saved to the object assigned to the function call.
+
+![plot](documentation/img/introductory_plot.jpeg)
+
+    [1] Process completed: Printing main summary information
+    [1] ------------------------------------------------------------------
+    [1] Optimisation summary (Main Set):
+    [1] 
+           p0 k_g  Tau_g   k_h  Tau_h   MSE counts_fn counts_gn convcode
+      499.645 0.8 20.386 1.402 10.125 0.473       107       107        0
+      
+                                          convergence
+      CONVERGENCE: REL_REDUCTION_OF_F <= FACTR*EPSMCH
+
+        Model fit metrics (Main set):
+        
+           RSQ       RMSE        MAPE
+        99.996   0.687571   0.1421066
+
+    [1] "Printing cross-validation information"
+    [1] ------------------------------------------------------------------
+    [1] Summary statistics across expanding windows:
     
+            RSQtrain RMSEtrain  MAPEtrain RMSEtest  MAPEtest
+    Min.     99.9950 0.4466963 0.09074603 1.419750 0.2408380
+    1st Qu.  99.9960 0.4646787 0.09558683 1.610950 0.2629409
+    Median   99.9970 0.5438228 0.10714373 1.643802 0.2636312
+    Mean     99.9964 0.5260290 0.10824618 1.642467 0.2738462
+    3rd Qu.  99.9970 0.5840220 0.12238690 1.726176 0.2995587
+    Max.     99.9970 0.5909250 0.12536742 1.811659 0.3022620
+    
+    [1] Model metrics for each expanding window
+    
+            RSQtrain RMSEtrain  MAPEtrain RMSEtest  MAPEtest
+    slice_1   99.997 0.4466963 0.09074603 1.726176 0.2995587
+    slice_2   99.997 0.4646787 0.09558683 1.811659 0.3022620
+    slice_3   99.995 0.5438228 0.10714373 1.610950 0.2636312
+    slice_4   99.996 0.5840220 0.12238690 1.419750 0.2408380
+    slice_5   99.997 0.5909250 0.12536742 1.643802 0.2629409
+    
+    [1] Fitted parameter values across expanding windows:
+    
+                  p0 k_g    Tau_g      k_h    Tau_h
+    slice_1 500.0468 0.8 20.52273 1.402431 10.17462
+    slice_2 500.1330 0.8 20.50480 1.402960 10.16465
+    slice_3 500.1174 0.8 20.48568 1.402744 10.16055
+    slice_4 499.8783 0.8 20.47246 1.401686 10.16378
+    slice_5 499.8289 0.8 20.45724 1.401614 10.15852
 
-
-## Model fitting resources
-
-| Code file | Associated function(s) | Functionality |
-|-|-|-|
-| [basicModel.R](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/functions/basicModel.R) | basicModel() | Function to fit the discrete one-component FFM (with optional initial component) |
-| standardModel.R | standardModel() | Function to fit the discrete two-component FFM (with optional initial components on fitness and fatigue) |
-| banisterModel.R | banisterModel() | Solve and fit the original first-order linear system of differential equations. Choice of a one or two component system |
-| [turnerModel.R](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/functions/turnerModel.R) | turnerModel() | Solve and fit the non-linear variant of the original model system proposed by Turner et al. (2017) |
-| calvertModel.R | calvertModel() | Function to fit the discrete two-component FFM with exponential delay on fitness component |
-| vdrModel.R | vdrModel() | Functions to fit the variable dose-response model with and without an external Hill transform (threshold saturation) fitted and applied to the training load values  |
-| [kalmanModel.R](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/functions/kalmanModel.R) | ... | Functions to model fitness and fatigue as latent state vector in Kalman Filter framework |
-
-## Other resources
-
-| File | Associated function(s) | Functionality |
-|-|-|-|
-| [computeModels.R](https://github.com/bsh2/Fitness-Fatigue-Models/blob/main/functions/computeModels.R) | computeModels() | Function to compute model predictions for a selected FFM given a definite set of parameter values and training load series (plus initial conditions if appropriate) |
+    [1] ------------------------------------------------------------------
+    [1] COMPLETE. Returning object
