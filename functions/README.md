@@ -1,6 +1,6 @@
 # Utilities: An R toolbox
 
-Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for all the functions. Furthemore, code files with examples are provided [here](documentation/code_examples). 
+Bespoke functions, written in [R](https://www.r-project.org/), for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities.pdf) is provided for all the functions. Furthermore, code files with examples are provided [here](documentation/code_examples). 
 
 Currently available functions:
 
@@ -8,7 +8,7 @@ Currently available functions:
 |-|-|-|-|-|-|
 | `basicModel()` | [basicModel.R](basicModel.R) | Fit the one-component model | `banisterModel()` | [banisterModel.R](banisterModel.R) | Solve and fit the original model system |
 | `standardModel()` | [standardModel.R](standardModel.R) | Fit the two-component model | `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve and fit non-linear variant of original system |
-| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fit the two-component model with exponential delay on fitness | `computeModels()` | [computeModels.R](computeModels.R) | Wrapper function to compute the models for given parameters |
+| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fit the two-component model with exponential delay on fitness | `computeModels()` | [computeModels.R](computeModels.R) | Wrapper function to compute the models for known parameters |
 
 <insert table>
 
