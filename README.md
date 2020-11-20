@@ -1,108 +1,26 @@
-The Fitness-Fatigue Model Project: A toolbox for implementing FFMs
-==================================================================
+# The Fitness-Fatigue Model Project
 
-This project offers a flexible R toolbox for investigating impulse-response models in sport and exercise science; providing functions and information to assist with the development and experimentation of models and methods. The structure of the functions contained aims to appeal to researchers seeking to investigate the structure and validity of models in both theoretical and experimental (i.e. data collection) scenarios. Please note this is not an endorsement of the models as 'ready to use' in day-to-day sport science practice (particularly not to inform decision making), but rather a toolbox to enhance scientific discourse, understanding, and development in the area of performance modeling. It is also hoped that this repository might also provide educational value to academics, practitioners, and students.
+## Introduction
 
-## Repository organisation
+This project is developing open-source, robust, and flexible [utilities](software/utilities) for fitting and evaluating fitness-fatigue models (FFMs); with modern optimisers, out-of-sample assessment, and input checking. In addition, [illustrative code](software/illustrative) (i.e. didactic-style) has been constructed, and which guides the user through the application of several advanced methods via an interactive procedural flow. Thorough documentation, explanatory examples, and mock data are provided with each software resource.
 
-| Directory   | Description                                                                      |
-|-------------|----------------------------------------------------------------------------------|
-| [functions](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/functions)   | R functions, scripts, and documentation |
-| [resources](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/resources)   | Research papers, educational files, notes, and links to other useful resources                  |
-| [simulations](https://github.com/bsh2/Fitness-Fatigue-Model/tree/main/simulations) | Code and some data files from experimental simulation research (part of my PhD thesis)    |
-| [didactic](./didactic)   | minimal R code with an emphasis on the mathematics underlying the models |
+The goal of this project is to expedite research and development of fitness-fatigue models and methods in the sport and exercise sciences, and to reduce initial barriers to study. It is hoped the resources contained will be useful to researchers, educators, students and practitioners alike. The repository is not an endorsement of these models as "ready to use". Rather, it should be thought of as a set of tools to aid scientific understanding, accelerate development, and enrich discussion in this area of performance modeling in sport. Within the repository there are also rich educational materials for lecturers, students and practitioners seeking to learn more about this area of sport science.
 
-## The Utilities
-### An introductory example
+## Navigating this repository
 
-Fitting the standard fitness-fatigue model (below) to experimental data is as simple as:
+![navigate](software/utilities/documentation/img/navigate.svg)
 
-<img src="https://latex.codecogs.com/svg.latex?\hat{p}(t)&space;=&space;p^*&space;&plus;&space;k_g&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" title="\hat{p}(t) = p^* + k_g \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" />
+## Contribute
 
-    # Import your experimental data set
-    
-    experimentalData = read.csv("experimentalData.csv")
-    
-Data should be in following format, with NA values indicating no measurement on a given day. Zero indicates no training occurred.
-  
-| days | performances | loads |
-|------|--------------|-------|
-| 1    | 100          | 50    |
-| 2    | NA           | 25    |
-| 3    | 102          | 75    |
-| 4    | NA           | 0     |
-| 5    | 82           | 105   |
-| 6    | 98           | 25    |
-| ...  | ..           | ...   |
-    
-    # Reasonable box constraints on parameter estimates c(p*, kg, Tg, kh, Th)
-    
-    boxConstraints = data.frame("lower" = c(10, 0.01, 1, 0.01, 1),
-                                "upper" = c(150, 3, 50, 3, 50))
-    
-    # Call the fitting function using Broyden-Fletcher-Goldfarb-Shanno algo
-    
-    fittedModel = standardModel(data = experimentalData,
-                                constraints = boxConstraints, 
-                                method = "bfgs",              
-                                doTrace = TRUE
-                                )
-Furthermore, in the basic example above it is possible to supply arguments to the function to tune the implementation further:
+Get in touch if you have a resource you think would fit here. To do this open an issue or submit a pull request.
 
-Supply a different fitting method (see list [here](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions))
-
-    method = "ga"
-    
-A vector of starting values for optim(), which are otherwise generated randomly from a truncated Gaussian distribution with inequality constraints enforced such as Tg > Th. Starting values not required for the evolutionary strategy
-
-    startingValues = c(75, 1, 20, 1.5, 10)               # c(p*, kg, Tg, kh, Th)
-  
-Parameters for the expanding window cross-validation method, which are currently as default a 60% initial window, 20% test horizon, and 5% expansion rate.
-
-    initialWindow = 50; testHorizon = 30; expandRate = 3
-
-Arguments for functions will vary slightly between different models. Documentation is provided for each function within the [documentation directory](https://github.com/bsh2/Fitness-Fatigue-Models/tree/main/functions/documentation).
-
-### Installation / use
-
-#### Option 1: Download from the github website
-    
-    # 1. Download from github.com/bsh2/Fitness-Fatigue-Models/functions
-    # 2. Place file in working directory
-    # 3. Source into your environment
-    
-    source("standardModel.R")
-    
-#### Option 2: Using the *devtools* package, obtain the 'raw' URL for the function and then source directly into R
-
-    library(devtools)
-    source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/functions/standardModel.R)
-
-## The Didactic Code
-
-Code is written as to be as close to math as possible.
-The response variable is always called `y` and the impulse vector `w`.
-
-For loops are used instead of applys. 
-
-Models exist independently of data. Functions will link the two together:w
-
-
-
-### Contribute
-
-- Issue Tracker: https://github.com/bsh2/Fitness-Fatigue-Models/issues
-
-#### Project authors
-
-- Ben Stephens Hemingway | [github](github.com/bsh2)
-- Ben Ogorek | [twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek)
-- Paul Swinton | [website](https://www3.rgu.ac.uk/dmstaff/swinton-paul)
-
-Note: *Code and README files in each directory reflect authorship if appropriate*
+### Colleagues
+- Ben Ogorek ([twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek))
+- Ben Stephens Hemingway ([github](github.com/bsh2))
+- Paul Swinton ([github](github.com/p-swinton), [profile](https://www3.rgu.ac.uk/dmstaff/swinton-paul))
 
 ### Support
 
-If you are having issues, please let us know. You can email us at
+Issue Tracker: https://github.com/bsh2/Fitness-Fatigue-Models/issues
 
-b.stephens-hemingway [at] rgu [dot] ac [dot] uk
+If you are having issues, please do let us know.

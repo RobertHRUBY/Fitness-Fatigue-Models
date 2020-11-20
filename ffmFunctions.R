@@ -111,13 +111,14 @@ update <- function(ffm, theta) {
   ffm
 }
 
-predict <- function(ffm, df) {
+make_predictions <- function(ffm, w) {
+  # Assumes w is 1-1 with days TODO: what if there are NAs?
   with(ffm, {
     N <- length(w)
+    for (i in 1:N) {
     initial_fitness_effects <- q_h * exp(-(1:N) / tau_g)
     initial_fatigue_effects <- q_g * exp(-(1:N) / tau_h)
 
-    # TODO: run them through a loop
     fitness <- (initial_fitness_effects
               + sapply(1:N, function(i) convolve_training(w[1:i], tau_g)))
 
@@ -129,21 +130,26 @@ predict <- function(ffm, df) {
     fatigue <- (initial_fatigue_effects
                 + sapply(1:N, function(i) convolve_training(w_fatigue[1:i], tau_h)))
 
-    p_0 + k_g * fitness - k_h * fatigue
+   }
+    y_hat <- p_0 + k_g * fitness - k_h * fatigue
+    list(y_hat=y_hat, fitness_hat = fitness, fatigue_hat = fatigue)
   })
 }
 
 
-increase_likelihood <- function(ffm, df, reps = 5) {
+increase_likelihood <- function(ffm, df, reps = 5, tol = 1E-12) {
   theta <- extract_params(ffm)
 
-  cost_fn1 <- function(theta1) {
-      theta <- c(theta1, theta2, theta3)
-      mod <- update(kalman_model, theta)
-      filtered <- predict(mod, df)
-      -1.0 * sum(filtered$loglike)
+  cost_fn1 <- function(theta) {
+      #theta <- c(theta1, theta2, theta3)
+      mod <- update(ffm, theta)
+      pred <- make_predictions(mod, df)
+      -1.0 * sum(dnorm(df$y, mean = pred$y_hat, sd = mod$xi, log=TRUE))
   }
-
+  res <- optim(theta, cost_fn1, method = "BFGS",
+               control = list(maxit = 10000, reltol=tol, parscale = theta))
+  theta1 <- res$par
+  update(ffm, theta1)
 }
 
 

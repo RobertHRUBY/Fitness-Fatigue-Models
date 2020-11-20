@@ -172,7 +172,8 @@ initialize_kalman_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
                        create_kalman_model(p_0, k_g, k_h, tau_g, tau_h, xi,
                                            sigma_g, sigma_h, rho_gh = 0,
                                            initial_g = fitness_0, initial_h = fatigue_0,
-                                           initial_sd_g = .5 * fitness_0, initial_sd_h = .5 * fatigue_0,
+                                           initial_sd_g = .5 * fitness_0,
+					   initial_sd_h = .5 * fatigue_0,
                                            initial_rho_gh =0))
   kalman_model
 }
