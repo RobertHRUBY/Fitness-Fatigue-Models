@@ -17,14 +17,16 @@ print.ffm <- function(mod, ...) {
     use_hill <- !is.na(gamma) & !is.na(delta)
     use_initial <- q_g + q_h > 0
     use_vdr <- !is.na(tau_h2)
-    cat("--- Hill Transform:", use_hill, ", VDR:", use_vdr, ", Initial Fitness & Fatigue:",
-	use_initial, "---\n\n")
+    cat("--- Hill Transform:", use_hill, ", VDR:", use_vdr,
+	", Initial Fitness & Fatigue:", use_initial, "---\n\n")
 
     w_i <- ifelse(use_hill, "w_i_star", "w_i")
     w_i_h <- ifelse(use_vdr, "k^i_h2", w_i)
 
-    cat("p_n =", p_0, "+", k_g, "* \\sum_{i = 1}^{n - 1}", w_i, "* \\exp^{-(n - i) /", tau_g, "}")
-    cat("\n          +", k_h , "* \\sum_{i = 1}^{n - 1}", w_i_h, "* \\exp^{-(n - i) /", tau_h, "}")
+    cat("p_n =", p_0, "+", k_g, "* \\sum_{i = 1}^{n - 1}",
+	      w_i, "* \\exp^{-(n - i) /", tau_g, "}")
+    cat("\n          -", k_h , "* \\sum_{i = 1}^{n - 1}",
+	      w_i_h, "* \\exp^{-(n - i) /", tau_h, "}")
     if(use_initial) {
         cat("\n          +", q_h , "* \\exp ^ {-n  /", tau_h, "} + ")
         cat(q_g , "* \\exp ^ {-n  /", tau_g, "}")
@@ -32,7 +34,8 @@ print.ffm <- function(mod, ...) {
     cat("\n          + eta_n\n")
     cat("where\n\n")
     if (use_hill) {
-        cat("w_i_star = w_i ^", gamma, "/ (", delta, "^", gamma, "+ w_i ^", gamma, ")")
+        cat("w_i_star = w_i ^", gamma, "/ (", delta, "^",
+	    gamma, "+ w_i ^", gamma, ")")
         cat("\n\nand\n\n")
     }
     if (use_vdr) {
@@ -59,19 +62,25 @@ initialize_ffm_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
     tau_g <- start_df[i, "tau_g"]
     tau_h <- start_df[i, "tau_h"]
 
-    dummy_fitness <- sapply(1:nrow(df), function(n) convolve_training(df$w[1:n], tau_g))
-    dummy_fatigue <- sapply(1:nrow(df), function(n) convolve_training(df$w[1:n], tau_h))
+    dummy_fitness <- sapply(1:nrow(df),
+			    function(n) convolve_training(df$w[1:n], tau_g))
+    dummy_fatigue <- sapply(1:nrow(df),
+                            function(n) convolve_training(df$w[1:n], tau_h))
     dummy_ffm <- lm(df$y ~ dummy_fitness + dummy_fatigue)
 
     # Quick estimate of starting values
     time <- 1:nrow(df)
     trend_fit <- lm(dummy_fitness ~ time)
-    start_df[i, "fitness_0"] <- predict(trend_fit, newdata = data.frame(time = 0))
+    start_df[i, "fitness_0"] <- predict(trend_fit,
+                                        newdata = data.frame(time = 0))
     trend_fat <- lm(dummy_fatigue ~ time)
-    start_df[i, "fatigue_0"] <- predict(trend_fat, newdata = data.frame(time = 0))
+    start_df[i, "fatigue_0"] <- predict(trend_fat,
+                                        newdata = data.frame(time = 0))
 
-    fit_resid <- dummy_fitness[2:nrow(df)] - exp(-1 / tau_g) * dummy_fitness[1:(nrow(df) - 1)]
-    fat_resid <- dummy_fatigue[2:nrow(df)] - exp(-1 / tau_h) * dummy_fatigue[1:(nrow(df) - 1)]
+    fit_resid <- (dummy_fitness[2:nrow(df)]
+		  - exp(-1 / tau_g) * dummy_fitness[1:(nrow(df) - 1)])
+    fat_resid <- (dummy_fatigue[2:nrow(df)]
+		  - exp(-1 / tau_h) * dummy_fatigue[1:(nrow(df) - 1)]
 
     start_df[i, "p_0"] <- abs(as.numeric(coef(dummy_ffm)[1]))
     start_df[i, "k_h"] <- abs(as.numeric(coef(dummy_ffm)[2]))
@@ -137,8 +146,61 @@ make_predictions <- function(ffm, w) {
 }
 
 
+convolve_tau_grad <- function(w, tau) {
+    T <- length(w)
+    if (T <= 1) return(0)
+
+    yesterday_to_first_day <- (T - 1):1
+    first_day_to_yesterday <- 1:(T - 1)
+    
+    sum(w[first_day_to_yesterday]
+        * (yesterday_to_first_day / tau ^ 2)
+        * exp(-yesterday_to_first_day / tau))
+}
+
 increase_likelihood <- function(ffm, df, reps = 5, tol = 1E-12) {
   theta <- extract_params(ffm)
+
+  w <- df$w
+  y <- df$y
+  N <- length(w)
+
+  #ffm <- update(ffm, c(400, .1, .3, 50, 6, 20))
+  ffm <- update(ffm, c(380, .05, .2, 45, 8, 10))
+  pred <- make_predictions(ffm, w)
+  resid <- y - pred$y_hat
+  theta <- extract_params(ffm)
+  reps <- 500
+  for (rep in 1:reps) {
+    df_dp_0 <- c(0, rep(1, N - 1))
+    df_dk_g <- sapply(1:N, function(n) convolve_training(w[1:n], ffm$tau_g))
+    df_dk_h <- -sapply(1:N, function(n) convolve_training(w[1:n], ffm$tau_h))
+    df_dtau_g <- ffm$k_g * sapply(1:N,
+                                  function(n) convolve_tau_grad(w[1:n],
+                                                                ffm$tau_g))
+    df_dtau_h <- -ffm$k_h * sapply(1:N,
+                                   function(n) convolve_tau_grad(w[1:n],
+                                                                 ffm$tau_h))
+    dsse_dp_0 <- -2 * sum(resid * df_dp_0)
+    dsse_dk_g <- -2 * sum(resid * df_dk_g)
+    dsse_dk_h <- -2 * sum(resid * df_dk_h)
+    dsse_tau_g <- -2 * sum(resid * df_dtau_g)
+    dsse_tau_h <- -2 * sum(resid * df_dtau_h)
+
+    lambda <- .001
+    theta[1] <- theta[1] - 150 * lambda * (1 / N) * dsse_dp_0 
+    theta[2] <- theta[2] - lambda / 8000 * (1 / N) * dsse_dk_g 
+    theta[3] <- theta[3] - lambda / 8000 * (1 / N) * dsse_dk_h 
+    theta[4] <- theta[4] -  lambda * (1 / N) * dsse_tau_g 
+    theta[5] <- theta[5] - lambda * (1 / N) * dsse_tau_h
+
+    ffm <- update(ffm, theta)
+    pred <- make_predictions(ffm, w)
+    resid <- y - pred$y_hat
+    theta[6] <- sqrt((1 / (N - 5)) * sum(resid ^ 2))
+    cat(theta, "\n")
+    plot(pred$y_hat ~ y, main = paste("R-squared:", cor(pred$y_hat, y)^2))
+  }
 
   cost_fn1 <- function(theta) {
       #theta <- c(theta1, theta2, theta3)
