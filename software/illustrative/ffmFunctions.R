@@ -28,8 +28,8 @@ print.ffm <- function(mod, ...) {
     cat("\n          -", k_h , "* \\sum_{i = 1}^{n - 1}",
 	      w_i_h, "* \\exp^{-(n - i) /", tau_h, "}")
     if(use_initial) {
-        cat("\n          +", q_h , "* \\exp ^ {-n  /", tau_h, "} + ")
-        cat(q_g , "* \\exp ^ {-n  /", tau_g, "}")
+        cat("\n          +", q_g , "* \\exp ^ {-n  /", tau_g, "} + ")
+        cat(q_h , "* \\exp ^ {-n  /", tau_h, "}")
     }
     cat("\n          + eta_n\n")
     cat("where\n\n")
@@ -46,90 +46,64 @@ print.ffm <- function(mod, ...) {
   })
 }
 
-initialize_ffm_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
-			             tau_h_seq = c(1, 5, 10, 15), tau_h2_seq = NA,
-                                     initialize_starting = FALSE) {
 
-  start_df <- expand.grid(tau_g = tau_g_seq, tau_h = tau_h_seq)
+initialize_ffm_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
+                                        tau_h_seq = c(1, 5, 10, 15),
+                                        tau_h2_seq = NA) {
+
+  start_df <- expand.grid(tau_g = tau_g_seq, tau_h = tau_h_seq,
+                          tau_h2 =tau_h2_seq)
   start_df$p_0 <- NA
   start_df$xi <- NA
   start_df$k_g <- NA
   start_df$k_h <- NA
-  start_df$fitness_0 <- NA
-  start_df$fatigue_0 <- NA
-  # TODO: most of this is identical to Kalman
+
+  y <- df$y
+  w <- df$w
+  n <- nrow(df)
+
   for (i in 1:nrow(start_df)) {
     tau_g <- start_df[i, "tau_g"]
     tau_h <- start_df[i, "tau_h"]
-
-    dummy_fitness <- sapply(1:nrow(df),
-			    function(n) convolve_training(df$w[1:n], tau_g))
-    dummy_fatigue <- sapply(1:nrow(df),
-                            function(n) convolve_training(df$w[1:n], tau_h))
-    dummy_ffm <- lm(df$y ~ dummy_fitness + dummy_fatigue)
-
-    # Quick estimate of starting values
-    time <- 1:nrow(df)
-    trend_fit <- lm(dummy_fitness ~ time)
-    start_df[i, "fitness_0"] <- predict(trend_fit,
-                                        newdata = data.frame(time = 0))
-    trend_fat <- lm(dummy_fatigue ~ time)
-    start_df[i, "fatigue_0"] <- predict(trend_fat,
-                                        newdata = data.frame(time = 0))
-
-    fit_resid <- (dummy_fitness[2:nrow(df)]
-		  - exp(-1 / tau_g) * dummy_fitness[1:(nrow(df) - 1)])
-    fat_resid <- (dummy_fatigue[2:nrow(df)]
-		  - exp(-1 / tau_h) * dummy_fatigue[1:(nrow(df) - 1)]
-
+    tau_h2 <- start_df[i, "tau_h2"]
+  
+    dummy_fitness <- sapply(1:n,
+ 													  function(i) convolve_training(w[1:i], tau_g))
+    w_fatigue <- w
+    if (!is.na(tau_h2)) {
+        w_fatigue <- sapply(1:n, function(i) ewma_training(w[1:i], tau_h2))
+    }
+    dummy_fatigue <- sapply(1:n,
+													  function(i) convolve_training(w_fatigue[1:i],
+                                                          tau_h))
+    dummy_ffm <- lm(y ~ dummy_fitness + dummy_fatigue)
     start_df[i, "p_0"] <- abs(as.numeric(coef(dummy_ffm)[1]))
     start_df[i, "k_h"] <- abs(as.numeric(coef(dummy_ffm)[2]))
     start_df[i, "k_g"] <- abs(as.numeric(coef(dummy_ffm)[3]))
     start_df[i, "xi"] <- sigma(dummy_ffm)
-
-    start_df[i, "sigma_g"] <- sd(fit_resid)
-    start_df[i, "sigma_h"] <- sd(fat_resid)
-  }
-
+ }
+  print(start_df)
   best_start <- start_df[which.min(start_df$xi), ]
-
-  ffm_model <- with(best_start,
-                    create_ffm_model(p_0, k_g, k_h, tau_g, tau_h, xi))
-  ffm_model
-}
-
-extract_params <- function(ffm) {
-  with(ffm, {
-    c(p_0,
-      k_g,
-      k_h,
-      tau_g,
-      tau_h,
-      xi)
+  print(best_start)
+	with(best_start, {
+   
+    ffm_model <- create_ffm_model(p_0, k_g, k_h, tau_g, tau_h, xi,
+                                  tau_h2 = tau_h2)
+	  					  		             
+    ffm_model
   })
 }
 
-update <- function(ffm, theta) {
-  ffm$p_0 <- theta[1]
-  ffm$k_g <- theta[2]
-  ffm$k_h <- theta[3]
-  ffm$tau_g <- theta[4]
-  ffm$tau_h <- theta[5]
-  ffm$xi <- theta[6]
-
-  ffm
-}
 
 make_predictions <- function(ffm, w) {
-  # Assumes w is 1-1 with days TODO: what if there are NAs?
+  #  TODO: what if there are NAs?
   with(ffm, {
     N <- length(w)
-    for (i in 1:N) {
     initial_fitness_effects <- q_h * exp(-(1:N) / tau_g)
     initial_fatigue_effects <- q_g * exp(-(1:N) / tau_h)
 
     fitness <- (initial_fitness_effects
-              + sapply(1:N, function(i) convolve_training(w[1:i], tau_g)))
+                + sapply(1:N, function(i) convolve_training(w[1:i], tau_g)))
 
     # VDR filter on fatigue (optional) -------------------------
     w_fatigue <- w
@@ -137,9 +111,9 @@ make_predictions <- function(ffm, w) {
         w_fatigue <- sapply(1:N, function(i) ewma_training(w[1:i], tau_h2))
     }
     fatigue <- (initial_fatigue_effects
-                + sapply(1:N, function(i) convolve_training(w_fatigue[1:i], tau_h)))
+                + sapply(1:N, function(i) convolve_training(w_fatigue[1:i],
+                                                            tau_h)))
 
-   }
     y_hat <- p_0 + k_g * fitness - k_h * fatigue
     list(y_hat=y_hat, fitness_hat = fitness, fatigue_hat = fatigue)
   })
@@ -158,7 +132,109 @@ convolve_tau_grad <- function(w, tau) {
         * exp(-yesterday_to_first_day / tau))
 }
 
-increase_likelihood <- function(ffm, df, reps = 5, tol = 1E-12) {
+extract_params <- function(ffm) {
+  with(ffm, {
+    c(p_0,
+      k_g,
+      k_h,
+      tau_g,
+      tau_h,
+      xi,
+			q_g,
+			q_h,
+      tau_h2
+		)
+  })
+}
+
+
+update <- function(ffm, theta) {
+  ffm$p_0 <- theta[1]
+  ffm$k_g <- theta[2]
+  ffm$k_h <- theta[3]
+  ffm$tau_g <- theta[4]
+  ffm$tau_h <- theta[5]
+  ffm$xi <- theta[6]
+  ffm$q_g <- theta[7]
+  ffm$q_h <- theta[8]
+  ffm$tau_h2 <- theta[9] # Could be NA
+  ffm
+}
+
+increase_likelihood <- function(ffm, df, reps = 1,
+                                tune_starting=FALSE, tune_vdr=FALSE, tune_hill=FALSE, 
+                                tol = 1E-12) {
+  theta <- extract_params(ffm)
+	theta1 <- theta[1:6]
+  theta2 <- theta[7:8]  # initial values
+  theta3 <- theta[9]  # initial values
+
+  w <- df$w
+  y <- df$y
+  N <- length(w)
+
+  # TODO: consider cost_function generator!
+  cost_fn1 <- function(theta1) {
+      theta <- c(theta1, theta2, theta3)
+      mod <- update(ffm, theta)
+      pred_df <- make_predictions(mod, w)
+      -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
+  }
+
+  cost_fn2 <- function(theta2) {
+      theta <- c(theta1, theta2, theta3)
+      mod <- update(ffm, theta)
+      pred_df <- make_predictions(mod, w)
+      -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
+  }
+
+  cost_fn3 <- function(theta3) {
+      theta <- c(theta1, theta2, theta3)
+      mod <- update(ffm, theta)
+      pred_df <- make_predictions(mod, w)
+      -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
+  }
+
+  for (rep in 1:reps) {
+    res <- optim(theta1, cost_fn1, method = "L-BFGS-B",
+								 lower = c(theta[1] / 5, 0, 0, theta[4] / 5, theta[5] / 5,
+													 theta[6] / 5),
+								 upper = theta * 5, # assume coming in w/ something reasonable
+                 control = list(maxit = 10000, factr=tol, parscale = theta1))
+    cat("Classic FFM Parameters:",
+        "\np_0:", res$par[1], "\nk_g:", res$par[2], "\nk_h:", res$par[3],
+        "\ntau_g:", res$par[4], "\ntau_h:", res$par[5], "\nxi:", res$par[6],
+        "\nwith likelihood:", res$value, "\n\n")
+    theta1 <- res$par
+    
+    if (tune_starting) {
+      res <- optim(theta2, cost_fn2, method = "L-BFGS-B",
+		  	 					  lower = c(0, 0),
+		  						  upper = theta[1] * 5 * c(1, 1),
+                    control = list(maxit = 10000, factr=tol, parscale = c(1, 1)))
+      cat("Starting Values:",
+          "\nq_g:", res$par[1], "\nq_h:", res$par[2], "\n",
+          "\nwith likelihood:", res$value, "\n\n")
+      theta2 <- res$par
+    }
+
+    if (tune_vdr) {
+      res <- optim(theta3, cost_fn3, method = "L-BFGS-B",
+		  	 					 lower = c(0),
+		  						 upper = theta[4] * 5,
+                   control = list(maxit = 10000, factr=tol))
+      cat("VDR tau_h2:", res$par[1],
+          "\nwith likelihood:", res$value, "\n\n")
+      theta3 <- res$par
+    }
+	}
+
+	theta <- c(theta1, theta2, theta3)
+  update(ffm, theta)
+}
+
+
+increase_likelihood_by_gradient <- function(ffm, df, reps = 5, tol = 1E-12) {
   theta <- extract_params(ffm)
 
   w <- df$w
@@ -201,17 +277,7 @@ increase_likelihood <- function(ffm, df, reps = 5, tol = 1E-12) {
     cat(theta, "\n")
     plot(pred$y_hat ~ y, main = paste("R-squared:", cor(pred$y_hat, y)^2))
   }
-
-  cost_fn1 <- function(theta) {
-      #theta <- c(theta1, theta2, theta3)
-      mod <- update(ffm, theta)
-      pred <- make_predictions(mod, df)
-      -1.0 * sum(dnorm(df$y, mean = pred$y_hat, sd = mod$xi, log=TRUE))
-  }
-  res <- optim(theta, cost_fn1, method = "BFGS",
-               control = list(maxit = 10000, reltol=tol, parscale = theta))
-  theta1 <- res$par
-  update(ffm, theta1)
+  theta
 }
 
 
@@ -244,11 +310,7 @@ ewma_training <- function(w, tau) {
 }
 
 simulate.ffm <- function(ffm_model, w) {
-
-  #T, load_spec, p_0, k_g, k_h, tau_g, tau_h, sigma_e,
-  #			 delta = NA, gamma = NA, 
-  #			 tau_h2 = NA,
-  #			 fitness_0 = 0, fatigue_0 = 0, seed = 0) {
+  # Get predictions, add error 
 
   with(ffm_model, {
     # Hill function transformation of training impulse (optional) ------ 
@@ -257,73 +319,27 @@ simulate.ffm <- function(ffm_model, w) {
     if (!is.na(delta) & !is.na(gamma)) {
        w <- (w ^ gamma / (delta ^ gamma + w ^ gamma))
     }
+    pred_df <- make_predictions(ffm_model, w)
+    y <- pred_df$y_hat + rnorm(length(w), sd = ffm_model$xi)
+    data.frame(t=1:N, w_raw, w, y, y_hat = pred_df$y_hat,
+               fitness = pred_df$fitness, fatigue = pred_df$fatigue)
+  })
+}
+  #  fitness <- (q_g
+  #  	      + sapply(1:N, function(t) convolve_training(w[1:t], tau_g)))
 
-    fitness <- (q_g
-    	      + sapply(1:N, function(t) convolve_training(w[1:t], tau_g)))
-
-    # VDR filter on fatigue (optional) -------------------------
-    w_fatigue <- w
-    if (!is.na(tau_h2)) {
-      w_fatigue <- sapply(1:N, function(t) ewma_training(w[1:t], tau_h2))
-    }
+  #  # VDR filter on fatigue (optional) -------------------------
+  #  w_fatigue <- w
+  #  if (!is.na(tau_h2)) {
+  #    w_fatigue <- sapply(1:N, function(t) ewma_training(w[1:t], tau_h2))
+  #  }
  
-    fatigue <- (q_h
-    	      + sapply(1:N, function(t) convolve_training(w_fatigue[1:t], tau_h)))
-    
-    y <- p_0 + k_g * fitness - k_h * fatigue + rnorm(N, 0, xi)
-    
-    data.frame(t=1:N, w_raw, w, y)
-    })
-}
+  #  fatigue <- (q_h
+  #  	      + sapply(1:N, function(t) convolve_training(w_fatigue[1:t], tau_h)))
+  #  
+  #  y <- p_0 + k_g * fitness - k_h * fatigue + rnorm(N, 0, xi)
+  #  
+  #  data.frame(t=1:N, w_raw, w, y)
+  #  })
 
-
-
-initialize_ffm_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
-                                        tau_h_seq = c(1, 5, 10, 15),
-                                        tau_h2_seq = NA) {
-
-  start_df <- expand.grid(tau_g = tau_g_seq, tau_h = tau_h_seq)
-  start_df$p_0 <- NA
-  start_df$xi <- NA
-  start_df$k_g <- NA
-  start_df$k_h <- NA
-  start_df$sigma_g <- NA
-  start_df$sigma_h <- NA
-  start_df$fitness_0 <- NA
-  start_df$fatigue_0 <- NA
-  
-  for (i in 1:nrow(start_df)) {
-    tau_g <- start_df[i, "tau_g"]
-    tau_h <- start_df[i, "tau_h"]
-  
-    dummy_fitness <- sapply(1:nrow(df), function(n) convolve_training(df$w[1:n], tau_g))
-    dummy_fatigue <- sapply(1:nrow(df), function(n) convolve_training(df$w[1:n], tau_h))
-    dummy_ffm <- lm(df$y ~ dummy_fitness + dummy_fatigue)
-  
-    # Quick estimate of starting values
-    time <- 1:nrow(df)
-    trend_fit <- lm(dummy_fitness ~ time)
-    start_df[i, "fitness_0"] <- predict(trend_fit, newdata = data.frame(time = 0))
-    trend_fat <- lm(dummy_fatigue ~ time)
-    start_df[i, "fatigue_0"] <- predict(trend_fat, newdata = data.frame(time = 0))
-  
-    fit_resid <- dummy_fitness[2:nrow(df)] - exp(-1 / tau_g) * dummy_fitness[1:(nrow(df) - 1)]
-    fat_resid <- dummy_fatigue[2:nrow(df)] - exp(-1 / tau_h) * dummy_fatigue[1:(nrow(df) - 1)]
-  
-    start_df[i, "p_0"] <- abs(as.numeric(coef(dummy_ffm)[1]))
-    start_df[i, "k_h"] <- abs(as.numeric(coef(dummy_ffm)[2]))
-    start_df[i, "k_g"] <- abs(as.numeric(coef(dummy_ffm)[3]))
-    start_df[i, "xi"] <- sigma(dummy_ffm)
-  
-    start_df[i, "sigma_g"] <- sd(fit_resid)
-    start_df[i, "sigma_h"] <- sd(fat_resid)
-  }
-  
-  best_start <- start_df[which.min(start_df$xi), ]
-  
-  
-  ffm_model <- with(best_start,
-                       create_ffm_model(p_0, k_g, k_h, tau_g, tau_h, xi))
-  ffm_model
-}
 
