@@ -1,4 +1,7 @@
-standardModel = function(inputData,
+# Version 1.0
+# Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
+
+calvertModel = function(inputData,
                         constraints,
                         method = 'bfgs',
                         startingValues = NULL,
@@ -49,11 +52,11 @@ standardModel = function(inputData,
     stop("Bounds incorrectly specified. Check values")
   }
   
-  if (!isTRUE(initialComponent) && dim(constraints)[1] != 5){
+  if (!isTRUE(initialComponent) && dim(constraints)[1] != 6){
     stop("Box constraints of incorrect dimension")
   }
   
-  if (isTRUE(initialComponent) && dim(constraints)[1] != 7){
+  if (isTRUE(initialComponent) && dim(constraints)[1] != 8){
     stop("Box constraints of incorrect dimension")
   }
   
@@ -64,11 +67,11 @@ standardModel = function(inputData,
     # If user supplied starting Values
     if (!is.null(startingValues)){
       # Check that starting value vector length is correct
-      if (length(startingValues) != 5){
+      if (length(startingValues) != 6){
         stop("Incorrect parameter vector supplied for startingValues")
       }
       # Check that starting value vector is within bounds
-      for (i in 1:5){
+      for (i in 1:6){
         if (startingValues[i] <= constraints$lower[i] ||
             startingValues[i] >= constraints$upper[i]){
           stop("Starting values not within bounds (cannot be on bounds)")
@@ -79,7 +82,8 @@ standardModel = function(inputData,
     # from random sampling from truncated normal distribution with mean
     # at middle of constraints
     if (is.null(startingValues)){
-      stop("Please supply starting values in order (p*,k_g,tau_g,k_h,tau_h")
+      stop("Please supply starting values in order (p*,k_g,tau_g1,
+           tau_g2,k_h,tau_h")
     }
   }
   
@@ -88,7 +92,7 @@ standardModel = function(inputData,
     # If user supplied starting Values
     if (!is.null(startingValues)){
       # Check that starting value vector length is correct
-      if (length(startingValues) != 7){
+      if (length(startingValues) != 8){
         stop("Incorrect parameter vector supplied for startingValues")
       }
       # Check that starting value vector is within bounds
@@ -102,7 +106,7 @@ standardModel = function(inputData,
     # If user has not supplied starting values, generate them (p*,K,Tau,q)
     if (is.null(startingValues)){
       stop("Please supply starting values in order 
-           (p*,k_g,tau_g,k_h,tau_h,q_g,q_h")
+           (p*,k_g,tau_g1,tau_g2,k_h,tau_h,q_g,q_h")
     }
   }
   
@@ -119,7 +123,7 @@ standardModel = function(inputData,
   # Method
   if (method != "bfgs" && method != "ga"){
     stop("Method supplied incorrectly. Options are 'bfgs' or 'ga'")
-  }
+  }U
   
   # Number of performance measurements in the data set
   if (sum(!is.na(inputData$performances)) <= 40){
