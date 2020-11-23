@@ -1,11 +1,11 @@
 
 create_ffm_model <- function(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50, tau_h = 15,
                              xi = 20, tau_h2 = NA, gamma = NA, delta = NA,
-                             q_g = 0, q_h = 0) {
+			     kappa = .01, q_g = 0, q_h = 0) {
 
   model <- list(p_0 = p_0, k_g = k_g, k_h = k_h, tau_g = tau_g, tau_h = tau_h,
                 xi = xi, tau_h2 = tau_h2, gamma = gamma, delta = delta,
-                q_g = q_g, q_h = q_h)
+		kappa = kappa, q_g = q_g, q_h = q_h)
   class(model) <- "ffm"
   model
 }
@@ -34,7 +34,7 @@ print.ffm <- function(mod, ...) {
     cat("\n          + eta_n\n")
     cat("where\n\n")
     if (use_hill) {
-        cat("w_i_star = w_i ^", gamma, "/ (", delta, "^",
+        cat("w_i_star =", kappa, "* w_i ^", gamma, "/ (", delta, "^",
 	    gamma, "+ w_i ^", gamma, ")")
         cat("\n\nand\n\n")
     }
@@ -48,48 +48,54 @@ print.ffm <- function(mod, ...) {
 
 
 initialize_ffm_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
-                                        tau_h_seq = c(1, 5, 10, 15),
-                                        tau_h2_seq = NA) {
+                                     tau_h_seq = c(1, 5, 10, 15),
+                                     tau_h2_seq = NA, delta_seq = NA,
+				     gamma_seq = NA, kappa = .01) {
 
   start_df <- expand.grid(tau_g = tau_g_seq, tau_h = tau_h_seq,
-                          tau_h2 =tau_h2_seq)
+                          tau_h2 = tau_h2_seq, delta = delta_seq,
+			  gamma = gamma_seq)
   start_df$p_0 <- NA
-  start_df$xi <- NA
   start_df$k_g <- NA
   start_df$k_h <- NA
+  start_df$xi <- NA
 
   y <- df$y
   w <- df$w
   n <- nrow(df)
 
+  w_raw <- w
   for (i in 1:nrow(start_df)) {
     tau_g <- start_df[i, "tau_g"]
     tau_h <- start_df[i, "tau_h"]
     tau_h2 <- start_df[i, "tau_h2"]
-  
-    dummy_fitness <- sapply(1:n,
- 													  function(i) convolve_training(w[1:i], tau_g))
+    delta <- start_df[i, "delta"]
+    gamma <- start_df[i, "gamma"]
+
+    if (!is.na(delta) & !is.na(gamma)) {  # Hill Transform
+       w <- hill_transform(w_raw, kappa, gamma, delta)
+    }
+    dummy_fitness <- sapply(1:n, function(i) convolve_training(w[1:i], tau_g))
     w_fatigue <- w
-    if (!is.na(tau_h2)) {
+    if (!is.na(tau_h2)) { # VDR
         w_fatigue <- sapply(1:n, function(i) ewma_training(w[1:i], tau_h2))
     }
-    dummy_fatigue <- sapply(1:n,
-													  function(i) convolve_training(w_fatigue[1:i],
-                                                          tau_h))
+    dummy_fatigue <- sapply(1:n, function(i) convolve_training(w_fatigue[1:i],
+                                                               tau_h))
     dummy_ffm <- lm(y ~ dummy_fitness + dummy_fatigue)
     start_df[i, "p_0"] <- abs(as.numeric(coef(dummy_ffm)[1]))
     start_df[i, "k_h"] <- abs(as.numeric(coef(dummy_ffm)[2]))
     start_df[i, "k_g"] <- abs(as.numeric(coef(dummy_ffm)[3]))
     start_df[i, "xi"] <- sigma(dummy_ffm)
- }
+  }
   print(start_df)
+  cat("The best combination------\n")
   best_start <- start_df[which.min(start_df$xi), ]
   print(best_start)
-	with(best_start, {
-   
+  with(best_start, {
     ffm_model <- create_ffm_model(p_0, k_g, k_h, tau_g, tau_h, xi,
-                                  tau_h2 = tau_h2)
-	  					  		             
+				  tau_h2 = tau_h2, gamma = gamma,
+				  delta = delta, q_g = 0, q_h = 0)
     ffm_model
   })
 }
@@ -99,9 +105,12 @@ make_predictions <- function(ffm, w) {
   #  TODO: what if there are NAs?
   with(ffm, {
     N <- length(w)
-    initial_fitness_effects <- q_h * exp(-(1:N) / tau_g)
-    initial_fatigue_effects <- q_g * exp(-(1:N) / tau_h)
+    initial_fitness_effects <- q_g * exp(-(1:N) / tau_g)
+    initial_fatigue_effects <- q_h * exp(-(1:N) / tau_h)
 
+    if (!is.na(delta) & !is.na(gamma)) {
+       w <- hill_transform(w, kappa, gamma, delta) 
+    }
     fitness <- (initial_fitness_effects
                 + sapply(1:N, function(i) convolve_training(w[1:i], tau_g)))
 
@@ -113,9 +122,9 @@ make_predictions <- function(ffm, w) {
     fatigue <- (initial_fatigue_effects
                 + sapply(1:N, function(i) convolve_training(w_fatigue[1:i],
                                                             tau_h)))
-
     y_hat <- p_0 + k_g * fitness - k_h * fatigue
-    list(y_hat=y_hat, fitness_hat = fitness, fatigue_hat = fatigue)
+    list(y_hat = y_hat, w_ffm = w, fitness_hat = fitness,
+	 fatigue_hat = fatigue)
   })
 }
 
@@ -158,16 +167,19 @@ update <- function(ffm, theta) {
   ffm$q_g <- theta[7]
   ffm$q_h <- theta[8]
   ffm$tau_h2 <- theta[9] # Could be NA
+  ffm$delta <- theta[10]
+  ffm$gamma <- theta[11]
   ffm
 }
 
 increase_likelihood <- function(ffm, df, reps = 1,
-                                tune_starting=FALSE, tune_vdr=FALSE, tune_hill=FALSE, 
-                                tol = 1E-12) {
+                                tune_starting=FALSE, tune_vdr=FALSE,
+				tune_hill=FALSE, tol = 1E-12) {
   theta <- extract_params(ffm)
 	theta1 <- theta[1:6]
   theta2 <- theta[7:8]  # initial values
-  theta3 <- theta[9]  # initial values
+  theta3 <- theta[9]  # tau_h2
+  theta4 <- theta[10:11]  # delta, gamma 
 
   w <- df$w
   y <- df$y
@@ -283,7 +295,6 @@ increase_likelihood_by_gradient <- function(ffm, df, reps = 5, tol = 1E-12) {
 
 hill_transform <- function(w, kappa, gamma, delta) {
   # w: vector (or scalar) of training implulses
-  # kappa, gamma, delta: Hill function parameters
   kappa * w ^ gamma / (w ^ gamma +  delta ^ gamma)
 }
 
@@ -310,20 +321,11 @@ ewma_training <- function(w, tau) {
 }
 
 simulate.ffm <- function(ffm_model, w) {
-  # Get predictions, add error 
-
-  with(ffm_model, {
-    # Hill function transformation of training impulse (optional) ------ 
-    w_raw <- w
-    N <- length(w)
-    if (!is.na(delta) & !is.na(gamma)) {
-       w <- (w ^ gamma / (delta ^ gamma + w ^ gamma))
-    }
-    pred_df <- make_predictions(ffm_model, w)
-    y <- pred_df$y_hat + rnorm(length(w), sd = ffm_model$xi)
-    data.frame(t=1:N, w_raw, w, y, y_hat = pred_df$y_hat,
-               fitness = pred_df$fitness, fatigue = pred_df$fatigue)
-  })
+  # Get predictions, add performance measurmemet error 
+  pred_df <- make_predictions(ffm_model, w)
+  y <- pred_df$y_hat + rnorm(length(w), sd = ffm_model$xi)
+  data.frame(t = 1:N, w=w, y=y, y_hat = pred_df$y_hat, w_ffm = pred_df$w_ffm,
+             fitness = pred_df$fitness, fatigue = pred_df$fatigue)
 }
   #  fitness <- (q_g
   #  	      + sapply(1:N, function(t) convolve_training(w[1:t], tau_g)))
