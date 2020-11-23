@@ -1,3 +1,6 @@
+# Version 1.0
+# Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
+
 turnerModel = function(inputData,
                        constraints,
                        doTrace = FALSE,
