@@ -141,17 +141,18 @@ convolve_tau_grad <- function(w, tau) {
 }
 
 
-extract_params <- function(ffm) {
+extract_params <- function(ffm, tune_initial = FALSE, tune_vdr = FALSE,
+			   tune_hill = FALSE) {
   # theta is variable-length based on particular model
   with(ffm, {
     theta <- c(p_0, k_g, k_h, tau_g, tau_h, xi)
-    if (max(q_g, q_h) > 0) {
+    if (tune_initial) {
       theta <- c(theta, q_g, q_h)
     }
-    if (!is.na(delta)) {
+    if (tune_hill) {
       theta <- c(theta, delta, gamma)
     }
-    if(!is.na(tau_h2)) {
+    if(tune_vdr) {
       theta <- c(theta, tau_h2)
     }
     theta
@@ -159,24 +160,27 @@ extract_params <- function(ffm) {
 }
 
 
-update <- function(ffm, theta) {
+update <- function(ffm, theta, tune_initial = FALSE, tune_vdr = FALSE,
+		   tune_hill = FALSE) {
   ffm$p_0 <- theta[1]
   ffm$k_g <- theta[2]
   ffm$k_h <- theta[3]
   ffm$tau_g <- theta[4]
   ffm$tau_h <- theta[5]
   ffm$xi <- theta[6]
-  # Theta > 6 in length says that starting values are being tuned
-  ffm$q_g <- ifelse(length(theta) > 6, theta[7], 0)
-  ffm$q_h <- ifelse(length(theta) > 6, theta[8], 0)
-  if (!is.na(ffm$delta)) {
-    ffm$delta <- theta[9]
-    ffm$gamma <-  theta[10]
-    if (!is.na(ffm$tau_h2)) {
-       ffm$tau_h2 <- theta[11]  # Fully-loaded model
-    }
-  } else if (!is.na(ffm$tau_h2)) {
-    ffm$tau_h2 <- theta[9]  # VDR but not Hill
+  offset <- 7
+  if (tune_initial) {
+    ffm$q_g <- theta[offset]
+    ffm$q_h <- theta[offset + 1]
+    offset <- offset + 2
+  }
+  if (tune_hill) {
+    ffm$delta <- theta[offset]
+    ffm$gamma <-  theta[offset + 1]
+    offset <- offset + 2
+  }
+  if (tune_vdr) {
+     ffm$tau_h2 <- theta[offset]  # Fully-loaded model
   }
   ffm
 }
@@ -185,13 +189,13 @@ update <- function(ffm, theta) {
 maximize_likelihood <- function(ffm, df, reps = 1,
                                 tune_initial=FALSE, tune_vdr=FALSE,
                                 tune_hill=FALSE, maxit = 10000, tol = 1E-12) {
-  theta <- extract_params(ffm)
+  theta <- extract_params(ffm, tune_initial, tune_vdr, tune_hill)
   w <- df$w
   y <- df$y
   N <- length(w)
 
   get_negloglike <- function(theta) {
-    mod <- update(ffm, theta)
+    mod <- update(ffm, theta, tune_initial, tune_vdr, tune_hill)
     pred_df <- make_predictions(mod, w)
     -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
   }
@@ -207,46 +211,46 @@ maximize_likelihood <- function(ffm, df, reps = 1,
                    theta[6] * 2)  # Not above 2 times initial error sd
 
   parscale <- theta[1:6]
-
+  offset <- 7
   if (tune_initial) {
     lower_basic <- c(lower_basic, 0, 0)
-    upper_basic <- c(upper_basic, y[1] * 3, y[1] * 3)
+    upper_basic <- c(upper_basic, y[1] * 10, y[1] * 10)
     parscale <- c(parscale, 1, 1)
-    if (length(theta) == 6) {
-      theta <- c(theta, .2, .1) 
-    }
+    pos <- offset:(offset + 1)
+    theta[pos] <- c(y[1], y[1] / 2)  # initial values that aren't zero
     cat("\n\nTuning Initial parameters (q_g, q_h) with lower bound:",
-	lower_basic[7:8],
-	"\n  and upper bound:", upper_basic[7:8], "\n  and starting values:",
-	theta[7:8], "\n")
+	lower_basic[pos], "\n  and upper bound:", upper_basic[pos],
+	"\n  and starting values:", theta[pos], "\n")
+    offset <- offset + 2
   }
   if (tune_hill) {
     lower_basic <- c(lower_basic, .1, .1)
-    upper_basic <- c(upper_basic, 20, 20)
+    upper_basic <- c(upper_basic, 100, 20)
     parscale <- c(parscale, .5, .5)
-    if (length(theta) == 8) {
-      theta <- c(theta, 5, 1.5) 
-    }
+    pos <- offset:(offset + 1)
     cat("\n\nTuning Hill parameters (delta, gamma) with lower bound:",
-	lower_basic[9:10],
-	"\n  and upper bound:", upper_basic[9:10], "\n  and starting values:",
-	theta[9:10], "\n")
+	lower_basic[pos], "\n  and upper bound:", upper_basic[pos],
+	"\n  and starting values:", theta[pos], "\n")
+    offset <- offset + 2
   }
   if (tune_vdr) {
     lower_basic <- c(lower_basic, 1)
     upper_basic <- c(upper_basic, N)
     parscale <- c(parscale, .5)
-    if (length(theta) == 10) {
-      theta <- c(theta, 1) 
-    }
-    cat("\n\nTuning VDR parameter tau_h2 with lower bound:", lower_basic[11],
-	"\n  and upper bound:", upper_basic[11], "\n  and starting values:",
-	theta[11], "\n")
+    pos <- offset
+    cat("\n\nTuning VDR parameter tau_h2 with lower bound:", lower_basic[pos],
+	"\n  and upper bound:", upper_basic[pos], "\n  and starting value:",
+	theta[pos], "\n")
   }
+  if (sum(is.na(theta)) > 0) {
+    stop("Missing parameter values. Ensure that starting values are set.")
+  }
+  cat("\nStarting L-BFGS-B optimization via optim.\n Depending")
+  cat(" on the model, this could take 30 seconds or 30 minutes...\n\n")
   res <- optim(theta, get_negloglike, method = "L-BFGS-B",
                lower = lower_basic, upper = upper_basic,
                control = list(maxit = maxit, factr = tol, parscale = parscale))
-  update(ffm, res$par)
+  update(ffm, res$par, tune_initial, tune_vdr, tune_hill)
 }
 
 increase_likelihood_by_gradient <- function(ffm, df, reps = 5) {

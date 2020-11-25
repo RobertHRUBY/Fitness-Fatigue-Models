@@ -6,9 +6,10 @@ w <- c(c(0:100), rep(0, 20), c(0:100), rep(0, 200))
 
 # Basic FFM -------------------------------------------------------------------
 ffm_basic <- create_ffm_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50,
-            tau_h = 15, xi = 20)
+                              tau_h = 15, xi = 20)
 
 df <- simulate(ffm_basic, w)
+
 # Predictions with true parameters
 pred_true_df <- make_predictions(ffm_basic, w)
 plot(df$y)
@@ -17,7 +18,7 @@ points(pred_true_df$y_hat, col = 'blue')
 # Estimating basic model, first get starting values from data set
 ffm <- initialize_ffm_from_data(df)
 
-# Just for demonstration - only works with Basic FFM, scaled for example
+# Just for demonstration - Get a feel for Gradient Descent with basic case
 ffm_gd <- increase_likelihood_by_gradient(ffm, df, reps=300)
 print(ffm_gd)
 
@@ -32,10 +33,14 @@ points(pred_df$y_hat, col = 'red')
 
 # Estimate initial values -----------------------------------------------------
 ffm_add_initial <- create_ffm_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50,
-                                    tau_h = 15, xi = 20, q_g = 40, q_h = 100)
+                                    tau_h = 15, xi = 20, q_g = 1500, q_h = 500)
 
 df <- simulate(ffm_add_initial, w)
 head(df, 5)  # Look for fitness and fatigue to be around their starting values
+
+# See the initial values at work
+plot(df$fitness)
+plot(df$fatigue)
 
 ffm <- initialize_ffm_from_data(df)
 
@@ -59,20 +64,26 @@ df <- simulate(ffm_vdr, w)
 head(df, 5)
 
 # Specify tau_h2_seq for data-driven VDR starting values
-ffm <- initialize_ffm_from_data(df, tau_h2_seq = c(1, 2, 3))
+ffm <- initialize_ffm_from_data(df, tau_h2_seq = c(1, 2, 5, 10, 15))
 
 # One-shot maximum likelihood using L-BFGS-B
 ffm_ml <- maximize_likelihood(ffm, df, tune_initial = TRUE, tune_vdr = TRUE)
 print(ffm_ml)
 
+# Predictions with estimated model - OK, this was a bit artificial!!
+pred_df <- make_predictions(ffm_ml, w)
+plot(df$y)
+points(pred_df$y_hat, col = 'red')
 
-# Estimate Hill coefficients and initial values
+# Estimate Hill coefficients -----------------------------------------------
 ffm_hill <- create_ffm_model(p_0 = 400, k_g = 1, k_h = 3, tau_g = 50,
-                             tau_h = 15, xi = 20, gamma = 2, delta = 1.5,
-                             q_g = 40, q_h = 100)
+                             tau_h = 15, xi = 20, gamma = 2, delta = 10)
 
 df <- simulate(ffm_hill, w)
 head(df)  # w_ffm is the Hill transformed impulses
+
+# Look at Hill transform
+plot(df$w_ffm ~ df$w)
 
 # Predictions with true model
 pred_df <- make_predictions(ffm_hill, w)
@@ -84,7 +95,7 @@ ffm <- initialize_ffm_from_data(df, delta_seq = c(.3, 1, 1.5, 5, 20),
                                 gamma_seq = c(.3, 1, 2, 5, 20))
 
 # One-shot maximum likelihood using L-BFGS-B
-ffm_ml <- maximize_likelihood(ffm, df, tune_initial = TRUE, tune_hill = TRUE)
+ffm_ml <- maximize_likelihood(ffm, df, tune_hill = TRUE)
 print(ffm_ml)
 
 # Hill transformation analysis
