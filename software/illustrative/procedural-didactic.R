@@ -113,6 +113,8 @@ ffm_close <- update(ffm, c(380, .5, 4, 60, 10, 25, 50, 110, 3, 1.5))
 ffm_ml2 <- maximize_likelihood(ffm_close, df, tune_initial = TRUE,
                                tune_hill = TRUE)
 print(ffm_ml2)
+
+# Examining Hill fit
 w_hill_ml2 <- hill_transform(w, ffm_ml2$kappa, ffm_ml2$gamma, ffm_ml2$delta)
 plot(w_hill_ml2 ~ w, main = 'Another go at Hill')
 
@@ -129,14 +131,16 @@ ffm_the_works <- create_ffm_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50,
                                   q_g = 300, q_h = 100)
 print(ffm_the_works)
 
-df <- simulate(ffm_the_works, w)
+df <- simulate(ffm_the_works)
 ffm <- initialize_ffm_from_data(df, tau_h2_seq = c(2, 5, 10, 30),
                                 delta_seq = c(.3, 1, 1.5,  5, 10),
                                 gamma_seq = c(.3, 1, 3, 5, 10))
 
-ffm <- maximize_likelihood(hill_ffm, df, reps = 5)
+ffm_ml <- maximize_likelihood(ffm, df, tune_initial = TRUE,
+                              tune_vdr = TRUE, tune_hill = TRUE)
+print(ffm_ml)
 
-pred_df <- make_predictions(hill_ffm, w)
-
-
-
+# Predictions with estimated model
+pred_df <- make_predictions(ffm_ml, w)
+plot(df$y)
+points(pred_df$y_hat, col = 'red')
