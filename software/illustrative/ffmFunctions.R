@@ -1,11 +1,11 @@
 
-create_ffm_model <- function(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50, tau_h = 15,
-                             xi = 20, tau_h2 = NA, gamma = NA, delta = NA,
-			     kappa = .01, q_g = 0, q_h = 0) {
-
+create_ffm_model <- function(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50,
+			     tau_h = 15, xi = 20, tau_h2 = NA, gamma = NA,
+			     delta = NA, kappa = 1, q_g = 0, q_h = 0) {
+  # Create an object of class "ffm"
   model <- list(p_0 = p_0, k_g = k_g, k_h = k_h, tau_g = tau_g, tau_h = tau_h,
                 xi = xi, tau_h2 = tau_h2, gamma = gamma, delta = delta,
-		kappa = kappa, q_g = q_g, q_h = q_h)
+                kappa = kappa, q_g = q_g, q_h = q_h)
   class(model) <- "ffm"
   model
 }
@@ -18,15 +18,15 @@ print.ffm <- function(mod, ...) {
     use_initial <- q_g + q_h > 0
     use_vdr <- !is.na(tau_h2)
     cat("--- Hill Transform:", use_hill, ", VDR:", use_vdr,
-	", Initial Fitness & Fatigue:", use_initial, "---\n\n")
+  ", Initial Fitness & Fatigue:", use_initial, "---\n\n")
 
     w_i <- ifelse(use_hill, "w_i_star", "w_i")
     w_i_h <- ifelse(use_vdr, "k^i_h2", w_i)
 
     cat("p_n =", p_0, "+", k_g, "* \\sum_{i = 1}^{n - 1}",
-	      w_i, "* \\exp^{-(n - i) /", tau_g, "}")
+        w_i, "* \\exp^{-(n - i) /", tau_g, "}")
     cat("\n          -", k_h , "* \\sum_{i = 1}^{n - 1}",
-	      w_i_h, "* \\exp^{-(n - i) /", tau_h, "}")
+        w_i_h, "* \\exp^{-(n - i) /", tau_h, "}")
     if(use_initial) {
         cat("\n          +", q_g , "* \\exp ^ {-n  /", tau_g, "} + ")
         cat(q_h , "* \\exp ^ {-n  /", tau_h, "}")
@@ -35,7 +35,7 @@ print.ffm <- function(mod, ...) {
     cat("where\n\n")
     if (use_hill) {
         cat("w_i_star =", kappa, "* w_i ^", gamma, "/ (", delta, "^",
-	    gamma, "+ w_i ^", gamma, ")")
+      gamma, "+ w_i ^", gamma, ")")
         cat("\n\nand\n\n")
     }
     if (use_vdr) {
@@ -50,11 +50,11 @@ print.ffm <- function(mod, ...) {
 initialize_ffm_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
                                      tau_h_seq = c(1, 5, 10, 15),
                                      tau_h2_seq = NA, delta_seq = NA,
-				     gamma_seq = NA, kappa = .01) {
+                                     gamma_seq = NA, kappa = 1) {
 
   start_df <- expand.grid(tau_g = tau_g_seq, tau_h = tau_h_seq,
                           tau_h2 = tau_h2_seq, delta = delta_seq,
-			  gamma = gamma_seq)
+                          gamma = gamma_seq)
   start_df$p_0 <- NA
   start_df$k_g <- NA
   start_df$k_h <- NA
@@ -94,15 +94,14 @@ initialize_ffm_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
   print(best_start)
   with(best_start, {
     ffm_model <- create_ffm_model(p_0, k_g, k_h, tau_g, tau_h, xi,
-				  tau_h2 = tau_h2, gamma = gamma,
-				  delta = delta, q_g = 0, q_h = 0)
+          tau_h2 = tau_h2, gamma = gamma,
+          delta = delta, q_g = 0, q_h = 0)
     ffm_model
   })
 }
 
 
 make_predictions <- function(ffm, w) {
-  #  TODO: what if there are NAs?
   with(ffm, {
     N <- length(w)
     initial_fitness_effects <- q_g * exp(-(1:N) / tau_g)
@@ -123,8 +122,8 @@ make_predictions <- function(ffm, w) {
                 + sapply(1:N, function(i) convolve_training(w_fatigue[1:i],
                                                             tau_h)))
     y_hat <- p_0 + k_g * fitness - k_h * fatigue
-    list(y_hat = y_hat, w_ffm = w, fitness_hat = fitness,
-	 fatigue_hat = fatigue)
+    data.frame(y_hat = y_hat, w_ffm = w, fitness_hat = fitness,
+               fatigue_hat = fatigue)
   })
 }
 
@@ -141,18 +140,21 @@ convolve_tau_grad <- function(w, tau) {
         * exp(-yesterday_to_first_day / tau))
 }
 
+
 extract_params <- function(ffm) {
+  # theta is variable-length based on particular model
   with(ffm, {
-    c(p_0,
-      k_g,
-      k_h,
-      tau_g,
-      tau_h,
-      xi,
-			q_g,
-			q_h,
-      tau_h2
-		)
+    theta <- c(p_0, k_g, k_h, tau_g, tau_h, xi)
+    if (max(q_g, q_h) > 0) {
+      theta <- c(theta, q_g, q_h)
+    }
+    if (!is.na(delta)) {
+      theta <- c(theta, delta, gamma)
+    }
+    if(!is.na(tau_h2)) {
+      theta <- c(theta, tau_h2)
+    }
+    theta
   })
 }
 
@@ -164,101 +166,98 @@ update <- function(ffm, theta) {
   ffm$tau_g <- theta[4]
   ffm$tau_h <- theta[5]
   ffm$xi <- theta[6]
-  ffm$q_g <- theta[7]
-  ffm$q_h <- theta[8]
-  ffm$tau_h2 <- theta[9] # Could be NA
-  ffm$delta <- theta[10]
-  ffm$gamma <- theta[11]
+  # Theta > 6 in length says that starting values are being tuned
+  ffm$q_g <- ifelse(length(theta) > 6, theta[7], 0)
+  ffm$q_h <- ifelse(length(theta) > 6, theta[8], 0)
+  if (!is.na(ffm$delta)) {
+    ffm$delta <- theta[9]
+    ffm$gamma <-  theta[10]
+    if (!is.na(ffm$tau_h2)) {
+       ffm$tau_h2 <- theta[11]  # Fully-loaded model
+    }
+  } else if (!is.na(ffm$tau_h2)) {
+    ffm$tau_h2 <- theta[9]  # VDR but not Hill
+  }
   ffm
 }
 
-increase_likelihood <- function(ffm, df, reps = 1,
-                                tune_starting=FALSE, tune_vdr=FALSE,
-				tune_hill=FALSE, tol = 1E-12) {
-  theta <- extract_params(ffm)
-	theta1 <- theta[1:6]
-  theta2 <- theta[7:8]  # initial values
-  theta3 <- theta[9]  # tau_h2
-  theta4 <- theta[10:11]  # delta, gamma 
 
+maximize_likelihood <- function(ffm, df, reps = 1,
+                                tune_initial=FALSE, tune_vdr=FALSE,
+                                tune_hill=FALSE, maxit = 10000, tol = 1E-12) {
+  theta <- extract_params(ffm)
   w <- df$w
   y <- df$y
   N <- length(w)
 
-  # TODO: consider cost_function generator!
-  cost_fn1 <- function(theta1) {
-      theta <- c(theta1, theta2, theta3)
-      mod <- update(ffm, theta)
-      pred_df <- make_predictions(mod, w)
-      -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
+  get_negloglike <- function(theta) {
+    mod <- update(ffm, theta)
+    pred_df <- make_predictions(mod, w)
+    -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
   }
 
-  cost_fn2 <- function(theta2) {
-      theta <- c(theta1, theta2, theta3)
-      mod <- update(ffm, theta)
-      pred_df <- make_predictions(mod, w)
-      -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
-  }
+  lower_basic <- c(theta[1] / 2, # Not below 1/2 of initial intercept
+                   0, 0,  # k_g and k_h may fall to zero, not below
+                   1, 1,  # 1-period minimum for time-constants
+                   theta[6] / 2) # Not below 1/2 of initial error sd
 
-  cost_fn3 <- function(theta3) {
-      theta <- c(theta1, theta2, theta3)
-      mod <- update(ffm, theta)
-      pred_df <- make_predictions(mod, w)
-      -1.0 * sum(dnorm(y, mean = pred_df$y_hat, sd = mod$xi, log=TRUE))
-  }
+  upper_basic <- c(theta[1] * 2,  # Not above 2 times initial intercept
+                   theta[2:3] * 10,  # k_g and k_h may reach 10x starting guess
+                   N, N,  # Largest time constant allowed is dataset size
+                   theta[6] * 2)  # Not above 2 times initial error sd
 
-  for (rep in 1:reps) {
-    res <- optim(theta1, cost_fn1, method = "L-BFGS-B",
-								 lower = c(theta[1] / 5, 0, 0, theta[4] / 5, theta[5] / 5,
-													 theta[6] / 5),
-								 upper = theta * 5, # assume coming in w/ something reasonable
-                 control = list(maxit = 10000, factr=tol, parscale = theta1))
-    cat("Classic FFM Parameters:",
-        "\np_0:", res$par[1], "\nk_g:", res$par[2], "\nk_h:", res$par[3],
-        "\ntau_g:", res$par[4], "\ntau_h:", res$par[5], "\nxi:", res$par[6],
-        "\nwith likelihood:", res$value, "\n\n")
-    theta1 <- res$par
-    
-    if (tune_starting) {
-      res <- optim(theta2, cost_fn2, method = "L-BFGS-B",
-		  	 					  lower = c(0, 0),
-		  						  upper = theta[1] * 5 * c(1, 1),
-                    control = list(maxit = 10000, factr=tol, parscale = c(1, 1)))
-      cat("Starting Values:",
-          "\nq_g:", res$par[1], "\nq_h:", res$par[2], "\n",
-          "\nwith likelihood:", res$value, "\n\n")
-      theta2 <- res$par
+  parscale <- theta[1:6]
+
+  if (tune_initial) {
+    lower_basic <- c(lower_basic, 0, 0)
+    upper_basic <- c(upper_basic, y[1] * 3, y[1] * 3)
+    parscale <- c(parscale, 1, 1)
+    if (length(theta) == 6) {
+      theta <- c(theta, .2, .1) 
     }
-
-    if (tune_vdr) {
-      res <- optim(theta3, cost_fn3, method = "L-BFGS-B",
-		  	 					 lower = c(0),
-		  						 upper = theta[4] * 5,
-                   control = list(maxit = 10000, factr=tol))
-      cat("VDR tau_h2:", res$par[1],
-          "\nwith likelihood:", res$value, "\n\n")
-      theta3 <- res$par
+    cat("\n\nTuning Initial parameters (q_g, q_h) with lower bound:",
+	lower_basic[7:8],
+	"\n  and upper bound:", upper_basic[7:8], "\n  and starting values:",
+	theta[7:8], "\n")
+  }
+  if (tune_hill) {
+    lower_basic <- c(lower_basic, .1, .1)
+    upper_basic <- c(upper_basic, 20, 20)
+    parscale <- c(parscale, .5, .5)
+    if (length(theta) == 8) {
+      theta <- c(theta, 5, 1.5) 
     }
-	}
-
-	theta <- c(theta1, theta2, theta3)
-  update(ffm, theta)
+    cat("\n\nTuning Hill parameters (delta, gamma) with lower bound:",
+	lower_basic[9:10],
+	"\n  and upper bound:", upper_basic[9:10], "\n  and starting values:",
+	theta[9:10], "\n")
+  }
+  if (tune_vdr) {
+    lower_basic <- c(lower_basic, 1)
+    upper_basic <- c(upper_basic, N)
+    parscale <- c(parscale, .5)
+    if (length(theta) == 10) {
+      theta <- c(theta, 1) 
+    }
+    cat("\n\nTuning VDR parameter tau_h2 with lower bound:", lower_basic[11],
+	"\n  and upper bound:", upper_basic[11], "\n  and starting values:",
+	theta[11], "\n")
+  }
+  res <- optim(theta, get_negloglike, method = "L-BFGS-B",
+               lower = lower_basic, upper = upper_basic,
+               control = list(maxit = maxit, factr = tol, parscale = parscale))
+  update(ffm, res$par)
 }
 
-
-increase_likelihood_by_gradient <- function(ffm, df, reps = 5, tol = 1E-12) {
+increase_likelihood_by_gradient <- function(ffm, df, reps = 5) {
   theta <- extract_params(ffm)
 
   w <- df$w
   y <- df$y
   N <- length(w)
 
-  #ffm <- update(ffm, c(400, .1, .3, 50, 6, 20))
-  ffm <- update(ffm, c(380, .05, .2, 45, 8, 10))
   pred <- make_predictions(ffm, w)
   resid <- y - pred$y_hat
-  theta <- extract_params(ffm)
-  reps <- 500
   for (rep in 1:reps) {
     df_dp_0 <- c(0, rep(1, N - 1))
     df_dk_g <- sapply(1:N, function(n) convolve_training(w[1:n], ffm$tau_g))
@@ -286,10 +285,11 @@ increase_likelihood_by_gradient <- function(ffm, df, reps = 5, tol = 1E-12) {
     pred <- make_predictions(ffm, w)
     resid <- y - pred$y_hat
     theta[6] <- sqrt((1 / (N - 5)) * sum(resid ^ 2))
-    cat(theta, "\n")
-    plot(pred$y_hat ~ y, main = paste("R-squared:", cor(pred$y_hat, y)^2))
+    cat("Rep", rep, ", Parameters:", theta[1:5], "RMSE:", theta[6], "\n")
+    plot(pred$y_hat ~ y,
+	 main = paste("Pred vs Observed, R-squared:", cor(pred$y_hat, y)^2))
   }
-  theta
+  ffm
 }
 
 
@@ -298,8 +298,6 @@ hill_transform <- function(w, kappa, gamma, delta) {
   kappa * w ^ gamma / (w ^ gamma +  delta ^ gamma)
 }
 
-# hill_transform(c(5, 6), 10000, 1, 10000) gets you back to where you were
-# Note that's setting kappa = delta.
 
 convolve_training <- function(w, tau) {
   T <- length(w)
@@ -320,28 +318,12 @@ ewma_training <- function(w, tau) {
   sum(w[first_day_to_today] * exp(-today_to_first_day / tau))
 }
 
+
 simulate.ffm <- function(ffm_model, w) {
   # Get predictions, add performance measurmemet error 
   pred_df <- make_predictions(ffm_model, w)
   y <- pred_df$y_hat + rnorm(length(w), sd = ffm_model$xi)
-  data.frame(t = 1:N, w=w, y=y, y_hat = pred_df$y_hat, w_ffm = pred_df$w_ffm,
+  data.frame(t = 1:length(w), w=w, y=y, y_hat = pred_df$y_hat,
+             w_ffm = pred_df$w_ffm,
              fitness = pred_df$fitness, fatigue = pred_df$fatigue)
 }
-  #  fitness <- (q_g
-  #  	      + sapply(1:N, function(t) convolve_training(w[1:t], tau_g)))
-
-  #  # VDR filter on fatigue (optional) -------------------------
-  #  w_fatigue <- w
-  #  if (!is.na(tau_h2)) {
-  #    w_fatigue <- sapply(1:N, function(t) ewma_training(w[1:t], tau_h2))
-  #  }
- 
-  #  fatigue <- (q_h
-  #  	      + sapply(1:N, function(t) convolve_training(w_fatigue[1:t], tau_h)))
-  #  
-  #  y <- p_0 + k_g * fitness - k_h * fatigue + rnorm(N, 0, xi)
-  #  
-  #  data.frame(t=1:N, w_raw, w, y)
-  #  })
-
-
