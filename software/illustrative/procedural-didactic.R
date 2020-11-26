@@ -55,13 +55,22 @@ points(pred_df$y_hat, col = 'red')
 
 
 # Estimate VDR parameter and initial values -----------------------------------
-ffm_vdr <- create_ffm_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50,
+ffm_vdr <- create_ffm_model(p_0 = 400, k_g = .1, k_h = .03, tau_g = 50,
                             tau_h = 15, xi = 20,
-                            tau_h2 = 8, 
+                            tau_h2 = 3, 
                             q_g = 300, q_h = 500)
 print(ffm_vdr)
 df <- simulate(ffm_vdr, w)
 head(df, 5)
+
+# Fatigue can get pretty large with tau_h and tau_h2
+plot(df$fitness, main = "Fitness with VDR")
+plot(df$fatigue, main = "Fatigue with VDR")
+
+# Predictions with true parameters
+pred_true_df <- make_predictions(ffm_vdr, w)
+plot(df$y)
+points(pred_true_df$y_hat, col = 'blue')
 
 # Specify tau_h2_seq for data-driven VDR starting values
 ffm <- initialize_ffm_from_data(df, tau_h2_seq = c(1, 2, 5, 10, 15))
@@ -76,14 +85,15 @@ plot(df$y)
 points(pred_df$y_hat, col = 'red')
 
 # Estimate Hill coefficients -----------------------------------------------
-ffm_hill <- create_ffm_model(p_0 = 400, k_g = 1, k_h = 3, tau_g = 50,
+ffm_hill <- create_ffm_model(p_0 = 400, k_g = 4, k_h = 5, tau_g = 50,
                              tau_h = 15, xi = 20, gamma = 2, delta = 10)
 
-df <- simulate(ffm_hill, w)
-head(df)  # w_ffm is the Hill transformed impulses
+# Look at Hill transformed training impulses
+w_hill <- get_hill_transformed_training(ffm_hill, w)
+plot(w_hill ~ w, main = "Simulation-specified Hill Transformation")
 
-# Look at Hill transform
-plot(df$w_ffm ~ df$w)
+df <- simulate(ffm_hill, w)
+head(df) 
 
 # Predictions with true model
 pred_df <- make_predictions(ffm_hill, w)
@@ -99,24 +109,11 @@ ffm_ml <- maximize_likelihood(ffm, df, tune_hill = TRUE)
 print(ffm_ml)
 
 # Hill transformation analysis
-plot(df$w_ffm ~ df$w,
+w_hill_ml <- get_hill_transformed_training(ffm_ml, w)
+plot(w_hill ~ w, 
      main = "Hill transformation - True (black) & Est (blue )")
-
-# Need to standardize hill function - gamma and delta swap positions
-w_hill_ml <- hill_transform(w, ffm$kappa, ffm$gamma, ffm$delta)
 points(w_hill_ml ~ w, col = 'blue')
 
-# Something has gone wrong with the estimation. Let's try better starting vals
-
-# (Better) one-shot maximum likelihood using L-BFGS-B
-ffm_close <- update(ffm, c(380, .5, 4, 60, 10, 25, 50, 110, 3, 1.5))
-ffm_ml2 <- maximize_likelihood(ffm_close, df, tune_initial = TRUE,
-                               tune_hill = TRUE)
-print(ffm_ml2)
-
-# Examining Hill fit
-w_hill_ml2 <- hill_transform(w, ffm_ml2$kappa, ffm_ml2$gamma, ffm_ml2$delta)
-plot(w_hill_ml2 ~ w, main = 'Another go at Hill')
 
 # Predictions with estimated model
 pred_df <- make_predictions(ffm_ml, w)
@@ -124,15 +121,44 @@ plot(df$y)
 points(pred_df$y_hat, col = 'red')
 
 
+# Not the estimation we'd like to see for Hill. Let's try closer starting vals
+# (Better) one-shot maximum likelihood using L-BFGS-B
+# TODO: get delta and gamma to be in the right order always
+ffm_close <- update(ffm, c(380, 3, 6, 55, 12, 25, 8, 1.5), tune_hill = TRUE)
+ffm_ml2 <- maximize_likelihood(ffm_close, df, tune_initial = TRUE,
+                               tune_hill = TRUE)
+print(ffm_ml2)
+
+# Examining Hill fit
+w_hill_ml2 <- get_hill_transformed_training(ffm_ml2, w)
+plot(w_hill_ml2 ~ w,
+     main = "Hill transformation Again - True (black) & Est (blue )")
+
+# Predictions with estimated model
+pred_df <- make_predictions(ffm_ml2, w)
+plot(df$y)
+points(pred_df$y_hat, col = 'red')
+
 # The works: VDR, Hill, and initial values ------------------------------------
-ffm_the_works <- create_ffm_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50,
-                                  tau_h = 15, xi = 10, tau_h2 = 10,
-                                  gamma = 3, delta = 5,
-                                  q_g = 300, q_h = 100)
+ffm_the_works <- create_ffm_model(p_0 = 400, k_g = 3, k_h = .3, tau_g = 50,
+                                  tau_h = 10, xi = 10, tau_h2 = 5,
+                                  gamma = .5, delta = 5,
+                                  q_g = 30, q_h = 10)
 print(ffm_the_works)
 
-df <- simulate(ffm_the_works)
-ffm <- initialize_ffm_from_data(df, tau_h2_seq = c(2, 5, 10, 30),
+w_hill_the_works <- get_hill_transformed_training(ffm_the_works, w)
+plot(w_hill_the_works ~ w, main = "Hill transformation")
+
+df <- simulate(ffm_the_works, w)
+
+# Predictions with estimated model
+plot(df$fitness)
+plot(df$fatigue)
+pred_df <- make_predictions(ffm_the_works, w)
+plot(df$y)
+points(pred_df$y_hat, col = 'red')
+
+ffm <- initialize_ffm_from_data(df, tau_h2_seq = c(1, 2, 5, 10),
                                 delta_seq = c(.3, 1, 1.5,  5, 10),
                                 gamma_seq = c(.3, 1, 3, 5, 10))
 
@@ -144,3 +170,9 @@ print(ffm_ml)
 pred_df <- make_predictions(ffm_ml, w)
 plot(df$y)
 points(pred_df$y_hat, col = 'red')
+
+w_hill_ml3 <- get_hill_transformed_training(ffm_ml, w)
+plot(w_hill_ml3 ~ w,
+     main = "Hill transformation Again - True (black) & Est (blue )")
+
+

@@ -290,8 +290,10 @@ increase_likelihood_by_gradient <- function(ffm, df, reps = 5) {
     resid <- y - pred$y_hat
     theta[6] <- sqrt((1 / (N - 5)) * sum(resid ^ 2))
     cat("Rep", rep, ", Parameters:", theta[1:5], "RMSE:", theta[6], "\n")
-    plot(pred$y_hat ~ y,
-	 main = paste("Pred vs Observed, R-squared:", cor(pred$y_hat, y)^2))
+    plot(df$y ~ df$t,
+	 main = paste("Gradient Descent: Pred vs Observed (blue), R-squared:",
+		      round(cor(pred$y_hat, df$y) ^ 2, 3)))
+    points(pred$y_hat ~ df$t, col = 'blue')
   }
   ffm
 }
@@ -302,6 +304,10 @@ hill_transform <- function(w, kappa, gamma, delta) {
   kappa * w ^ gamma / (w ^ gamma +  delta ^ gamma)
 }
 
+
+get_hill_transformed_training <- function(ffm, w) {
+  hill_transform(w, ffm$kappa, ffm$gamma, ffm$delta)
+}
 
 convolve_training <- function(w, tau) {
   T <- length(w)
