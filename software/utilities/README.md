@@ -18,8 +18,8 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 These are functions that are currently under experimental development. They will become full features of the project, or removed if not proven to work well. Use with caution
 
-| Function | File | Description | Function | File | Description |
-|-|-|-|-|-|-|
+| Function | File | Description | 
+|-|-|-|
 | `basicModel()` | [basicModel.R](basicModel.R) | Fit the one-component model 
 
 
