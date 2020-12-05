@@ -20,9 +20,26 @@ These are functions that are currently under experimental development. They will
 
 | Function | File | Description | 
 |-|-|-|
-| `basicModel()` | [basicModel.R](basicModel.R) | Fit the one-component model 
+| `basicModel()` | [basicModel.R](basicModel.R) | Fit the one-component model
 
 
+### Loading the functions into R
+
+#### Step 1: Install and load the R package `devtools`
+
+    install.packages("devtools")
+    library(devtools)
+
+#### Step 2: Load the required function
+
+| Function | Code (to import into R) |
+|-|-|
+| `banisterModel()` | source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/banisterModel.R ) |
+| `standardModel()` | source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/standardModel.R) |
+| `calvertModel()` | source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/calvertModel.R ) |
+| `turnerModel()` | source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/turnerModel.R ) |
+| `computeModels()` | source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/computeModels.R ) |
+    
 ## Getting started: An introductory example
 
 Consider a researcher looking to fit a fitness-fatigue model to a set of experimental data (i.e. a time-series of quantified training load and measured performance values).
