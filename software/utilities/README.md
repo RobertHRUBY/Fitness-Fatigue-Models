@@ -12,7 +12,7 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 | `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the discrete solution to the standard two component model | [docs]() [example]() | GA or L-BFGS-B | Bounds, estimation of initial traces, cross validation, genetic algorithms |
 | `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the discrete solution to the fitness-delay model | [docs]() [example]() | GA or L-BFGS-B | Bounds, estimation of initial traces, cross validation, genetic algorithms |
 | `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve system of ODE's and fit the non-linear variant of the standard model | [docs]() [example]() | GA | Bounds, estimation of initial traces, cross validation |
-| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [docs]() [example]() | NA - Simple computation | Compute with or without initial traces for discrete models |
+| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [docs]() [example]() | N/A - Simple computation | Compute with or without initial traces for discrete models |
 
 ### Experimental features:
 
