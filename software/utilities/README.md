@@ -6,13 +6,13 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 ## Currently available functions:
 
-| Function | Code file | Description | Documentation | Example |
+| Function | Code file | Description | Usage | Optimiser |
 |-|-|-|-|-|
-| `banisterModel()` | [banisterModel.R](banisterModel.R) | Solve system of ODE's and fit the standard model from first principles | [here]() | [here]() |
-| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the discrete solution to the standard two component model | [here]() | [here]() |
-| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the discrete solution to the fitness-delay model | [here]() | [here]() |
-| `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve system of ODE's and fit the non-linear variant of the standard model | [here]() | [here]() |
-| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [here]() | [here]() |
+| `banisterModel()` | [banisterModel.R](banisterModel.R) | Solve system of ODE's and fit the standard model from first principles | [docs]() \| [example]() | GA or L-BFGS-B |
+| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the discrete solution to the standard two component model | [docs]() \| [example]() | GA or L-BFGS-B |
+| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the discrete solution to the fitness-delay model | [docs]() \| [example]() | GA or L-BFGS-B |
+| `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve system of ODE's and fit the non-linear variant of the standard model | [docs]() \| [example]() | GA or L-BFGS-B |
+| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [docs]() \| [example]() | GA or L-BFGS-B |
 
 
 ### Experimental features:
