@@ -1,16 +1,19 @@
-# Utilities: An R toolbox
+# Utilities: An R toolbox for fitting and evaluating FFMs
 
-Includes easy to use functions for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking in [R](https://www.r-project.org/). Complete [documentation](documentation/utilities_documentation.pdf) is provided for each. Furthermore, code files with reproducible examples are provided [here](documentation/code_examples).
+This directory includes easy to use [R](https://www.r-project.org/) functions for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/utilities_documentation.pdf) is provided for each. Furthermore, code files with reproducible examples are provided [here](documentation/code_examples).
 
-*An introductory example is provided further down in this README.*
+*An introductory example for one function is provided further down in this README.*
 
 ## Currently available functions:
 
-| Function | File | Description | Function | File | Description |
-|-|-|-|-|-|-|
-| `banisterModel()` | [banisterModel.R](banisterModel.R) | Solve and fit the original model system |
-| `standardModel()` | [standardModel.R](standardModel.R) | Fit the two-component model | `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve and fit non-linear variant of original system |
-| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fit the two-component model with exponential delay on fitness | `computeModels()` | [computeModels.R](computeModels.R) | Wrapper function to compute the models for known parameters |
+| Function | Code file | Description | Documentation | Example |
+|-|-|-|-|-|
+| `banisterModel()` | [banisterModel.R](banisterModel.R) | Solve system of ODE's and fit the standard model from first principles | [here]() | [here]() |
+| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the discrete solution to the standard two component model | [here]() | [here]() |
+| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the discrete solution to the fitness-delay model | [here]() | [here]() |
+| `turnerModel()` | [turnerModel.R](turnerModel.R) | Solve system of ODE's and fit the non-linear variant of the standard model | [here]() | [here]() |
+| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [here]() | [here]() |
+
 
 ### Experimental features:
 
