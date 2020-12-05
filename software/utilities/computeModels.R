@@ -1,3 +1,6 @@
+# Version 1.0
+# Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
+
 computeModels = function(model = NULL,
                          parms = NULL,
                          loadSeries = NULL,
@@ -68,7 +71,7 @@ computeModels = function(model = NULL,
     df0 = data.frame(s, "ws" = loadSeries)
     for (n in 1:length(s)){
       df1 <- df0[1:s[n], ]
-      p[n] <- parms[1] + parms[4]*(exp (- (i/parms[3]))) +
+      p[n] <- parms[1] + parms[4]*(exp (- (n/parms[3]))) +
         parms[2]* sum(df1$ws * exp(-(n-df1$s) / parms[3]))
     }
     return(p)
@@ -171,7 +174,7 @@ computeModels = function(model = NULL,
         stop("Incorrect parameters supplied. Please supply a vector of 
                c(p*,K,T,q")
       }
-      computedModel = basicModel(parms, loadSeries)
+      computedModel = basicModelIC(parms, loadSeries)
     }
   
   # Standard Model
