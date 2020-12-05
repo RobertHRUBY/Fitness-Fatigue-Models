@@ -32,7 +32,7 @@ These are functions that are currently under experimental development. They will
 
 #### Step 2: Import the required function
 
-| Function | Code (to import into R) |
+| Function | Code (copy, paste, run) |
 |-|-|
 | `banisterModel()` | `source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/banisterModel.R )` |
 | `standardModel()` | `source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/standardModel.R)` |
