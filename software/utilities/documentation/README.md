@@ -2,11 +2,11 @@
 
 | R script | Function | Documentation | Code example |
 |-|-|-|-|
-| banisterModel.R | `banisterModel()` | [here]() | [here]() |
-| standardModel.R | `standardModel()` | [here]() | [here]() |
-| calvertModel.R | `calvertModel()` | [here]() | [here]() |
-| turnerModel.R | `turnerModel()` | [here]() | [here]() |
-| computeModels.R | `computeModels()` | [here]() | [here]() |
+| banisterModel.R | `banisterModel()` | [banisterModel_docs.pdf]() | [here]() |
+| standardModel.R | `standardModel()` | [standardModel_docs.pdf]() | [here]() |
+| calvertModel.R | `calvertModel()` | [calvertModel_docs.pdf]() | [here]() |
+| turnerModel.R | `turnerModel()` | [turnerModel_docs.pdf]() | [here]() |
+| computeModels.R | `computeModels()` | [computeModels_docs.pdf]() | [here]() |
 
 
 ## Sub-directories
