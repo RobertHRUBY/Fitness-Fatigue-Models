@@ -57,9 +57,7 @@ To begin with, the researcher imports or loads thier data into the R environment
     mockData = getURL()
     mockData = read.csv(textConnection(mockData))
 
-We briefly impsect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series.
-
-Inspect the mock dataset as follows
+We briefly impsect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series. Run the following command:
 
     head(mockData)
     
