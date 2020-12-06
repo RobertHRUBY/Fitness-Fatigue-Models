@@ -12,7 +12,12 @@ standardModel <- function(inputData,
                         testHorizon = NULL,
                         expandRate = NULL,
                         doParallel = FALSE,
-                        maxit = 10000){
+                        maxit = 10000,
+                        popSize = 120,
+                        gaSelection = 'gareal_tourSelection',
+                        gaCrossover = 'gareal_blxCrossover',
+                        gaMutation = 'gareal_rsMutation',
+                        gaElitism = 7.5){
   
   # ------------------------------------------------------------------------------
   # BASIC INPUT VALIDATION AND LOAD DEPENDENCIES
@@ -347,17 +352,17 @@ standardModel <- function(inputData,
                       upper = constraints$upper,
                       maxiter = maxit,
                       monitor = doTrace,
-                      popSize = 120,
+                      popSize = popSize,
                       optim = TRUE,
                       optimArgs = list(method = "L-BFGS-B",
                                        poptim = 0.1,
                                        pressel = 0.5,
                                        control = list(maxit = 1500)
                       ),
-                      elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      elitism = gaElitism,
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
@@ -448,9 +453,9 @@ standardModel <- function(inputData,
                       fitness = objectiveFn,
                       lower = constraints$lower,
                       upper = constraints$upper,
-                      maxiter = 10000,
+                      maxiter = maxit,
                       monitor = doTrace,
-                      popSize = 120,
+                      popSize = popSize,
                       optim = TRUE,
                       optimArgs = list(method = "L-BFGS-B",
                                        poptim = 0.1,
@@ -458,9 +463,9 @@ standardModel <- function(inputData,
                                        control = list(maxit = 1500)
                       ),
                       elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
