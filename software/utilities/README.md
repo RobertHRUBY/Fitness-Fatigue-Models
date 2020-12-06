@@ -1,13 +1,13 @@
 # Utilities: An R toolbox for fitting and evaluating FFMs
 
-This directory includes easy to use [R](https://www.r-project.org/) functions for fitting and evaluating FFMs with modern optimisers, cross-validation, and input checking. Complete [documentation](documentation/) is provided for each. Furthermore, code files with reproducible examples are provided [here](documentation/examples).
+This directory includes easy to use [R](https://www.r-project.org/) functions for fitting and evaluating FFMs with modern optimizer, cross-validation, and input checking. Complete [documentation](documentation/) is provided for each. Furthermore, code files with reproducible examples are provided [here](documentation/examples).
 
 ## Currently available functions:
 
-| Function | Code file | Description | Usage | Optimiser | Features |
+| Function | Code file | Description | Usage | Optimizer | Features |
 |-|-|-|-|-|-|
-| `banisterModel()` | [banisterModel.R](banisterModel.R) | Numerically solve system of ODE's and fit the standard model from first principles | [docs]() [example]() | GA or L-BFGS-B | Bounds, estimation of initial conditions, cross validation, genetic algorithms |
-| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the explicit solution to the standard two component model | [docs]() [example]() | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
+| `banisterModel()` | [banisterModel.R](banisterModel.R) | Numerically solve system of ODE's and fit the standard model from first principles | [docs]() [example]() | GA | Bounds, estimation of initial conditions, cross validation, genetic algorithms |
+| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the explicit solution to the standard two component model | [docs]() [example](documentation/examples/standardModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
 | `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the explicit solution to the fitness-delay model | [docs]() [example]() | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
 | `turnerModel()` | [turnerModel.R](turnerModel.R) | Numerically solve system of ODE's and fit the non-linear variant of the standard model | [docs]() [example]() | GA | Bounds, estimation of initial conditions, cross validation |
 | `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [docs]() [example]() | NA - Simple computation | Compute with or without initial traces for discrete models |
