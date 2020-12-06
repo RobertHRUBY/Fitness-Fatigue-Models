@@ -6,7 +6,33 @@ computeModels = function(model = NULL,
                          loadSeries = NULL){
 
 # Models include: Quick guide
-
+  
+  
+  #   standardModel(parms, loadSeries) - model = "standard"
+  #       parms: c(p*,kg,Tg,kh,Th)
+  #       loadSeries: single vector of positive real values of time-series length
+  
+  #   standardModelIC(parms, loadSeries) - model = "standardIC"
+  #       parms: c(p*,kg,Tg,kh,Th,qg,qh)
+  #       loadSeries: single vector of positive real values of time-series length
+  
+  #   turnerModel(parms, loadSeries) - model = "turner"
+  #       parms: c(kg, kh, Tg, Th, alpha, beta, p*, g0, h0)
+  #       loadSeries: single vector of positive real values of time-series length
+  
+  #   banisterModel(parms, loadSeries) - model = "banister"
+  #       parms: c(kg, kh, Tg, Th, p*, g0, h0)
+  #       loadSeries: single vector of positive real values of time-series length
+  
+  #   calvertModel(parms, loadSeries) - model = "calvert"
+  #       parms:
+  #       loadSeries: single vector of positive real values of time-series length
+  
+  #   calvertModelIC(parms, loadSeries) - model = "calvert"
+  #       parms:
+  #       loadSeries: single vector of positive real values of time-series length
+  
+# EXPERIMENTAL
 #   basicModel(parms, loadSeries) - model = "basic"
 #       parms: c(p*, K, T)
 #       loadSeries: single vector of positive real values of time-series length
@@ -14,27 +40,7 @@ computeModels = function(model = NULL,
 #   basicModelIC(parms, loadSeries) - model = "basicIC"
 #       parms: c(p*, K, T, q)
 #       loadSeries: single vector of positive real values of time-series length
-  
-#   standardModel(parms, loadSeries) - model = "standard"
-#       parms: c(p*,kg,Tg,kh,Th)
-#       loadSeries: single vector of positive real values of time-series length
-  
-#   standardModelIC(parms, loadSeries) - model = "standardIC"
-#       parms: c(p*,kg,Tg,kh,Th,qg,qh)
-#       loadSeries: single vector of positive real values of time-series length
-  
-#   turnerModel(parms, loadSeries) - model = "turner"
-#       parms: c(kg, kh, Tg, Th, alpha, beta, p*, g0, h0)
-#       loadSeries: single vector of positive real values of time-series length
 
-#   banisterModel(parms, loadSeries) - model = "banister"
-#       parms: c(kg, kh, Tg, Th, p*, g0, h0)
-#       loadSeries: single vector of positive real values of time-series length
-  
-#   calvertModel(parms, loadSeries) - model = "calvert"
-#       parms:
-#       loadSeries: single vector of positive real values of time-series length
-  
 # Input validation
   
   if (is.null(model)){
@@ -103,10 +109,10 @@ computeModels = function(model = NULL,
     for (n in 1:length(s)){
       df1 <- df0[1:s[n], ]
       fitness[n] = parms[2] * sum( df1$ws * exp(- (n - df1$s) / parms[3]) ) +
-        parms[6]*(exp (- (i/parms[3])))
+        parms[6]*(exp (- (n/parms[3])))
       fatigue[n] =  parms[4] * sum( df1$ws * exp(- (n - df1$s) / parms[5]) ) + 
-        parms[7]*(exp (- (i/parms[5])))
-      p[n] <- pars[1] + fitness[n] - fatigue[n]
+        parms[7]*(exp (- (n/parms[5])))
+      p[n] <- parms[1] + fitness[n] - fatigue[n]
     }
     return(data.frame("fitness" = fitness, "fatigue" = fatigue,
                       "performance" = p))  
@@ -158,7 +164,7 @@ computeModels = function(model = NULL,
   
   # Banister's model (Original system)
   # Model Computation Function
-  computeModel = function(parms, loadSeries){
+  banisterCompute = function(parms, loadSeries){
     # Format data into correct format
     compData = data.frame("days" = 0:length(loadSeries),
                           "G" = c(rep(0, length(loadSeries)+1)),
@@ -202,7 +208,39 @@ computeModels = function(model = NULL,
   } # End of banisterCompute
   
   # Calvert's model (Fitness-delay)
+  calvertModel = function(parms, loadSeries){
+    
+    p = numeric(length = length(loadSeries))
+    s = 1:length(loadSeries)
+    df0 = data.frame(s, "ws" = loadSeries)
+      for (n in 1:length(s)){
+        df1 <- df0[1:s[n], ]
+        p[n] <- parms[1] + 
+          parms[2] * sum( df1$ws * (exp(- (n - df1$s) / parms[3]) - 
+                                     exp(- (n - df1$s) / parms[4]))) -
+          parms[5] * sum( df1$ws * exp(- (n - df1$s) / parms[6]) )
+      }
+    return(p)  
+  }
   
+  # Calvert's model (Fitness-delay)
+  calvertModelIC = function(parms, loadSeries){
+    
+    p = numeric(length = length(loadSeries))
+    s = 1:length(loadSeries)
+    df0 = data.frame(s, "ws" = loadSeries)
+    for (n in 1:length(s)){
+      df1 <- df0[1:s[n], ]
+      
+      p[n] <- parms[1] + 
+        parms[2] * sum( df1$ws * (exp(- (n - df1$s) / parms[3]) - 
+                                   exp(- (n - df1$s) / parms[4]))) -
+        parms[5] * sum( df1$ws * exp(- (n - df1$s) / parms[6]) ) +
+        parms[7]*(exp (- (n/parms[3]))) -
+        parms[8]*(exp (- (n/parms[6])))
+    }
+    return(p)  
+  }
   
 # Call appropriate function
   
@@ -210,7 +248,7 @@ computeModels = function(model = NULL,
     if (model == "basic"){
       if (length(parms) != 3){
         stop("Incorrect parameters supplied. Please supply a vector of 
-             c(p*,K,T")
+             c(p*,K,T)")
       }
       computedModel = basicModel(parms, loadSeries)
     }
@@ -218,7 +256,7 @@ computeModels = function(model = NULL,
     if (model == "basicIC"){
       if (length(parms) != 4){
         stop("Incorrect parameters supplied. Please supply a vector of 
-               c(p*,K,T,q")
+               c(p*,K,T,q)")
       }
       computedModel = basicModelIC(parms, loadSeries)
     }
@@ -227,15 +265,15 @@ computeModels = function(model = NULL,
     if (model == "standard"){
       if (length(parms) != 5){
         stop("Incorrect parameters supplied. Please supply a vector of 
-             c(p*,kg,Tg,kh,Th")
+             c(p*,kg,Tg,kh,Th)")
       }
       computedModel = standardModel(parms, loadSeries)
     }
     # Initial conditions
-    if (model == "standard"){
+    if (model == "standardIC"){
       if (length(parms) != 7){
         stop("Incorrect parameters supplied. Please supply a vector of 
-             c(p*,kg,Tg,kh,Th,qg,qh")
+             c(p*,kg,Tg,kh,Th,qg,qh)")
       }
       computedModel = standardModelIC(parms, loadSeries)
     }
@@ -244,7 +282,7 @@ computeModels = function(model = NULL,
     if (model == "turner"){
       if (length(parms) != 9){
         stop("Incorrect parameters supplied. Please supply a vector of 
-             c(kg,kh,Tg,Th,alpha,beta,p0,g0,h0")
+             c(kg,kh,Tg,Th,alpha,beta,p0,g0,h0)")
       }
       require(deSolve)
       computedModel = turnerCompute(parms, loadSeries)
@@ -254,10 +292,28 @@ computeModels = function(model = NULL,
     if (model == "banister"){
       if (length(parms) != 7){
         stop("Incorrect parameters supplied. Please supply a vector of 
-             c(kg,kh,Tg,Th,p0,g0,h0")
+             c(kg,kh,Tg,Th,p0,g0,h0)")
       }
       require(deSolve)
       computedModel = banisterCompute(parms, loadSeries)
+    }
+  
+  # Calvert model (no initial component)
+    if (model == "calvert"){
+      if (length(parms) != 6){
+        stop("Incorrect parameters supplied. Please supply a vector of 
+               c(p*,kg,Tg1,Tg2,kh,Th)")
+      }
+      computedModel = calvertModel(parms, loadSeries)
+    }
+    
+  # Calvert model (with initial component)
+    if (model == "calvertIC"){
+      if (length(parms) != 8){
+        stop("Incorrect parameters supplied. Please supply a vector of 
+               c(p*,kg,Tg1,Tg2,kh,Th,qg,qh)")
+      }
+      computedModel = calvertModelIC(parms, loadSeries)
     }
   
   # Return computed model of choice
