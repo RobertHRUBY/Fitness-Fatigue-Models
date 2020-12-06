@@ -1,3 +1,6 @@
-# Illustrative code resources
+Fitness Fatigue Model Notebooks
+===================
 
-TODO: BenO's readme and code files here.
+
+- [Standard FFM, VDR, and Hill tranformation](./fitness-fatigue-models-illustrative-code.ipynb)
+- [Kalman Filter](./kalman-filter-illustrative-code.ipynb)
