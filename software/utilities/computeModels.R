@@ -157,6 +157,53 @@ computeModels = function(model = NULL,
     return(compData)
   } # End of turnerCompute
   
+  # Banister's model (Original system)
+  # Model Computation Function
+  computeModel = function(parms, loadSeries){
+    # Format data into correct format
+    compData = data.frame("days" = 0:length(loadSeries),
+                          "G" = c(rep(0, length(loadSeries)+1)),
+                          "H" = c(rep(0, length(loadSeries)+1)),
+                          "pHat" = c(rep(0, length(loadSeries)+1)),
+                          "loads" = c(0, loadSeries)
+    )
+    # Function called by numerical ODE solver
+    banisterSolve = function(t, y, parms){
+      r = c()
+      r[1] = (parms[1]*currentLoad) - 
+        ((1/parms[3]) * y["G"])
+      r[2] = (parms[2]*currentLoad) - 
+        ((1/parms[4]) * y["H"])
+      return(list(r))
+    } # end of banisterSolve
+    # Solve model
+    for (j in 1:length(compData$days)){
+      currentLoad = compData$loads[j]
+      if (j == 1){
+        stateInit = c(G = parms[6],     # Fitness
+                      H = parms[7])     # Fatigue
+      } else{
+        # Initialize based on previous value
+        stateInit = c(G = compData$G[j-1],    # Fitness 
+                      H = compData$H[j-1])    # Fatigue
+      }
+      t = 0:1
+      out = ode(y = stateInit, times = t, func = banisterSolve, 
+                parms = parms)
+      if (j == 1){
+        compData$G[j] = unname(out[1,2])
+        compData$H[j] = unname(out[1,3])
+      } else{
+        compData$G[j] = unname(out[2,2])
+        compData$H[j] = unname(out[2,3])
+      }
+      compData$pHat[j] = parms[5] + compData$G[j] - compData$H[j]
+    } # End of solve loop
+    return(compData)
+  } # End of banisterCompute
+  
+  # Calvert's model (Fitness-delay)
+  
   
 # Call appropriate function
   
