@@ -7,14 +7,14 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 | Function | Code file | Description | Usage | Optimizer | Features |
 |-|-|-|-|-|-|
 | `banisterModel()` | [banisterModel.R](banisterModel.R) | Numerically solve system of ODE's and fit the standard model from first principles | [docs](documentation/banisterModel_docs.pdf) [example](documentation/examples/banisterModelExample.R) | GA | Bounds, estimation of initial conditions, cross validation, genetic algorithms |
-| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the explicit solution to the standard two component model | [docs]() [example](documentation/examples/standardModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
-| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the explicit solution to the fitness-delay model | [docs]() [example](documentation/examples/calvertModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
+| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the explicit solution to the standard two component model | [docs](documentation/standardModel_docs.pdf) [example](documentation/examples/standardModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
+| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the explicit solution to the fitness-delay model | [docs](documentation/calvertModel_docs.pdf) [example](documentation/examples/calvertModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
 | `turnerModel()` | [turnerModel.R](turnerModel.R) | Numerically solve system of ODE's and fit the non-linear variant of the standard model | [docs](documentation/turnerModel_docs.pdf) [example](documentation/examples/turnerModelExample.R) | GA | Bounds, estimation of initial conditions, cross validation |
-| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [docs]() [example](documentation/examples/computeModelsExample.R) | NA - Simple computation | Compute with or without initial traces for discrete models |
+| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [docs](documentation/computeModels_docs.pdf) [example](documentation/examples/computeModelsExample.R) | NA - Simple computation | Compute with or without initial traces for discrete models |
 
-### Experimental features:
+#### Experimental scripts:
 
-These are functions that are currently under experimental development. They will become full features of the project, or removed if not proven to work well. Use with caution
+These are functions that are currently under experimental development. They will become full features of the project, or removed if not proven to work well. Use with caution, limited documentation provided. See directory.
 
 | Function | File | Description | 
 |-|-|-|
