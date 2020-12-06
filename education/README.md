@@ -1,4 +1,4 @@
-## Links, notes, and other educational resources
+## Links, notes, and other educational resources on the WWW
 
 ### Links to other great resources
 - [Kalman-Filter estimation in MATLAB](https://github.com/bsh2/Kalman-Fitness-Fatigue): Kolossa et al. (2017) (Forked)
