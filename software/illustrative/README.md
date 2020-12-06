@@ -11,5 +11,5 @@ forked using the (free) platform.
 
 ## The Notebooks on Kaggle.com 
 
-- [Standard FFM, VDR, and Hill tranformation](https://www.kaggle.com/baogorek/fitness-fatigue-models-illustrative-code.ipynb)
-- [Kalman Filter](https://www.kaggle.com/baogorek/kalman-filter-illustrative-code.ipynb)
+- [Standard FFM, VDR, and Hill tranformation](https://www.kaggle.com/baogorek/fitness-fatigue-models-illustrative-code)
+- [Kalman Filter](https://www.kaggle.com/baogorek/kalman-filter-illustrative-code)
