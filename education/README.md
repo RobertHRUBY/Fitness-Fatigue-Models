@@ -13,4 +13,4 @@
 
 ### Historical timeline of FFM research
 
-![Historical timeline](other_resources/Historical%20timeline.jpg)
+![Historical timeline](misc/Historical%20timeline.jpg)
