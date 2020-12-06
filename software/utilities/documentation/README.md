@@ -1,10 +1,12 @@
 # Documentation: Utilities
 
-1. [banisterModel.R docs]() | [code example]() | function: `banisterModel()`
-2. [standardModel.R docs]() | [code example]() | function: `standardModel()`
-3. [calvertModel.R docs]() | [code example]() | function: `calvertModel()`
-4. [turnerModel.R docs]() | [code example]() | function: `turnerModel()`
-5. [computeModels.R docs]() | [code example]() | function: `computeModels()`
+| R script | Function | Documentation | Code example |
+|-|-|-|-|
+| banisterModel.R | `banisterModel()` | [here]() | [here]() |
+| standardModel.R | `standardModel()` | [here]() | [here]() |
+| calvertModel.R | `calvertModel()` | [here]() | [here]() |
+| turnerModel.R | `turnerModel()` | [here]() | [here]() |
+| computeModels.R | `computeModels()` | [here]() | [here]() |
 
 
 ## Sub-directories
