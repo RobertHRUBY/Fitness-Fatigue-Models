@@ -40,26 +40,30 @@ These are functions that are currently under experimental development. They will
 | `turnerModel()` | `source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/turnerModel.R )` |
 | `computeModels()` | `source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/computeModels.R )` |
     
-## Getting started: An introductory example
+## An introductory example (getting started)
 
-Consider a researcher looking to fit a fitness-fatigue model to a set of experimental data (i.e. a time-series of quantified training load and measured performance values).
+Consider a researcher looking to fit an FFM to a set of experimental data (i.e. time-series of quantified training load and measured performance values)
 
-*Note, you will need to install the following packages* (`RCurl`,`devtools`) *to follow along in your own R interpreter (e.g. [R-studio](https://rstudio.com/)). You can do this by running the following code:*
+*Note, you will need to have installed the following packages* (`RCurl`,`devtools`) *to follow along with this example your own R interpreter/environment (e.g. [R-studio Recommended](https://rstudio.com/)). You can do this by running the following code:*
 
     install.packages("RCurl")
     install.packages("devtools")
 
 ### 1. Load data
 
-To begin with, the researcher imports or loads their data into the environment. For the purposes of the example, we import a set of mock data provided [here](documentation/data/mockData.csv) using the code below:
+To begin with, the researcher imports or loads thier data into the R environment. For the purposes of the example, we import a set of mock data provided [here](documentation/data/mockData.csv) using the code below:
 
     library(RCurl)
     mockData = getURL()
     mockData = read.csv(textConnection(mockData))
 
-Inspect the structure of the dataset. It should be in three column form, in order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training occurred on a given day.
+We briefly impsect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series.
+
+Inspect the mock dataset as follows
 
     head(mockData)
+    
+  
     days   performances    loads
        1          466.2    56.35
        2             NA     0.00
