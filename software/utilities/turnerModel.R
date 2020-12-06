@@ -53,6 +53,11 @@ turnerModel = function(inputData,
     stop("Bounds incorrectly specified. Check values")
   }
   
+  if (constraints$lower[5] < 0.3 || constraints$lower[6] < 0.3){
+    stop("lower bounds on alpha,beta are too low. Will cause
+         local search to violate bounds and crash")
+  }
+  
   if (dim(constraints)[1] != 9){
     stop("Box constraints of incorrect dimension")
   }
@@ -230,8 +235,6 @@ turnerModel = function(inputData,
                     popSize = popSize,
                     optim = TRUE,
                     optimArgs = list(method = "L-BFGS-B",
-                                     poptim = 0.2,
-                                     pressel = 0.5,
                                      control = list(maxit = 1500)
                     ),
                     elitism = gaElitism,
@@ -352,8 +355,6 @@ turnerModel = function(inputData,
                     popSize = popSize,
                     optim = TRUE,
                     optimArgs = list(method = "L-BFGS-B",
-                                     poptim = 0.2,
-                                     pressel = 0.5,
                                      control = list(maxit = 1500)
                     ),
                     elitism = gaElitism,
