@@ -6,7 +6,7 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 | Function | Code file | Description | Usage | Optimizer | Features |
 |-|-|-|-|-|-|
-| `banisterModel()` | [banisterModel.R](banisterModel.R) | Numerically solve system of ODE's and fit the standard model from first principles | [docs]() [example](documentation/examples/banisterModelExample.R) | GA | Bounds, estimation of initial conditions, cross validation, genetic algorithms |
+| `banisterModel()` | [banisterModel.R](banisterModel.R) | Numerically solve system of ODE's and fit the standard model from first principles | [docs](documentation/banisterModel_docs.pdf) [example](documentation/examples/banisterModelExample.R) | GA | Bounds, estimation of initial conditions, cross validation, genetic algorithms |
 | `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the explicit solution to the standard two component model | [docs]() [example](documentation/examples/standardModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
 | `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the explicit solution to the fitness-delay model | [docs]() [example](documentation/examples/calvertModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
 | `turnerModel()` | [turnerModel.R](turnerModel.R) | Numerically solve system of ODE's and fit the non-linear variant of the standard model | [docs]() [example]() | GA | Bounds, estimation of initial conditions, cross validation |
