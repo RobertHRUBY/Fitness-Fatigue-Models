@@ -1,16 +1,23 @@
 # Version 1.0
 # Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
 
-calvertModel = function(inputData,
+calvertModel <- function(inputData,
                         constraints,
                         method = 'bfgs',
                         startingValues = NULL,
                         doTrace = FALSE,
                         initialComponent = FALSE,
+                        parscale = NULL,
                         initialWindow = NULL,
                         testHorizon = NULL,
                         expandRate = NULL,
-                        doParallel = FALSE){
+                        doParallel = FALSE,
+                        maxit = 10000,
+                        popSize = 120,
+                        gaSelection = 'gareal_tourSelection',
+                        gaCrossover = 'gareal_blxCrossover',
+                        gaMutation = 'gareal_rsMutation',
+                        gaElitism = 7.5){
   
   # ------------------------------------------------------------------------------
   # BASIC INPUT VALIDATION AND LOAD DEPENDENCIES
@@ -35,6 +42,27 @@ calvertModel = function(inputData,
   }
   
   # Validation checks on function call, and subsequently establish conditions
+  
+  # Parameter optimization scaling
+  if (is.null(parscale) && initialComponent == FALSE){
+    parscale <- c(1,1,1,1,1,1)
+  }
+  
+  if (is.null(parscale) && initialComponent == TRUE){
+    parscale <- c(1,1,1,1,1,1,1,1)
+  }
+  
+  if (is.null(parscale) & initialComponent == TRUE){
+    if (length(parscale) != 8){
+      stop("Incorrect parscale length")
+    }
+  }
+  
+  if (!is.null(parscale) & initialComponent == FALSE){
+    if (length(parscale) != 6){
+      stop("Incorrect parscale length")
+    }
+  }
   
   # Column dim and names of input data
   if (dim(inputData)[2] != 3){
@@ -169,7 +197,7 @@ calvertModel = function(inputData,
   
   # Optimisation tracing
   if (isTRUE(doTrace) && method == "bfgs"){
-    doTrace == 6                              # Optim control argument
+    doTrace <- 6                              # Optim control argument
     # if left as true / false value that is argument ready to supply to GA
   }
   
@@ -234,18 +262,22 @@ calvertModel = function(inputData,
         inputSubset = trainingData[1:measureIndex[i], ]
         modelledPerformance = par[1] + 
           par[2]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[3]))) -
-          par[4]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[5]))) +
-          par[6]*(exp (- (measureIndex[i]/par[3]))) -
-          par[7]*(exp (- (measureIndex[i]/par[5])))
+                        (exp(-(measureIndex[i]-inputSubset$days)/par[3]) - 
+                         exp(-(measureIndex[i]-inputSubset$days)/par[4])
+                        )
+                      )
+                  ) -
+          par[5]*(sum(inputSubset$loads * 
+                        exp(-(measureIndex[i]-inputSubset$days)/par[6]))) +
+          par[7]*(exp (- (measureIndex[i]/par[3]))) -
+          par[8]*(exp (- (measureIndex[i]/par[6])))
         squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
       }
       if (method == "bfgs"){
-        return(mean(squaredResiduals))
+        return(sum(squaredResiduals))
       }
       if (method == "ga"){
-        return(- mean(squaredResiduals))
+        return(- sum(squaredResiduals))
       }
     } # End of objective/cost function
   }
@@ -253,24 +285,28 @@ calvertModel = function(inputData,
   # Without initial component
   # --------------------------------------------------------------------------
   if (initialComponent == FALSE){
-    # Note to self, order of pars is c(p0,kg,Tg,kh,Th)
+    # Note to self, order of pars is c(p0,kg,Tg1,Tg2,kh,Th)
     objectiveFn = function(par){
       # Initialize the vector containing the squared residuals
       squaredResiduals = numeric(length(measuredPerformance))
       for (i in 1:length(measuredPerformance)){
         inputSubset = trainingData[1:measureIndex[i], ]
-        modelledPerformance <- par[1] + 
+        modelledPerformance = par[1] + 
           par[2]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[3]))) -
-          par[4]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[5])))
+                        (exp(-(measureIndex[i]-inputSubset$days)/par[3]) - 
+                           exp(-(measureIndex[i]-inputSubset$days)/par[4])
+                        )
+          )
+          ) -
+          par[5]*(sum(inputSubset$loads * 
+                        exp(-(measureIndex[i]-inputSubset$days)/par[6])))
         squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
       }
       if (method == "bfgs"){
-        return(mean(squaredResiduals))
+        return(sum(squaredResiduals))
       }
       if (method == "ga"){
-        return(- mean(squaredResiduals))
+        return(- sum(squaredResiduals))
       }
     } # End of objective/cost function
   }
@@ -292,24 +328,25 @@ calvertModel = function(inputData,
                          upper = constraints$upper,
                          method = "L-BFGS-B",
                          control = list(trace = doTrace,
-                                        maxit = 10000)
+                                        maxit = 10000,
+                                        factr = 1e-8)
                          # TODO: Make use of parscale at some point
       )
       
       # Extract values and summary object
       sliceModel = unlist(sliceModel)
       if (initialComponent == TRUE){
-        slicePars = as.numeric(sliceModel[1:7])
+        slicePars = as.numeric(sliceModel[1:8])
         sliceSummary = as.data.frame(t(sliceModel))
-        colnames(sliceSummary) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h",
-                                   "MSE","counts_fn","counts_gn",
+        colnames(sliceSummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h","q_g","q_h",
+                                   "RSS","counts_fn","counts_gn",
                                    "convcode","convergence")
       }
       if (initialComponent == FALSE){
-        slicePars = as.numeric(sliceModel[1:5])
+        slicePars = as.numeric(sliceModel[1:6])
         sliceSummary = as.data.frame(t(sliceModel))
-        colnames(sliceSummary) = c("p0","k_g","Tau_g","k_h","Tau_h",
-                                   "MSE","counts_fn","counts_gn",
+        colnames(sliceSummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h",
+                                   "RSS","counts_fn","counts_gn",
                                    "convcode","convergence")
       }
     }
@@ -321,9 +358,9 @@ calvertModel = function(inputData,
                       fitness = objectiveFn,
                       lower = constraints$lower,
                       upper = constraints$upper,
-                      maxiter = 10000,
+                      maxiter = maxit,
                       monitor = doTrace,
-                      popSize = 120,
+                      popSize = popSize,
                       optim = TRUE,
                       optimArgs = list(method = "L-BFGS-B",
                                        poptim = 0.1,
@@ -331,9 +368,9 @@ calvertModel = function(inputData,
                                        control = list(maxit = 1500)
                       ),
                       elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
@@ -434,9 +471,9 @@ calvertModel = function(inputData,
                                        control = list(maxit = 1500)
                       ),
                       elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
@@ -468,21 +505,21 @@ calvertModel = function(inputData,
     # Extract values and create summary object (primarySummary)
     primaryModel = unlist(primaryModel)
     if (initialComponent == TRUE){
-      primaryPars = as.numeric(primaryModel[1:7])
+      primaryPars = as.numeric(primaryModel[1:8])
       primarySummary = as.data.frame(t(primaryModel))
-      primarySummary[,c(-9,-10,-11,-12)] = 
-        round(as.numeric(primarySummary[,c(-9,-10,-11,-12)]),3)
-      colnames(primarySummary) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h",
-                                   "MSE","counts_fn",
+      primarySummary[,c(-10,-11,-12,-13)] = 
+        round(as.numeric(primarySummary[,c(-10,-11,-12,-13)]),3)
+      colnames(primarySummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h","q_g","q_h",
+                                   "RSS","counts_fn",
                                    "counts_gn","convcode","convergence")
     }
     if (initialComponent == FALSE){
-      primaryPars = as.numeric(primaryModel[1:5])
+      primaryPars = as.numeric(primaryModel[1:6])
       primarySummary = as.data.frame(t(primaryModel))
-      primarySummary[,c(-7,-8,-9,-10)] = 
-        round(as.numeric(primarySummary[,c(-7,-8,-9,-10)]),3)
-      colnames(primarySummary) = c("p0","k_g","Tau_g","k_h","Tau_h",
-                                   "MSE","counts_fn",
+      primarySummary[,c(-8,-9,-10,-11)] = 
+        round(as.numeric(primarySummary[,c(-8,-9,-10,-11)]),3)
+      colnames(primarySummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h",
+                                   "RSS","counts_fn",
                                    "counts_gn","convcode","convergence")
     }
     
@@ -582,19 +619,19 @@ calvertModel = function(inputData,
   
   # Model summary (parameter values + optim ref) - Loop depending on IC
   if (initialComponent == TRUE){
-    cvParms = matrix(data = NA, nrow = nSlices, ncol = 7)
+    cvParms = matrix(data = NA, nrow = nSlices, ncol = 8)
     for (i in 1:nSlices){
       cvParms[i,] = as.numeric(sliceModels[[i]]$slicePars)
     }
-    colnames(cvParms) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h")
+    colnames(cvParms) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h","q_g","q_h")
     rownames(cvParms) = sliceNames
   }
   if (initialComponent == FALSE){
-    cvParms = matrix(data = NA, nrow = nSlices, ncol = 5)
+    cvParms = matrix(data = NA, nrow = nSlices, ncol = 6)
     for (i in 1:nSlices){
       cvParms[i,] = as.numeric(sliceModels[[i]]$slicePars)
     }
-    colnames(cvParms) = c("p0","k_g","Tau_g","k_h","Tau_h")
+    colnames(cvParms) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h")
     rownames(cvParms) = sliceNames
   }
   
