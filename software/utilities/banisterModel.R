@@ -3,7 +3,7 @@
 
 banisterModel = function(inputData,
                          constraints,
-                         doTrace = FALSE,
+                         doTrace = TRUE,
                          initialWindow = NULL,
                          testHorizon = NULL,
                          expandRate = NULL,
