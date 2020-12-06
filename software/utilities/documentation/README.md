@@ -4,7 +4,7 @@
 2. [standardModel.R docs]() | [code example]() | function: `standardModel()`
 3. [calvertModel.R docs]() | [code example]() | function: `calvertModel()`
 4. [turnerModel.R docs]() | [code example]() | function: `turnerModel()`
-5. [computeModels.R docs[]() | [code example]() | function: `computeModels()`
+5. [computeModels.R docs]() | [code example]() | function: `computeModels()`
 
 
 ## Sub-directories
