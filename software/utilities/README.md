@@ -57,7 +57,7 @@ To begin with, the researcher imports or loads thier data into the R environment
     mockData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/documentation/data/mockUpper.csv")
     mockData = read.csv(textConnection(mockData))
 
-We briefly insect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series. Run the following command:
+We briefly insect the structure of the dataset. Contextually, the data represents upper body training load values reflecting a non-linear relationship between [intensity and volume](https://www.alancouzens.com/blog/volume_vs_intensity2.html), for an upper body performance measure (bench press). It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series. Run the following command:
 
     head(mockData)
     
@@ -75,7 +75,7 @@ Note the following console output. The order of the data, and appropriate use of
 
 ### 2. Import the model fitting function
 
-You can read more about the available functions and associated code files in the [documentation](documentation/utilities.pdf). However, for this example we will consider the standard fitness-fatigue model, described as follows:
+You can read more about the available functions and associated code files in the [documentation](documentation/) directory. However, for this example we will consider applying the standard fitness-fatigue model, described mathematically as follows:
 
 <img src="https://latex.codecogs.com/svg.latex?\hat{p}(t)&space;=&space;p^*&space;&plus;&space;k_g&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h&space;\sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" title="\hat{p}(t) = p^* + k_g \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_g}})-k_h \sum_{i=1}^{n-1}\omega(i)(e^{\frac{-(n-i)}{\tau_h}})" />
 
