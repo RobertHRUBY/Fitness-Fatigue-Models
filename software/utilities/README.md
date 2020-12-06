@@ -63,7 +63,8 @@ Inspect the mock dataset as follows
 
     head(mockData)
     
-  
+Note the following console output. The order of the data, and appropriate use of NA or zero values as described is important. This format is consistent for all functions in the repository for input data:
+
     days   performances    loads
        1          466.2    56.35
        2             NA     0.00
