@@ -210,11 +210,11 @@ turnerModel = function(inputData,
     
     # Wrap in cost function (Mean squared error)
     compSubset = subset(compData, !is.na(compData$p) == TRUE)
-    MSE = mean((compSubset$p - compSubset$pHat)^2)
+    RSS = sum((compSubset$p - compSubset$pHat)^2)
     
-    # Return MSE value (note minus due to minimization in GA)
-    return(-MSE)
-  } # End of turner MSE fitness function
+    # Return RSS value (note minus due to minimization in GA)
+    return(-RSS)
+  } # End of turner RSS fitness function
   
   # Cross-validation fitting function
   crossValidate = function(objectiveFn,
