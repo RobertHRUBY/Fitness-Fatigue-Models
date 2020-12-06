@@ -8,7 +8,7 @@
 | turnerModel.R | `turnerModel()` | [turnerModel_docs.pdf](turnerModel_docs.pdf) | [here](examples/turnerModelExample.R) |
 | computeModels.R | `computeModels()` | [computeModels_docs.pdf](computeModels_docs.pdf) | [here](examples/computeModelsExample.R) |
 
-In addition, please check out [this Kaggle notebook]() which explores the function developed for Turner's model even further.
+In addition, please check out [TODO: this Kaggle notebook]() which explores the function developed for Turner's model even further.
 
 ## Sub-directories
 
