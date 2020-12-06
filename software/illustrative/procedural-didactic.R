@@ -175,4 +175,49 @@ w_hill_ml3 <- get_hill_transformed_training(ffm_ml, w)
 plot(w_hill_ml3 ~ w,
      main = "Hill transformation Again - True (black) & Est (blue )")
 
+# ---------------------------------------------------------------------
+# Kalman Filter -------------------------------------------------------
+# ---------------------------------------------------------------------
+source("kalmanFunctions.R")
+kalman_model <- create_kalman_model(p_0 = 400, k_g = .1, k_h = .3, tau_g = 50,
+                                    tau_h = 15, xi = 15,
+                                    sigma_g = 20, sigma_h = 10, rho_gh = .2,
+                                    initial_g = 1500, initial_h = 500,
+                                    initial_sd_g = 500, initial_sd_h = 250,
+                                    initial_rho_gh = 0)
+print(kalman_model)
+w <- rep(c(seq(10, 50), rep(20, 14)), 5)
+w <- c(w, rep(0, 100), w)  #  Adding long rest!
+plot(w, main = "Training impulses for this demonstration", xlab = "time")
 
+set.seed(134323)
+df <- simulate(kalman_model, w)
+head(df)
+
+# Note that state error can lead to fitness and fatigue dropping below 0
+plot(df$true_fitness, main = "True fitness with state error")
+plot(df$true_fatigue, main = "True fatigue with state error")
+
+filtered <- filter(kalman_model, df)
+names(filtered)
+
+# Predictions with True Parameters
+plot(df$y, xlab = "time",
+     main = "Predictions with Kalman Filter, True Parameters")
+points(filtered$df$y_hat, col = 'blue')
+
+kf_mod <- initialize_kalman_from_data(df)
+print(kf_mod)
+
+kf_mod <- increase_likelihood(kf_mod, df, reps = 10)
+print(kf_mod)
+
+filtered <- filter(kf_mod, df)
+
+plot(filtered$X[, 1], main = "Estimated fitness")
+plot(filtered$X[, 2], main = "Estimated fatigue")
+
+df$pred <- filtered$df$y_hat
+
+plot(y ~ t, data = df, main = "Observed and Kalman Filter predictions")
+points(filtered$df$y_hat, col = 'blue')

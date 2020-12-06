@@ -149,9 +149,9 @@ initialize_kalman_from_data <- function(df, tau_g_seq = c(100, 60, 30, 20),
     # Quick estimate of starting values
     time <- 1:nrow(df)
     trend_fit <- lm(dummy_fitness ~ time)
-    start_df[i, "fitness_0"] <- predict(trend_fit, newdata = data.frame(time = 0))
+    start_df[i, "fitness_0"] <- predict(trend_fit, newdata = data.frame(time = 1))
     trend_fat <- lm(dummy_fatigue ~ time)
-    start_df[i, "fatigue_0"] <- predict(trend_fat, newdata = data.frame(time = 0))
+    start_df[i, "fatigue_0"] <- predict(trend_fat, newdata = data.frame(time = 1))
   
     fit_resid <- dummy_fitness[2:nrow(df)] - exp(-1 / tau_g) * dummy_fitness[1:(nrow(df) - 1)]
     fat_resid <- dummy_fatigue[2:nrow(df)] - exp(-1 / tau_h) * dummy_fatigue[1:(nrow(df) - 1)]
@@ -252,13 +252,13 @@ simulate.kalmanfilter <- function(kalman_model, w) {
       # A priori mean and variance of state --
       if (n == 1) {
         # simulate unconditional: x_0
-        X[n, ] <- mvrnorm(1, x_0, M_0)
+        X[n, ] <- x_0
       } else {
         # simulate conditional: x_n | x_(n - 1)
         X[n, ] <- mvrnorm(1, A %*% X[n - 1, ] + B * w[n - 1], Q)
       }
       # Simulate conditional: y_n | x_n
-      y[n] <- rnorm(1, p_0 + C %*% X[n, ], xi) #sqrt(xi ^ 2 + C %*% Q %*% t(C)))
+      y[n] <- rnorm(1, p_0 + C %*% X[n, ], xi)
     }
     data.frame(t = 1:T, w, y, true_fitness = X[, 1], true_fatigue = X[, 2])
   })
