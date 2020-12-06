@@ -1,6 +1,6 @@
 # Educational Resources
 
-## A new two-part review series covering fitness-fatigue models
+## A new two-part review series examining fitness-fatigue models
 
 1. [A narrative review of mathematical fitness-fatigue modelling for applications in exercise science: Model dynamics, methods, limitations, and future recommendations](https://osf.io/preprints/sportrxiv/ap75j/) (Preprint)
 
