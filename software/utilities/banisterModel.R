@@ -123,14 +123,14 @@ banisterModel = function(inputData,
                           "loads" = c(0, loadSeries)
     )
     # Function called by numerical ODE solver
-    turnerSolve = function(t, y, parms){
+    banisterSolve = function(t, y, parms){
       r = c()
       r[1] = (parms[1]*currentLoad) - 
         ((1/parms[3]) * y["G"])
       r[2] = (parms[2]*currentLoad) - 
         ((1/parms[4]) * y["H"])
       return(list(r))
-    } # end of turnerSolve
+    } # end of banisterSolve
     # Solve model
     for (j in 1:length(compData$days)){
       currentLoad = compData$loads[j]
@@ -143,7 +143,7 @@ banisterModel = function(inputData,
                       H = compData$H[j-1])    # Fatigue
       }
       t = 0:1
-      out = ode(y = stateInit, times = t, func = turnerSolve, 
+      out = ode(y = stateInit, times = t, func = banisterSolve, 
                 parms = parms)
       if (j == 1){
         compData$G[j] = unname(out[1,2])
@@ -155,7 +155,7 @@ banisterModel = function(inputData,
       compData$pHat[j] = parms[5] + compData$G[j] - compData$H[j]
     } # End of solve loop
     return(compData)
-  } # End of turnerCompute
+  } # End of banisterCompute
   
   # Global Loss Function
   objectiveFn = function(parmsAndICS){
@@ -169,14 +169,14 @@ banisterModel = function(inputData,
                           "loads" = c(0, trainingData$loads))
     
     # Function called by numerical ODE solver
-    turnerSolve = function(t, y, parmsAndICS){
+    banisterSolve = function(t, y, parmsAndICS){
       r = c()
       r[1] = (parmsAndICS[1]*currentLoad) - 
         ((1/parmsAndICS[3]) * y["G"])
       r[2] = (parmsAndICS[2]*currentLoad) - 
         ((1/parmsAndICS[4]) * y["H"])
       return(list(r))
-    } # end of turnerSolve
+    } # end of banisterSolve
     
     # Solve model
     for (j in 1:length(compData$days)){
@@ -193,7 +193,7 @@ banisterModel = function(inputData,
       }
       
       t = 0:1
-      out = ode(y = stateInit, times = t, func = turnerSolve, 
+      out = ode(y = stateInit, times = t, func = banisterSolve, 
                 parms = parmsAndICS)
       
       if (j == 1){
@@ -214,7 +214,7 @@ banisterModel = function(inputData,
     
     # Return RSS value (note minus due to minimization in GA)
     return(-RSS)
-  } # End of turner RSS fitness function
+  } # End of banister RSS fitness function
   
   # Cross-validation fitting function
   crossValidate = function(objectiveFn,
@@ -541,4 +541,4 @@ banisterModel = function(inputData,
                       "cv" = crossValidation)
   
 return(returnObject)
-}# End of turnerModel
+}# End of banisterModel
