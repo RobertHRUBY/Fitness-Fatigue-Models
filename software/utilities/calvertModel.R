@@ -151,7 +151,7 @@ calvertModel <- function(inputData,
   # Method
   if (method != "bfgs" && method != "ga"){
     stop("Method supplied incorrectly. Options are 'bfgs' or 'ga'")
-  }U
+  }
   
   # Number of performance measurements in the data set
   if (sum(!is.na(inputData$performances)) <= 40){
@@ -225,10 +225,11 @@ calvertModel <- function(inputData,
         df1 <- df0[1:s[n], ]
         
         p[n] <- pars[1] + 
-          pars[2] * sum( df1$ws * exp(- (n - df1$s) / pars[3]) ) -
-          pars[4] * sum( df1$ws * exp(- (n - df1$s) / pars[5]) ) +
-          pars[6]*(exp (- (i/pars[3]))) -
-          pars[7]*(exp (- (i/pars[5])))
+          pars[2] * sum( df1$ws * (exp(- (n - df1$s) / pars[3]) - 
+                                     exp(- (n - df1$s) / pars[4]))) -
+          pars[5] * sum( df1$ws * exp(- (n - df1$s) / pars[6]) ) +
+          pars[7]*(exp (- (i/pars[3]))) -
+          pars[8]*(exp (- (i/pars[6])))
       }
     }
     
@@ -237,8 +238,9 @@ calvertModel <- function(inputData,
       for (n in 1:length(s)){
         df1 <- df0[1:s[n], ]
         p[n] <- pars[1] + 
-          pars[2] * sum( df1$ws * exp(- (n - df1$s) / pars[3]) ) -
-          pars[4] * sum( df1$ws * exp(- (n - df1$s) / pars[5]) )
+          pars[2] * sum( df1$ws * (exp(- (n - df1$s) / pars[3]) - 
+                                   exp(- (n - df1$s) / pars[4]))) -
+          pars[5] * sum( df1$ws * exp(- (n - df1$s) / pars[6]) )
       }
     }
     
