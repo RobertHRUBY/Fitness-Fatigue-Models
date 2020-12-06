@@ -11,6 +11,6 @@
   - [3 - Modelling Cumulative Impact Part III](https://towardsdatascience.com/modeling-cumulative-impact-part-iii-1b216273b499)
   - [4 - Modelling cumulative impact via the Kalman Filter and External Control Inputs](https://towardsdatascience.com/the-kalman-filter-and-external-control-inputs-70ea6bcbc55f)
 
-### Historical research list: FFM and closely related models
+### Historical timeline of FFM research
 
-![Historical timeline](https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/resources/timeline.jpg?token=AGTSF7KJRTCN2SEXMASE3T27WQRU4)
+![Historical timeline](other_resources/Historical%20timeline.jpg)
