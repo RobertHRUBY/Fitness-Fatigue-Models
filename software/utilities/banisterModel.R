@@ -1,6 +1,9 @@
+# Version 1.0
+# Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
+
 banisterModel = function(inputData,
                          constraints,
-                         doTrace = FALSE,
+                         doTrace = TRUE,
                          initialWindow = NULL,
                          testHorizon = NULL,
                          expandRate = NULL,
@@ -120,14 +123,14 @@ banisterModel = function(inputData,
                           "loads" = c(0, loadSeries)
     )
     # Function called by numerical ODE solver
-    turnerSolve = function(t, y, parms){
+    banisterSolve = function(t, y, parms){
       r = c()
       r[1] = (parms[1]*currentLoad) - 
         ((1/parms[3]) * y["G"])
       r[2] = (parms[2]*currentLoad) - 
         ((1/parms[4]) * y["H"])
       return(list(r))
-    } # end of turnerSolve
+    } # end of banisterSolve
     # Solve model
     for (j in 1:length(compData$days)){
       currentLoad = compData$loads[j]
@@ -140,7 +143,7 @@ banisterModel = function(inputData,
                       H = compData$H[j-1])    # Fatigue
       }
       t = 0:1
-      out = ode(y = stateInit, times = t, func = turnerSolve, 
+      out = ode(y = stateInit, times = t, func = banisterSolve, 
                 parms = parms)
       if (j == 1){
         compData$G[j] = unname(out[1,2])
@@ -152,7 +155,7 @@ banisterModel = function(inputData,
       compData$pHat[j] = parms[5] + compData$G[j] - compData$H[j]
     } # End of solve loop
     return(compData)
-  } # End of turnerCompute
+  } # End of banisterCompute
   
   # Global Loss Function
   objectiveFn = function(parmsAndICS){
@@ -166,14 +169,14 @@ banisterModel = function(inputData,
                           "loads" = c(0, trainingData$loads))
     
     # Function called by numerical ODE solver
-    turnerSolve = function(t, y, parmsAndICS){
+    banisterSolve = function(t, y, parmsAndICS){
       r = c()
       r[1] = (parmsAndICS[1]*currentLoad) - 
         ((1/parmsAndICS[3]) * y["G"])
       r[2] = (parmsAndICS[2]*currentLoad) - 
         ((1/parmsAndICS[4]) * y["H"])
       return(list(r))
-    } # end of turnerSolve
+    } # end of banisterSolve
     
     # Solve model
     for (j in 1:length(compData$days)){
@@ -190,7 +193,7 @@ banisterModel = function(inputData,
       }
       
       t = 0:1
-      out = ode(y = stateInit, times = t, func = turnerSolve, 
+      out = ode(y = stateInit, times = t, func = banisterSolve, 
                 parms = parmsAndICS)
       
       if (j == 1){
@@ -207,11 +210,11 @@ banisterModel = function(inputData,
     
     # Wrap in cost function (Mean squared error)
     compSubset = subset(compData, !is.na(compData$p) == TRUE)
-    MSE = mean((compSubset$p - compSubset$pHat)^2)
+    RSS = sum((compSubset$p - compSubset$pHat)^2)
     
-    # Return MSE value (note minus due to minimization in GA)
-    return(-MSE)
-  } # End of turner MSE fitness function
+    # Return RSS value (note minus due to minimization in GA)
+    return(-RSS)
+  } # End of banister RSS fitness function
   
   # Cross-validation fitting function
   crossValidate = function(objectiveFn,
@@ -538,4 +541,4 @@ banisterModel = function(inputData,
                       "cv" = crossValidation)
   
 return(returnObject)
-}# End of turnerModel
+}# End of banisterModel

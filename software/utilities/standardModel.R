@@ -1,13 +1,23 @@
-standardModel = function(inputData,
+# Version 1.0
+# Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
+
+standardModel <- function(inputData,
                         constraints,
                         method = 'bfgs',
                         startingValues = NULL,
-                        doTrace = FALSE,
+                        doTrace = TRUE,
                         initialComponent = FALSE,
+                        parscale = NULL,
                         initialWindow = NULL,
                         testHorizon = NULL,
                         expandRate = NULL,
-                        doParallel = FALSE){
+                        doParallel = FALSE,
+                        maxit = 10000,
+                        popSize = 120,
+                        gaSelection = 'gareal_tourSelection',
+                        gaCrossover = 'gareal_blxCrossover',
+                        gaMutation = 'gareal_rsMutation',
+                        gaElitism = 7.5){
   
   # ------------------------------------------------------------------------------
   # BASIC INPUT VALIDATION AND LOAD DEPENDENCIES
@@ -32,6 +42,27 @@ standardModel = function(inputData,
   }
   
   # Validation checks on function call, and subsequently establish conditions
+  
+  # Parameter optimisation scaling
+  if (is.null(parscale) && initialComponent == FALSE){
+    parscale <- c(1,1,1,1,1)
+  }
+  
+  if (is.null(parscale) && initialComponent == TRUE){
+    parscale <- c(1,1,1,1,1,1,1)
+  }
+  
+  if (is.null(parscale) & initialComponent == TRUE){
+    if (length(parscale) != 7){
+      stop("Incorrect parscale length")
+    }
+  }
+  
+  if (!is.null(parscale) & initialComponent == FALSE){
+    if (length(parscale) != 5){
+      stop("Incorrect parscale length")
+    }
+  }
   
   # Column dim and names of input data
   if (dim(inputData)[2] != 3){
@@ -138,9 +169,9 @@ standardModel = function(inputData,
   
   # If no expanding window arguments specified, use following defaults
   if(is.null(initialWindow)){
-    initialWindow = round(length(inputData$days) * 0.60, 0)   # 60% of data
-    testHorizon = round(length(inputData$days) * 0.2, 0)      # 20% of data
-    expandRate = round(length(inputData$days) * 0.04, 0)      # 4% of data
+    initialWindow <- round(length(inputData$days) * 0.60, 0)   # 60% of data
+    testHorizon <- round(length(inputData$days) * 0.2, 0)      # 20% of data
+    expandRate <- round(length(inputData$days) * 0.04, 0)      # 4% of data
     print("No initialWindow argument supplied", quote = FALSE)
     print("Defaults used for initialWindow, testHorizon and expandRate",
           quote = FALSE)
@@ -158,14 +189,14 @@ standardModel = function(inputData,
           quote = FALSE)
   } else{
     # Or convert supplied values to 'days'
-    initialWindow = round(length(inputData$days) * initialWindow/100, 0)
-    testHorizon = round(length(inputData$days) * testHorizon/100, 0)
-    expandRate = round(length(inputData$days) * expandRate/100, 0)
+    initialWindow <- round(length(inputData$days) * initialWindow/100, 0)
+    testHorizon <- round(length(inputData$days) * testHorizon/100, 0)
+    expandRate <- round(length(inputData$days) * expandRate/100, 0)
   }
   
   # Optimisation tracing
   if (isTRUE(doTrace) && method == "bfgs"){
-    doTrace == 6                              # Optim control argument
+    doTrace <- 6                              # Optim control argument
     # if left as true / false value that is argument ready to supply to GA
   }
   
@@ -238,10 +269,10 @@ standardModel = function(inputData,
         squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
       }
       if (method == "bfgs"){
-        return(mean(squaredResiduals))
+        return(sum(squaredResiduals))
       }
       if (method == "ga"){
-        return(- mean(squaredResiduals))
+        return(- sum(squaredResiduals))
       }
     } # End of objective/cost function
   }
@@ -263,10 +294,10 @@ standardModel = function(inputData,
         squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
       }
       if (method == "bfgs"){
-        return(mean(squaredResiduals))
+        return(sum(squaredResiduals))
       }
       if (method == "ga"){
-        return(- mean(squaredResiduals))
+        return(- sum(squaredResiduals))
       }
     } # End of objective/cost function
   }
@@ -288,7 +319,9 @@ standardModel = function(inputData,
                          upper = constraints$upper,
                          method = "L-BFGS-B",
                          control = list(trace = doTrace,
-                                        maxit = 10000)
+                                        maxit = maxit,
+                                        factr = 1e-14,
+                                        parscale = parscale)
                          # TODO: Make use of parscale at some point
       )
       
@@ -298,14 +331,14 @@ standardModel = function(inputData,
         slicePars = as.numeric(sliceModel[1:7])
         sliceSummary = as.data.frame(t(sliceModel))
         colnames(sliceSummary) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h",
-                                   "MSE","counts_fn","counts_gn",
+                                   "RSS","counts_fn","counts_gn",
                                    "convcode","convergence")
       }
       if (initialComponent == FALSE){
         slicePars = as.numeric(sliceModel[1:5])
         sliceSummary = as.data.frame(t(sliceModel))
         colnames(sliceSummary) = c("p0","k_g","Tau_g","k_h","Tau_h",
-                                   "MSE","counts_fn","counts_gn",
+                                   "RSS","counts_fn","counts_gn",
                                    "convcode","convergence")
       }
     }
@@ -317,19 +350,19 @@ standardModel = function(inputData,
                       fitness = objectiveFn,
                       lower = constraints$lower,
                       upper = constraints$upper,
-                      maxiter = 10000,
+                      maxiter = maxit,
                       monitor = doTrace,
-                      popSize = 120,
+                      popSize = popSize,
                       optim = TRUE,
                       optimArgs = list(method = "L-BFGS-B",
                                        poptim = 0.1,
                                        pressel = 0.5,
                                        control = list(maxit = 1500)
                       ),
-                      elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      elitism = gaElitism,
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
@@ -420,9 +453,9 @@ standardModel = function(inputData,
                       fitness = objectiveFn,
                       lower = constraints$lower,
                       upper = constraints$upper,
-                      maxiter = 10000,
+                      maxiter = maxit,
                       monitor = doTrace,
-                      popSize = 120,
+                      popSize = popSize,
                       optim = TRUE,
                       optimArgs = list(method = "L-BFGS-B",
                                        poptim = 0.1,
@@ -430,9 +463,9 @@ standardModel = function(inputData,
                                        control = list(maxit = 1500)
                       ),
                       elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
@@ -457,7 +490,9 @@ standardModel = function(inputData,
                          upper = constraints$upper,
                          method = "L-BFGS-B",
                          control = list(trace = doTrace,
-                                        maxit = 10000)
+                                        maxit = 10000,
+                                        factr = 1e-14,
+                                        parscale = parscale)
                          # TODO: Make use of parscale at some point
     )
     
@@ -469,7 +504,7 @@ standardModel = function(inputData,
       primarySummary[,c(-9,-10,-11,-12)] = 
         round(as.numeric(primarySummary[,c(-9,-10,-11,-12)]),3)
       colnames(primarySummary) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h",
-                                   "MSE","counts_fn",
+                                   "RSS","counts_fn",
                                    "counts_gn","convcode","convergence")
     }
     if (initialComponent == FALSE){
@@ -478,7 +513,7 @@ standardModel = function(inputData,
       primarySummary[,c(-7,-8,-9,-10)] = 
         round(as.numeric(primarySummary[,c(-7,-8,-9,-10)]),3)
       colnames(primarySummary) = c("p0","k_g","Tau_g","k_h","Tau_h",
-                                   "MSE","counts_fn",
+                                   "RSS","counts_fn",
                                    "counts_gn","convcode","convergence")
     }
     
