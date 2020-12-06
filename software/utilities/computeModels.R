@@ -3,8 +3,7 @@
 
 computeModels = function(model = NULL,
                          parms = NULL,
-                         loadSeries = NULL,
-                         initialComponent = NULL){
+                         loadSeries = NULL){
 
 # Models include: Quick guide
 
