@@ -1,13 +1,16 @@
 # Documentation: Utilities
 
-## Written documentation
+1. [banisterModel.R docs]() | [code example]() | function: `banisterModel()`
+2. [standardModel.R docs]() | [code example]() | function: `standardModel()`
+3. [calvertModel.R docs]() | [code example]() | function: `calvertModel()`
+4. [turnerModel.R docs]() | [code example]() | function: `turnerModel()`
+5. [computeModels.R docs[]() | [code example]() | function: `computeModels()`
 
-* [utilities_documentation.pdf](utilities_documentation.pdf) - In depth documentation complete for all code files within the utilities directory of the software repository
 
-## Nested directories:
+## Sub-directories
 
 | Directory | Description |
 |-|-|
-| [code_examples](code_examples/) | Self-contained reproducible code examples for each utility function |
-| [data](data/) | Various data sets used in the written documentation and code examples to demonstrate function implementation |
-| [img](img/) | Container for misc screenshots/figures relevant to the documentation or whole repository. Can be largely ignored |
+| [examples](code_examples/) | Reproducible code examples for each utility function |
+| [data](data/) | Mock data sets used in the code examples |
+| [img](img/) | Misc figure/image container. Can be ignored by users |
