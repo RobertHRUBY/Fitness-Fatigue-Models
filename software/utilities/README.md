@@ -54,10 +54,10 @@ Consider a researcher looking to fit an FFM to a set of experimental data (i.e. 
 To begin with, the researcher imports or loads thier data into the R environment. For the purposes of the example, we import a set of mock data provided [here](documentation/data/mockData.csv) using the code below:
 
     library(RCurl)
-    mockData = getURL()
+    mockData = getURL("https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/documentation/data/mockUpper.csv")
     mockData = read.csv(textConnection(mockData))
 
-We briefly impsect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series. Run the following command:
+We briefly insect the structure of the dataset. It should be in three column form, in the order "days", "performances", "loads". NA values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series. Run the following command:
 
     head(mockData)
     
