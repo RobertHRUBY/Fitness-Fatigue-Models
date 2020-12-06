@@ -20,7 +20,7 @@ These are functions that are currently under experimental development. They will
 |-|-|-|
 | `basicModel()` | [basicModel.R](basicModel.R) | Fit the one-component model
 
-### Input data format
+## How to: Structure input data
 
 Should be in three column form, in the order L-R of "days", "performances", "loads". NA (simply leave as empty cells in excel) values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series. The order of the data, and appropriate use of NA or zero values as described is important. **This format is consistent for all functions in the repository for input data**
 
@@ -34,7 +34,7 @@ Should be in three column form, in the order L-R of "days", "performances", "loa
        ...          ...      ...
 
 
-### Import a function directly into R from github
+## How to: Import a function from this repo directly into R
 
 #### Step 1: Install and load the R package `devtools`
 
