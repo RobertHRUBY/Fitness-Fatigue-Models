@@ -5,7 +5,7 @@
 | banisterModel.R | `banisterModel()` | [banisterModel_docs.pdf]() | [here](examples/banisterModelExample.R) |
 | standardModel.R | `standardModel()` | [standardModel_docs.pdf]() | [here](examples/standardModelExample.R) |
 | calvertModel.R | `calvertModel()` | [calvertModel_docs.pdf]() | [here](examples/calvertModelExample.R) |
-| turnerModel.R | `turnerModel()` | [turnerModel_docs.pdf]() | [here]() |
+| turnerModel.R | `turnerModel()` | [turnerModel_docs.pdf]() | [here (KAGGLE notebook)]() |
 | computeModels.R | `computeModels()` | [computeModels_docs.pdf]() | [here](examples/computeModelsExample.R) |
 
 
