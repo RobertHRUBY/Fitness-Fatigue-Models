@@ -49,7 +49,7 @@ Consider a researcher looking to fit an FFM to a set of experimental data (i.e. 
     install.packages("RCurl")
     install.packages("devtools")
 
-### 1. Load data
+### 1. Load (input) data
 
 To begin with, the researcher imports or loads thier data into the R environment. For the purposes of the example, we import a set of mock data provided [here](documentation/data/mockData.csv) using the code below:
 
