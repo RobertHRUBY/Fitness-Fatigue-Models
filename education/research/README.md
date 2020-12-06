@@ -1,4 +1,4 @@
-# RGU Sport Science Research Lab
+# RGU Sport Science Lab: FFM research
 
 ## Output
 
