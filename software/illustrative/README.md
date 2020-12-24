@@ -64,4 +64,4 @@ http://127.0.0.1:8888/?token=e1415230a823c4ac12b4970bc4b363c04d6bffc584eb1f6a
   of the fitness-fatigue model with performance data
 
 ### Data
--- [./example\_loads.csv](./example_loads.csv): a data set of example training loads created by @bsh2.
+- [./example\_loads.csv](./example_loads.csv): a data set of example training loads created by @bsh2.
