@@ -17,13 +17,19 @@ to immediately begin interacting with the notebook.
 
 ## The Notebooks using Docker
 
+### Setup
 Download [Docker Desktop](https://www.docker.com/products/docker-desktop) for your
 operating system. Open a terminal (e.g., Powershell for Windows) and run:
 ```
 docker pull jupyter/r-notebook:a0a544e6dc6e
 ```
 
-To start the notebook server, run the command corresponding to your platform:
+If you have not already, clone this repo:
+  `git clone https://github.com/bsh2/Fitness-Fatigue-Models.git`
+
+### Starting and Stopping the Notebook Server
+1. While still in the terminal, change directories to /software/illustrative/ (where this README.md is)
+2. To start the notebook server, run the following command corresponding to your platform:
 
 On Windows:
 ```  
@@ -38,13 +44,13 @@ On Linux:
 docker run --rm -it -p 8888:8888 -w /home/jovyan/work -v "$PWD":/home/jovyan/work jupyter/r-notebook:a0a544e6dc6e
 ```
 
-Follow the instructions to point your browser to the specified URL with token included,
+3. Follow the instructions to point your browser to the specified URL with token included,
 for instance,
 ```
 http://127.0.0.1:8888/?token=e1415230a823c4ac12b4970bc4b363c04d6bffc584eb1f6a
 ```
 
-Press Ctrl+C in the terminal to shut down the notebook server.
+4. Press Ctrl+C in the terminal to shut down the notebook server.
 
 ## Directory contents
 
@@ -56,4 +62,3 @@ Press Ctrl+C in the terminal to shut down the notebook server.
 - [./ffmfunctions.R](./ffmfunctions.R): functions for fitting and using fitness-fatigue models with performance data
 - [./kalmanfilterfunctions.R](./kalmanfilterfunctions.R): functions for fitting and using the Kalman Filter representation
   of the fitness-fatigue model with performance data
-
