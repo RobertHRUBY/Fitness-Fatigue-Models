@@ -62,3 +62,6 @@ http://127.0.0.1:8888/?token=e1415230a823c4ac12b4970bc4b363c04d6bffc584eb1f6a
 - [./ffmfunctions.R](./ffmfunctions.R): functions for fitting and using fitness-fatigue models with performance data
 - [./kalmanfilterfunctions.R](./kalmanfilterfunctions.R): functions for fitting and using the Kalman Filter representation
   of the fitness-fatigue model with performance data
+
+### Data
+-- [./example\_loads.csv](./example_loads.csv): a data set of example training loads created by @bsh2.
