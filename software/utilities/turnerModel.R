@@ -1,6 +1,9 @@
+# Version 1.0
+# Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
+
 turnerModel = function(inputData,
                        constraints,
-                       doTrace = FALSE,
+                       doTrace = TRUE,
                        initialWindow = NULL,
                        testHorizon = NULL,
                        expandRate = NULL,
@@ -48,6 +51,11 @@ turnerModel = function(inputData,
   
   if (!all(constraints$lower <= constraints$upper)){
     stop("Bounds incorrectly specified. Check values")
+  }
+  
+  if (constraints$lower[5] < 0.3 || constraints$lower[6] < 0.3){
+    stop("lower bounds on alpha,beta are too low. Will cause
+         local search to violate bounds and crash")
   }
   
   if (dim(constraints)[1] != 9){
@@ -207,11 +215,11 @@ turnerModel = function(inputData,
     
     # Wrap in cost function (Mean squared error)
     compSubset = subset(compData, !is.na(compData$p) == TRUE)
-    MSE = mean((compSubset$p - compSubset$pHat)^2)
+    RSS = sum((compSubset$p - compSubset$pHat)^2)
     
-    # Return MSE value (note minus due to minimization in GA)
-    return(-MSE)
-  } # End of turner MSE fitness function
+    # Return RSS value (note minus due to minimization in GA)
+    return(-RSS)
+  } # End of turner RSS fitness function
   
   # Cross-validation fitting function
   crossValidate = function(objectiveFn,
@@ -227,8 +235,6 @@ turnerModel = function(inputData,
                     popSize = popSize,
                     optim = TRUE,
                     optimArgs = list(method = "L-BFGS-B",
-                                     poptim = 0.2,
-                                     pressel = 0.5,
                                      control = list(maxit = 1500)
                     ),
                     elitism = gaElitism,
@@ -349,8 +355,6 @@ turnerModel = function(inputData,
                     popSize = popSize,
                     optim = TRUE,
                     optimArgs = list(method = "L-BFGS-B",
-                                     poptim = 0.2,
-                                     pressel = 0.5,
                                      control = list(maxit = 1500)
                     ),
                     elitism = gaElitism,

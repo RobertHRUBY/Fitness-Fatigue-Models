@@ -1,13 +1,23 @@
-standardModel = function(inputData,
+# Version 1.0
+# Documentation: github.com/bsh2/fitness-fatigue-models/software/utilities/
+
+calvertModel <- function(inputData,
                         constraints,
                         method = 'bfgs',
                         startingValues = NULL,
-                        doTrace = FALSE,
+                        doTrace = TRUE,
                         initialComponent = FALSE,
+                        parscale = NULL,
                         initialWindow = NULL,
                         testHorizon = NULL,
                         expandRate = NULL,
-                        doParallel = FALSE){
+                        doParallel = FALSE,
+                        maxit = 10000,
+                        popSize = 120,
+                        gaSelection = 'gareal_tourSelection',
+                        gaCrossover = 'gareal_blxCrossover',
+                        gaMutation = 'gareal_rsMutation',
+                        gaElitism = 7.5){
   
   # ------------------------------------------------------------------------------
   # BASIC INPUT VALIDATION AND LOAD DEPENDENCIES
@@ -33,6 +43,27 @@ standardModel = function(inputData,
   
   # Validation checks on function call, and subsequently establish conditions
   
+  # Parameter optimization scaling
+  if (is.null(parscale) && initialComponent == FALSE){
+    parscale <- c(1,1,1,1,1,1)
+  }
+  
+  if (is.null(parscale) && initialComponent == TRUE){
+    parscale <- c(1,1,1,1,1,1,1,1)
+  }
+  
+  if (is.null(parscale) & initialComponent == TRUE){
+    if (length(parscale) != 8){
+      stop("Incorrect parscale length")
+    }
+  }
+  
+  if (!is.null(parscale) & initialComponent == FALSE){
+    if (length(parscale) != 6){
+      stop("Incorrect parscale length")
+    }
+  }
+  
   # Column dim and names of input data
   if (dim(inputData)[2] != 3){
     stop("Are you sure the input data is of 3 column form in order from L to R:
@@ -49,11 +80,11 @@ standardModel = function(inputData,
     stop("Bounds incorrectly specified. Check values")
   }
   
-  if (!isTRUE(initialComponent) && dim(constraints)[1] != 5){
+  if (!isTRUE(initialComponent) && dim(constraints)[1] != 6){
     stop("Box constraints of incorrect dimension")
   }
   
-  if (isTRUE(initialComponent) && dim(constraints)[1] != 7){
+  if (isTRUE(initialComponent) && dim(constraints)[1] != 8){
     stop("Box constraints of incorrect dimension")
   }
   
@@ -64,11 +95,11 @@ standardModel = function(inputData,
     # If user supplied starting Values
     if (!is.null(startingValues)){
       # Check that starting value vector length is correct
-      if (length(startingValues) != 5){
+      if (length(startingValues) != 6){
         stop("Incorrect parameter vector supplied for startingValues")
       }
       # Check that starting value vector is within bounds
-      for (i in 1:5){
+      for (i in 1:6){
         if (startingValues[i] <= constraints$lower[i] ||
             startingValues[i] >= constraints$upper[i]){
           stop("Starting values not within bounds (cannot be on bounds)")
@@ -79,7 +110,8 @@ standardModel = function(inputData,
     # from random sampling from truncated normal distribution with mean
     # at middle of constraints
     if (is.null(startingValues)){
-      stop("Please supply starting values in order (p*,k_g,tau_g,k_h,tau_h")
+      stop("Please supply starting values in order (p*,k_g,tau_g1,
+           tau_g2,k_h,tau_h")
     }
   }
   
@@ -88,7 +120,7 @@ standardModel = function(inputData,
     # If user supplied starting Values
     if (!is.null(startingValues)){
       # Check that starting value vector length is correct
-      if (length(startingValues) != 7){
+      if (length(startingValues) != 8){
         stop("Incorrect parameter vector supplied for startingValues")
       }
       # Check that starting value vector is within bounds
@@ -102,7 +134,7 @@ standardModel = function(inputData,
     # If user has not supplied starting values, generate them (p*,K,Tau,q)
     if (is.null(startingValues)){
       stop("Please supply starting values in order 
-           (p*,k_g,tau_g,k_h,tau_h,q_g,q_h")
+           (p*,k_g,tau_g1,tau_g2,k_h,tau_h,q_g,q_h")
     }
   }
   
@@ -165,7 +197,7 @@ standardModel = function(inputData,
   
   # Optimisation tracing
   if (isTRUE(doTrace) && method == "bfgs"){
-    doTrace == 6                              # Optim control argument
+    doTrace <- 6                              # Optim control argument
     # if left as true / false value that is argument ready to supply to GA
   }
   
@@ -193,10 +225,11 @@ standardModel = function(inputData,
         df1 <- df0[1:s[n], ]
         
         p[n] <- pars[1] + 
-          pars[2] * sum( df1$ws * exp(- (n - df1$s) / pars[3]) ) -
-          pars[4] * sum( df1$ws * exp(- (n - df1$s) / pars[5]) ) +
-          pars[6]*(exp (- (i/pars[3]))) -
-          pars[7]*(exp (- (i/pars[5])))
+          pars[2] * sum( df1$ws * (exp(- (n - df1$s) / pars[3]) - 
+                                     exp(- (n - df1$s) / pars[4]))) -
+          pars[5] * sum( df1$ws * exp(- (n - df1$s) / pars[6]) ) +
+          pars[7]*(exp (- (i/pars[3]))) -
+          pars[8]*(exp (- (i/pars[6])))
       }
     }
     
@@ -205,8 +238,9 @@ standardModel = function(inputData,
       for (n in 1:length(s)){
         df1 <- df0[1:s[n], ]
         p[n] <- pars[1] + 
-          pars[2] * sum( df1$ws * exp(- (n - df1$s) / pars[3]) ) -
-          pars[4] * sum( df1$ws * exp(- (n - df1$s) / pars[5]) )
+          pars[2] * sum( df1$ws * (exp(- (n - df1$s) / pars[3]) - 
+                                   exp(- (n - df1$s) / pars[4]))) -
+          pars[5] * sum( df1$ws * exp(- (n - df1$s) / pars[6]) )
       }
     }
     
@@ -230,18 +264,22 @@ standardModel = function(inputData,
         inputSubset = trainingData[1:measureIndex[i], ]
         modelledPerformance = par[1] + 
           par[2]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[3]))) -
-          par[4]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[5]))) +
-          par[6]*(exp (- (measureIndex[i]/par[3]))) -
-          par[7]*(exp (- (measureIndex[i]/par[5])))
+                        (exp(-(measureIndex[i]-inputSubset$days)/par[3]) - 
+                         exp(-(measureIndex[i]-inputSubset$days)/par[4])
+                        )
+                      )
+                  ) -
+          par[5]*(sum(inputSubset$loads * 
+                        exp(-(measureIndex[i]-inputSubset$days)/par[6]))) +
+          par[7]*(exp (- (measureIndex[i]/par[3]))) -
+          par[8]*(exp (- (measureIndex[i]/par[6])))
         squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
       }
       if (method == "bfgs"){
-        return(mean(squaredResiduals))
+        return(sum(squaredResiduals))
       }
       if (method == "ga"){
-        return(- mean(squaredResiduals))
+        return(- sum(squaredResiduals))
       }
     } # End of objective/cost function
   }
@@ -249,24 +287,28 @@ standardModel = function(inputData,
   # Without initial component
   # --------------------------------------------------------------------------
   if (initialComponent == FALSE){
-    # Note to self, order of pars is c(p0,kg,Tg,kh,Th)
+    # Note to self, order of pars is c(p0,kg,Tg1,Tg2,kh,Th)
     objectiveFn = function(par){
       # Initialize the vector containing the squared residuals
       squaredResiduals = numeric(length(measuredPerformance))
       for (i in 1:length(measuredPerformance)){
         inputSubset = trainingData[1:measureIndex[i], ]
-        modelledPerformance <- par[1] + 
+        modelledPerformance = par[1] + 
           par[2]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[3]))) -
-          par[4]*(sum(inputSubset$loads * 
-                        exp(-(measureIndex[i]-inputSubset$days)/par[5])))
+                        (exp(-(measureIndex[i]-inputSubset$days)/par[3]) - 
+                           exp(-(measureIndex[i]-inputSubset$days)/par[4])
+                        )
+          )
+          ) -
+          par[5]*(sum(inputSubset$loads * 
+                        exp(-(measureIndex[i]-inputSubset$days)/par[6])))
         squaredResiduals[i] = (modelledPerformance - measuredPerformance[i])^2  
       }
       if (method == "bfgs"){
-        return(mean(squaredResiduals))
+        return(sum(squaredResiduals))
       }
       if (method == "ga"){
-        return(- mean(squaredResiduals))
+        return(- sum(squaredResiduals))
       }
     } # End of objective/cost function
   }
@@ -288,24 +330,25 @@ standardModel = function(inputData,
                          upper = constraints$upper,
                          method = "L-BFGS-B",
                          control = list(trace = doTrace,
-                                        maxit = 10000)
+                                        maxit = 10000,
+                                        factr = 1e-8)
                          # TODO: Make use of parscale at some point
       )
       
       # Extract values and summary object
       sliceModel = unlist(sliceModel)
       if (initialComponent == TRUE){
-        slicePars = as.numeric(sliceModel[1:7])
+        slicePars = as.numeric(sliceModel[1:8])
         sliceSummary = as.data.frame(t(sliceModel))
-        colnames(sliceSummary) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h",
-                                   "MSE","counts_fn","counts_gn",
+        colnames(sliceSummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h","q_g","q_h",
+                                   "RSS","counts_fn","counts_gn",
                                    "convcode","convergence")
       }
       if (initialComponent == FALSE){
-        slicePars = as.numeric(sliceModel[1:5])
+        slicePars = as.numeric(sliceModel[1:6])
         sliceSummary = as.data.frame(t(sliceModel))
-        colnames(sliceSummary) = c("p0","k_g","Tau_g","k_h","Tau_h",
-                                   "MSE","counts_fn","counts_gn",
+        colnames(sliceSummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h",
+                                   "RSS","counts_fn","counts_gn",
                                    "convcode","convergence")
       }
     }
@@ -317,9 +360,9 @@ standardModel = function(inputData,
                       fitness = objectiveFn,
                       lower = constraints$lower,
                       upper = constraints$upper,
-                      maxiter = 10000,
+                      maxiter = maxit,
                       monitor = doTrace,
-                      popSize = 120,
+                      popSize = popSize,
                       optim = TRUE,
                       optimArgs = list(method = "L-BFGS-B",
                                        poptim = 0.1,
@@ -327,9 +370,9 @@ standardModel = function(inputData,
                                        control = list(maxit = 1500)
                       ),
                       elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
@@ -430,9 +473,9 @@ standardModel = function(inputData,
                                        control = list(maxit = 1500)
                       ),
                       elitism = 5,
-                      selection = gareal_tourSelection, # Tournament
-                      crossover = gareal_blxCrossover,  # BLX (blend)
-                      mutation = gareal_rsMutation,     # Random
+                      selection = gaSelection, # Tournament
+                      crossover = gaCrossover,  # BLX (blend)
+                      mutation = gaMutation,     # Random
                       run = 150, # Halt value
                       parallel = doParallel, # multi-platform
                       seed = 12345 # Seed for replication later
@@ -464,21 +507,21 @@ standardModel = function(inputData,
     # Extract values and create summary object (primarySummary)
     primaryModel = unlist(primaryModel)
     if (initialComponent == TRUE){
-      primaryPars = as.numeric(primaryModel[1:7])
+      primaryPars = as.numeric(primaryModel[1:8])
       primarySummary = as.data.frame(t(primaryModel))
-      primarySummary[,c(-9,-10,-11,-12)] = 
-        round(as.numeric(primarySummary[,c(-9,-10,-11,-12)]),3)
-      colnames(primarySummary) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h",
-                                   "MSE","counts_fn",
+      primarySummary[,c(-10,-11,-12,-13)] = 
+        round(as.numeric(primarySummary[,c(-10,-11,-12,-13)]),3)
+      colnames(primarySummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h","q_g","q_h",
+                                   "RSS","counts_fn",
                                    "counts_gn","convcode","convergence")
     }
     if (initialComponent == FALSE){
-      primaryPars = as.numeric(primaryModel[1:5])
+      primaryPars = as.numeric(primaryModel[1:6])
       primarySummary = as.data.frame(t(primaryModel))
-      primarySummary[,c(-7,-8,-9,-10)] = 
-        round(as.numeric(primarySummary[,c(-7,-8,-9,-10)]),3)
-      colnames(primarySummary) = c("p0","k_g","Tau_g","k_h","Tau_h",
-                                   "MSE","counts_fn",
+      primarySummary[,c(-8,-9,-10,-11)] = 
+        round(as.numeric(primarySummary[,c(-8,-9,-10,-11)]),3)
+      colnames(primarySummary) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h",
+                                   "RSS","counts_fn",
                                    "counts_gn","convcode","convergence")
     }
     
@@ -578,19 +621,19 @@ standardModel = function(inputData,
   
   # Model summary (parameter values + optim ref) - Loop depending on IC
   if (initialComponent == TRUE){
-    cvParms = matrix(data = NA, nrow = nSlices, ncol = 7)
+    cvParms = matrix(data = NA, nrow = nSlices, ncol = 8)
     for (i in 1:nSlices){
       cvParms[i,] = as.numeric(sliceModels[[i]]$slicePars)
     }
-    colnames(cvParms) = c("p0","k_g","Tau_g","k_h","Tau_h","q_g","q_h")
+    colnames(cvParms) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h","q_g","q_h")
     rownames(cvParms) = sliceNames
   }
   if (initialComponent == FALSE){
-    cvParms = matrix(data = NA, nrow = nSlices, ncol = 5)
+    cvParms = matrix(data = NA, nrow = nSlices, ncol = 6)
     for (i in 1:nSlices){
       cvParms[i,] = as.numeric(sliceModels[[i]]$slicePars)
     }
-    colnames(cvParms) = c("p0","k_g","Tau_g","k_h","Tau_h")
+    colnames(cvParms) = c("p0","k_g","Tau_g1","Tau_g2","k_h","Tau_h")
     rownames(cvParms) = sliceNames
   }
   
