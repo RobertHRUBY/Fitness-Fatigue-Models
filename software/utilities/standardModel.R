@@ -320,7 +320,7 @@ standardModel <- function(inputData,
                          method = "L-BFGS-B",
                          control = list(trace = doTrace,
                                         maxit = maxit,
-                                        factr = 1e-14,
+                                        #factr = 1e7,
                                         parscale = parscale)
                          # TODO: Make use of parscale at some point
       )
@@ -491,7 +491,7 @@ standardModel <- function(inputData,
                          method = "L-BFGS-B",
                          control = list(trace = doTrace,
                                         maxit = 10000,
-                                        factr = 1e-14,
+                                        #factr = 1e7,
                                         parscale = parscale)
                          # TODO: Make use of parscale at some point
     )
