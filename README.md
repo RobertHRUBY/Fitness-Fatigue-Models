@@ -1,4 +1,4 @@
-# The Fitness-Fatigue Model Code Project
+# The Fitness-Fatigue Model Project
 
 ## Introduction
 
