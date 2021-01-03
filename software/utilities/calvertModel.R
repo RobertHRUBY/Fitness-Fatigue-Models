@@ -330,8 +330,8 @@ calvertModel <- function(inputData,
                          upper = constraints$upper,
                          method = "L-BFGS-B",
                          control = list(trace = doTrace,
-                                        maxit = 10000,
-                                        factr = 1e-8)
+                                        maxit = 10000)
+                                        #factr = 1e-8
                          # TODO: Make use of parscale at some point
       )
       
