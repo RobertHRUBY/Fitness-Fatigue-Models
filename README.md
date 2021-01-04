@@ -1,6 +1,6 @@
 # The Fitness-Fatigue Model Project
 
-### Website: [fitnessfatigue.com](https://fitnessfatigue.com)
+### [fitnessfatigue.com](https://fitnessfatigue.com)
 
 ## Introduction
 
