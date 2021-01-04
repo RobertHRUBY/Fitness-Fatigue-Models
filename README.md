@@ -1,5 +1,7 @@
 # The Fitness-Fatigue Model Project
 
+### Website: [fitnessfatigue.com](https://fitnessfatigue.com)
+
 ## Introduction
 
 This project is focussed on developing open-source, robust, and flexible [utilities](software/utilities) for fitting and evaluating fitness-fatigue models (FFMs); with modern optimisers, out-of-sample assessment, and input checking. In addition, [illustrative code](software/illustrative) (i.e. didactic-style) has been constructed, and which guides the user through the application of several advanced methods via an interactive procedural flow. Thorough documentation, explanatory examples, and mock data are provided with each software resource.
