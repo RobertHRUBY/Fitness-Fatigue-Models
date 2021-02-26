@@ -1,6 +1,8 @@
 # The Fitness-Fatigue Model Project
 
 ### [fitnessfatigue.com](https://fitnessfatigue.com)
+### [Scientific Review Part I](https://osf.io/preprints/sportrxiv/ap75j/)
+### [Scientific Review Part II](https://osf.io/preprints/sportrxiv/5qgc2)
 
 ## Introduction
 
