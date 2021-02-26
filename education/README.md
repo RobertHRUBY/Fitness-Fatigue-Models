@@ -5,7 +5,7 @@
 
 1. Traditional and contemporary approaches to mathematical fitness-fatigue models in exercise science: A practical guide with resources. Part I [(Major update to existing preprint)](https://osf.io/preprints/sportrxiv/ap75j/)
 
-2. Traditional and contemporary approaches to mathematical fitness-fatigue models in exercise science: A practical guide with resources. Part II (Brand new release)
+2. [Traditional and contemporary approaches to mathematical fitness-fatigue models in exercise science: A practical guide with resources. Part II (Brand new release)](https://osf.io/preprints/sportrxiv/5qgc2/)
 
 ## Links to other great resources on the WWW
 - [Kalman-Filter estimation in MATLAB](https://github.com/bsh2/Kalman-Fitness-Fatigue): Kolossa et al. (2017) (Forked)
