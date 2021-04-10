@@ -359,9 +359,9 @@ convolve_training <- function(w, tau) {
 
 ewma_training <- function(w, tau) {
   T <- length(w)
-  if (T <= 1) return(0)
+  if (T < 1) return(0)
 
-  today_to_first_day <- T:1
+  today_to_first_day <- (T - 1):0
   first_day_to_today <- 1:T
   sum(w[first_day_to_today] * exp(-today_to_first_day / tau))
 }
