@@ -27,8 +27,8 @@ standardObjectiveSS <- function(pars, loads, perfVals, initial = FALSE,
     inputSubset <- loads[1:dayT, ]
     
     if (initial == TRUE){
-      initFitness <- pars[6] * exp(-(1:dayT) / pars[3])
-      initFatigue <- pars[7] * exp(-(1:dayT) / pars[5])
+      initFitness <- pars[6] * exp(-(dayT) / pars[3])
+      initFatigue <- pars[7] * exp(-(dayT) / pars[5])
     } else{
       initFitness <- 0
       initFatigue <- 0
@@ -67,6 +67,8 @@ standardObjectiveLL <- function(pars, loads, perfVals, initial = FALSE,
   # Pars: c(p*, kg, Tg, kh, Th, sigma, qg, qh)          initial = TRUE
   # ---------------------------------------------------------------------------
   
+  # Ancillary function (required)
+  # ----------------------------------------------------------------------------
   convolveTraining <- function(loads, tau){
     
     # Value of t relevant to (eq 6.9) 
@@ -75,6 +77,7 @@ standardObjectiveLL <- function(pars, loads, perfVals, initial = FALSE,
     # Note that loads[1:dayt] will yield c(w(0), w(1), ... , w(t-1))
     return(sum(loads[1:dayt] * exp(-(dayt:1 / tau))))
   }
+  # ----------------------------------------------------------------------------
   
   finalMeasurement <- tail(perfVals$day, 1)
   
