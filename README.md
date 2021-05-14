@@ -1,6 +1,6 @@
 # The FFM Project (Code Repository)
 *Associated website:* [fitnessfatigue.com](https://fitnessfatigue.com)
-*Associated review:* [Part I](https://osf.io/preprints/sportrxiv/ap75j/) | [Part II](https://osf.io/preprints/sportrxiv/5qgc2)
+*Associated review:* [Part I](https://osf.io/preprints/sportrxiv/ap75j/) [Part II](https://osf.io/preprints/sportrxiv/5qgc2)
 
 ## Introduction
 
