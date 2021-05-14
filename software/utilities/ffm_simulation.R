@@ -46,7 +46,7 @@ standardPredict <- function(pars, loads, initialPars = c(0,0)){
 # ------------------------------------------------------------------------------
 # Prediction function - Fitness-delay FFM
 # ------------------------------------------------------------------------------
-standardPredict <- function(pars, loads, initialPars = c(0,0)){
+fitnessDelayPredict <- function(pars, loads, initialPars = c(0,0)){
   
   # Parameters supplied as: pars <- c(p*, k_g, Tau_g, Tau_g2, k_h, Tau_h)
   

@@ -47,10 +47,10 @@ fitnessDelayObjectiveSS <- function(pars, loads, perfVals, initial = FALSE,
   } # Loop updates until iterated over all available measurements
   
   # Output
-  if(maximise = FALSE){
+  if(maximise == FALSE){
     return(sum(squaredResiduals))
   }
-  if(maximise = TRUE){
+  if(maximise == TRUE){
     return(-1 * sum(squaredResiduals))
   }
 }
@@ -109,10 +109,10 @@ fitnessDelayObjectiveLL <- function(pars, loads, perfVals, initial = FALSE,
   # Compute errors
   errors <- perfVals$performance - modPerformance
   
-  if (maximise = FALSE){
+  if (maximise == FALSE){
     return(-1.0 * sum(dnorm(errors, mean = 0, sd = pars[7], log = TRUE)))
   }
-  if (maximise = TRUE){
+  if (maximise == TRUE){
     return(sum(dnorm(errors, mean = 0, sd = pars[7], log = TRUE)))
   }
   

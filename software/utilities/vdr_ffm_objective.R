@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Objective function (Residual sum of squares) - VDR FFM
 # ------------------------------------------------------------------------------
-vdrObjective <- function(pars, loads, perfVals, initial = FALSE, maximise = FALSE){
+vdrObjectiveSS <- function(pars, loads, perfVals, initial = FALSE, maximise = FALSE){
   
   # INPUT NOTES:
   # ----------------------------------------------------------
@@ -52,10 +52,10 @@ vdrObjective <- function(pars, loads, perfVals, initial = FALSE, maximise = FALS
   }
   
   # Output
-  if(maximise = FALSE){
+  if(maximise == FALSE){
     return(sum(squaredResiduals))
   }
-  if(maximise = TRUE){
+  if(maximise == TRUE){
     return(-1 * sum(squaredResiduals))
   }
 }
@@ -64,7 +64,7 @@ vdrObjective <- function(pars, loads, perfVals, initial = FALSE, maximise = FALS
 # Objective function (Log likelihood) - VDR FFM
 # ------------------------------------------------------------------------------
 
-vdrObjective <- function(pars, loads, perfVals, initial = FALSE, maximise = FALSE){
+vdrObjectiveLL <- function(pars, loads, perfVals, initial = FALSE, maximise = FALSE){
   
   # INPUT NOTES:
   # -----------------------------------------------------------------
@@ -116,10 +116,10 @@ vdrObjective <- function(pars, loads, perfVals, initial = FALSE, maximise = FALS
   # Compute errors
   errors <- perfVals$performance - modPerformance
   
-  if (maximise = FALSE){
+  if (maximise == FALSE){
     return(-1.0 * sum(dnorm(errors, mean = 0, sd = pars[7], log = TRUE)))
   }
-  if (maximise = TRUE){
+  if (maximise == TRUE){
     return(sum(dnorm(errors, mean = 0, sd = pars[7], log = TRUE)))
   }
 
