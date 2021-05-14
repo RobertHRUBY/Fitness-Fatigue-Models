@@ -1,6 +1,7 @@
 # The FFM Project (Code Repository)
+<br>
+<b> Associated website: </b> [fitnessfatigue.com](https://fitnessfatigue.com)
 </br>
-<b> Associated website: </b> 
 
 </br>
 <b> Associated scientific review: <b> 
