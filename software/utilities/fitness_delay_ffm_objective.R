@@ -87,8 +87,10 @@ fitnessDelayObjectiveLL <- function(pars, loads, perfVals, initial = FALSE,
   }
   
   # Compute modeled performance from t=1 to t=finalMeasurement
-  modFitness <- pars[2] * (sapply(1:finalMeasurement, function(t) convolveTraining(loads$load[1:t], pars[3], pars[4])))
-  modFatigue <- pars[5] * sapply(1:finalMeasurement, function(t) convolveTraining(loads$load[1:t], pars[6]))
+  modFitness <- pars[2] * 
+    sapply(1:finalMeasurement, function(t) convolveTraining(loads$load[1:t], pars[3], pars[4]))
+  modFatigue <- pars[5] * 
+    sapply(1:finalMeasurement, function(t) convolveTraining(loads$load[1:t], pars[6]))
   
   if (initial == FALSE){
     modPerformance <- pars[1] + modFitness - modFatigue
