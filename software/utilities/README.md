@@ -10,10 +10,10 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 | File | Contains | Model | Function name |
 |-|-|-|-|
-| standard_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | Standard FFM | `standardObjectiveSS` |
-| fitness_delay_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | Fitness-delay FFM | `fitnessDelayObjectiveSS` |
-| vdr_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | VDR FFM | `vdrObjectiveSS` |
-| cross_validation.R | Expanding-window CV function for fitting and evaluating the VDR model | VDR FFM | `vdrCrossValidate` |
+| standard_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | Standard FFM | `standardObjectiveSS`, `standardObjectiveLL`, `standardObjectiveNLL` |
+| fitness_delay_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | Fitness-delay FFM | `fitnessDelayObjectiveSS`, `fitnessDelayObjectiveLL`, `fitnessDelayObjectiveNLL` |
+| vdr_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | VDR FFM | `vdrObjectiveSS`, `vdrObjectiveLL`, `vdrObjectiveNLL` |
+| cross_validation.R | Expanding-window CV function for fitting and evaluating the FFMs | Standard, Fitness-delay, VDR FFM | `standardCrossValidate`, `fitnessDelayCrossValidate`, `vdrCrossValidate` |
 | ffm_simulation.R | Functions for simulating (computing/predicting) FFMs | Standard, Fitness-delay, VDR FFM | `standardPredict`, `fitnessDelayPredict`, `vdrPredict` |
 | example.R | An example file demonstrating the use of the above files and functions | All | N/A |
 
