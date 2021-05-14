@@ -8,5 +8,11 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 **Files contained:**
 
-- *"standard_model_NLS.R"*
+- **standard_model_NLS.R:** Least-squares objective function and simulation (prediction) function for the standard FFM (5 parameter, 2 component). Can be used in a nonlinear least-squares fitting approach
+- **fitness_delay_model_NLS.R:** Least-squares objective function and simulation (prediction) function for the fitness-delay FFM (i.e., Calvert's model with exponential growth on fitness response). Can be used in a nonlinear least-squares fitting approach
+- **VDR_model_NLS.R:**
+- **standard_model_MLE.R:**
+- **fitness_delay_model_MLE.R:**
+- **VDR_model_MLE.R:**
+
 
