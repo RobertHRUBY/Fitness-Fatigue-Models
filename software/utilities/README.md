@@ -10,19 +10,11 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 | File | Contains | Model | Function name |
 |-|-|-|-|
-| standard_model_NLS.R | Sum-of-squares objective function | Standard FFM | `standardObjectiveSS` |
-| standard_model_MLE.R | (1) Log-likelihood objective function; (2) Negative log-likelihood objective function | Standard FFM | (1) `standardObjectiveLL`, (2) `standardObjectiveNLL` |
-| fitness_delay_model_NLS.R | Sum-of-squares objective function | Fitness-delay FFM | `fitnessDelayObjectiveSS` |
-| fitness_delay_model_MLE.R | (1) Log-likelihood objective function (2) Negative log-likelihood objective function | Fitness-delay FFM | `fitnessDelayObjectiveLL`, `fitnessDelayObjectiveNLL` |
-| vdr_model_NLS.R | Sum-of-squares objective function | VDR FFM |  |
-| vdr_model_MLE.R | (1) Log-likelihood objective function; (2) Negative log-likelihood objective function | VDR FFM |  |
-|  |  |  |  |
-
-- **standard_model_NLS.R:** Least-squares objective function and simulation (prediction) function for the standard FFM (5 parameter, 2 component). Can be used in a nonlinear least-squares fitting approach
-- **fitness_delay_model_NLS.R:** Least-squares objective function and simulation (prediction) function for the fitness-delay FFM (i.e., Calvert's model with exponential growth on fitness response). Can be used in a nonlinear least-squares fitting approach
-- **VDR_model_NLS.R:**
-- **standard_model_MLE.R:**
-- **fitness_delay_model_MLE.R:**
-- **VDR_model_MLE.R:**
+| standard_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | Standard FFM | `standardObjectiveSS` |
+| fitness_delay_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | Fitness-delay FFM | `fitnessDelayObjectiveSS` |
+| vdr_ffm_objective.R | Sum-of-squares function, log-likelihood function, negative log-likelihood function | VDR FFM | `vdrObjectiveSS` |
+| cross_validation.R | Expanding-window CV function for fitting and evaluating the VDR model | VDR FFM | `vdrCrossValidate` |
+| ffm_simulation.R | Functions for simulating (computing/predicting) FFMs | Standard, Fitness-delay, VDR FFM | `standardPredict`, `fitnessDelayPredict`, `vdrPredict` |
+| example.R | An example file demonstrating the use of the above files and functions | All | N/A |
 
 
