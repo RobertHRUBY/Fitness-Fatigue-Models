@@ -49,7 +49,7 @@ standardObjectiveSS <- function(pars, loads, perfVals, initial = FALSE,
     return(sum(squaredResiduals))
   }
   if(maximise = TRUE){
-    return(-sum(squaredResiduals))
+    return(-1 * sum(squaredResiduals))
   }
 }
 

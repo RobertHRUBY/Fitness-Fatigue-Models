@@ -56,7 +56,7 @@ vdrObjective <- function(pars, loads, perfVals, initial = FALSE, maximise = FALS
     return(sum(squaredResiduals))
   }
   if(maximise = TRUE){
-    return(-sum(squaredResiduals))
+    return(-1 * sum(squaredResiduals))
   }
 }
 
