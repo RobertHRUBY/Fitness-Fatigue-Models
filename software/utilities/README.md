@@ -13,7 +13,6 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 | standard_ffm_objective.R | Residual sum of squares and log-likelihood objective functions | Standard FFM | `standardObjectiveSS`, `standardObjectiveLL` |
 | fitness_delay_ffm_objective.R | Residual sum of squares and log-likelihood objective functions | Fitness-delay FFM | `fitnessDelayObjectiveSS`, `fitnessDelayObjectiveLL` |
 | vdr_ffm_objective.R | Residual sum of squares and log-likelihood objective functions | VDR FFM | `vdrObjectiveSS`, `vdrObjectiveLL` |
-| cross_validation.R | Expanding-window CV function for fitting and evaluating the FFMs | Standard, Fitness-delay, VDR FFM | `standardCrossValidate`, `fitnessDelayCrossValidate`, `vdrCrossValidate` |
+| cross_validation.R | Example implementation of a cross-validation method for the VDR model (Expanding-window) | VDR FFM | 'vdrCV' |
 | ffm_simulation.R | Functions for simulating (computing/predicting) FFMs | Standard, Fitness-delay, VDR FFM | `standardPredict`, `fitnessDelayPredict`, `vdrPredict` |
-| example.R | An example file demonstrating the use of the above files/functions under synthetic inputs and multiple optimisation algorithms  | All | N/A |
-
+| example.R | Demonstration of the use of the above files/functions under synthetic inputs and different optimisation algos | All | N/A |
