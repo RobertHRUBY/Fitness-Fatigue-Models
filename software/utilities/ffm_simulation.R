@@ -1,41 +1,88 @@
 # ------------------------------------------------------------------------------
 # Prediction function - Standard FFM
 # ------------------------------------------------------------------------------
-standardPredict <- function(pars, loads, returnObject = "all"){
+standardPredict <- function(pars, loads, initialPars = c(0,0)){
   
-  # Returns
-  #   if returnObject = "all" : dataframe with daily performance, fitness, fatigue
-  #   if returnObject = "fitness" : vector of daily model fitness values only
-  #   if returnObject = "fatigue" : vector of daily model fatigue values only
-  #   if returnObject = "performance" : vector of daily model performance values only
+  # Parameters supplied as: pars <- c(p*, k_g, Tau_g, k_h, Tau_h)
   
-  # Set up zeroed vectors of required length
-  seriesLength <- tail(loads$day, 1)
-  performance <- numeric(length = seriesLength)  # Model performance
-  fitness <- numeric(length = seriesLength)      # Model fitness
-  fatigue <- numeric(length = seriesLength)      # Model fatigue
-  
-  # Calculate model fitness g(t), fatigue h(t), and performance  p(t) for t = 1:seriesLength
-  for (t in 1:seriesLength){
+  convolveTraining <- function(loads, tau){
     
-    # Isolate the required load data for calculating p(t) (i.e. loads from day 0 to day t-1)
-    inputSubset <- loads[loads$day < t, ]
+    # Value of t relevant to (eq 6.9) 
+    dayt <- length(loads)
     
-    # Compute g(t), h(t), p(t) for current t
-    fitness[t] <- pars[2] * sum( inputSubset$load * exp(- (t - inputSubset$day) / pars[3]) )
-    fatigue[t] <- pars[4] * sum( inputSubset$load * exp(- (t - inputSubset$day) / pars[5]) )
-    performance[t] <- pars[1] + fitness[t] - fatigue[t]
-    
-  } # Loop index updates (t <- t+1) until t = seriesLength
-  
-  # Output
-  if (returnObject == "performance"){return(performance)}
-  if (returnObject == "fitness"){return(fitness)}
-  if (returnObject == "fatigue"){return(fatigue)}
-  if (returnObject == "all"){
-    return(data.frame("day" = 1:seriesLength, "fitness" = fitness, "fatigue" = fatigue,
-                      "performance" = performance))
+    # Note that loads[1:dayt] will yield c(w(0), w(1), ... , w(t-1))
+    return(sum(loads[1:dayt] * exp(-(dayt:1 / tau))))
   }
   
-} # End function (closing bracket)
+  # Length of the training load series (final day)
+  T <- tail(loads$day, 1)
+  
+  # If initial parameters q_g and q_h are supplied (otherwise evaluates to 0)
+  initialFitness <- initialPars[1] * exp(-(1:T) / pars[3])
+  initialFatigue <- initialPars[2] * exp(-(1:T) / pars[4])
+  
+  # Calculate the fitness and fatigue effects (Utilizing sapply function)
+  fitness <- pars[2] * 
+    base::sapply(1:T, function(t) convolveTraining(loads$load[1:t], 
+                                                   pars[3]))
+  
+  fatigue <- standardPars[4] * 
+    base::sapply(1:T, function(t) convolveTraining(loads$load[1:t], 
+                                                   pars[5]))
+  
+  performance <- pars[1] + initialFitness - initialFatigue + fitness - fatigue
+  
+  # Return model predicted performance, fitness, and fatigue
+  return(data.frame(day = 1:T,
+                    performance = performance, 
+                    fitness = fitness, 
+                    fatigue = fatigue, 
+                    load = loads$load[2:(T + 1)]))
+}
 
+# ------------------------------------------------------------------------------
+# Prediction function - Fitness-delay FFM
+# ------------------------------------------------------------------------------
+standardPredict <- function(pars, loads, initialPars = c(0,0)){
+  
+  # Parameters supplied as: pars <- c(p*, k_g, Tau_g, Tau_g2, k_h, Tau_h)
+  
+  convolveTraining <- function(loads, tau1, tau2){
+    
+    # Value of t relevant to (eq 6.9) 
+    dayt <- length(loads)
+    delay <- exp(-(dayt:1 / tau1)) - exp(-(dayt:1 / tau2)) 
+    
+    # Note that loads[1:dayt] will yield c(w(0), w(1), ... , w(t-1))
+    return(sum(loads[1:dayt] * delay))
+  }
+  
+  # Length of the training load series (final day)
+  T <- tail(loads$day, 1)
+  
+  # If initial parameters q_g and q_h are supplied (otherwise evaluates to 0)
+  initialFitness <- initialPars[1] * exp(-(1:T) / pars[3])
+  initialFatigue <- initialPars[2] * exp(-(1:T) / pars[6])
+  
+  # Calculate the fitness and fatigue effects (Utilizing sapply function)
+  fitness <- pars[2] * 
+    base::sapply(1:T, function(t) convolveTraining(loads$load[1:t], 
+                                                   pars[3], pars[4]))
+  
+  fatigue <- pars[5] * 
+    base::sapply(1:T, function(t) convolveTraining(loads$load[1:t], 
+                                                   pars[6]))
+  
+  performance <- pars[1] + initialFitness - initialFatigue + fitness - fatigue
+  
+  # Return model predicted performance, fitness, and fatigue
+  return(data.frame(day = 1:T,
+                    performance = performance, 
+                    fitness = fitness, 
+                    fatigue = fatigue, 
+                    load = loads$load[2:(T + 1)]))
+}
+
+# ------------------------------------------------------------------------------
+# Prediction function - VDR FFM
+# ------------------------------------------------------------------------------
