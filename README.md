@@ -10,7 +10,7 @@ The aim of this repository is to expedite research and development of FFMs and a
 
 ## Navigating this repository
 
-![navigate](software/utilities/documentation/img/navigate.svg)
+The main folder of the repository is [software](software), which gives the user the option of accessing the [utilities](software/utilies) folder, where they can find annotated code files containing R functions for implementing and fitting the various models, or the [illustrative](software/illustrative) folder which contains didactic code resources and notebooks for learning about various FFMs.
 
 ## Contribute
 
