@@ -8,5 +8,5 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 **Files contained:**
 
-
+- *"standard_model_NLS.R"*
 
