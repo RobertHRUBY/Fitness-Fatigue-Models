@@ -13,6 +13,6 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 | standard_ffm_objective.R | Residual sum of squares and log-likelihood objective functions | Standard FFM | `standardObjectiveSS`, `standardObjectiveLL` | - |
 | fitness_delay_ffm_objective.R | Residual sum of squares and log-likelihood objective functions | Fitness-delay FFM | `fitnessDelayObjectiveSS`, `fitnessDelayObjectiveLL` | - |
 | vdr_ffm_objective.R | Residual sum of squares and log-likelihood objective functions | VDR FFM | `vdrObjectiveSS`, `vdrObjectiveLL` | - |
-| cross_validation.R | Expanding-window CV functions for the VDR model (fitting via parallelised L-BFGS-B multi-start) | VDR FFM | `vdrCrossValidate` | Packages: `optimx`,`caret`,`RcppAlgos`,`parallel`,`doSNOW`,`foreach` |
+| cross_validation.R | Expanding-window CV functions for the VDR model (fitting via parallelised L-BFGS-B multi-start) | VDR FFM | `vdrCrossValidate` | Packages: `optimx`,`caret`,<br>`RcppAlgos`,`parallel`,<br>`doSNOW`,`foreach` |
 | ffm_simulation.R | Functions for simulating (computing/predicting) FFMs | Standard, Fitness-delay, VDR FFM | `standardPredict`, `fitnessDelayPredict`, `vdrPredict` | - |
-| example.R | Demonstration of the use of the above files/functions under synthetic inputs and different optimisation algos | All | N/A | Packages: `optimx`, `GA`, `pso`,`cmaes`,`DEoptim` |
+| example.R | Demonstration of the use of the above files/functions under synthetic inputs and different optimisation algos | All | N/A | Packages: `optimx`, `GA`, <br>`pso`,`cmaes`,`DEoptim` |
