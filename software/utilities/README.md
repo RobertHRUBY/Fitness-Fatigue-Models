@@ -8,7 +8,7 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 **Files contained:**
 
-| File | Contains | Model | Function name | Package dependencies |
+| File | Contains | Model | Function name | Dependencies |
 |-|-|-|-|-|
 | [standard_ffm_objective.R](standard_ffm_objective.R) | Residual sum of squares and log-likelihood objective functions | Standard FFM | `standardObjectiveSS`, `standardObjectiveLL` | - |
 | [fitness_delay_ffm_objective.R](fitness_delay_ffm_objective.R) | Residual sum of squares and log-likelihood objective functions | Fitness-delay FFM | `fitnessDelayObjectiveSS`, `fitnessDelayObjectiveLL` | - |
