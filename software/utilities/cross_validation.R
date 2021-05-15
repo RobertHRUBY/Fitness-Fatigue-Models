@@ -1,5 +1,4 @@
-source("vdr_ffm_objective.R")
-source("ffm_simulation.R")
+
 
 # Fit the VDR model via MLE using the L-BFGS-B algorithm started from multiple
 # random starting points (parallelised train-test splits)
@@ -12,6 +11,9 @@ expandingWindow_CV <- function(dat,
                                nStarts = 10,
                                cores = NULL,
                                initial = FALSE){
+  
+  source("vdr_ffm_objective.R")
+  source("ffm_simulation.R")
   
   # Ancillary functions
   # ----------------------------------------------------------------------------
@@ -121,7 +123,7 @@ expandingWindow_CV <- function(dat,
     
     # Compute predicted performance for the entire time-series (blocks 1 + 2)
     temp_predictions <- sapply(1:dim(parmat)[1], 
-                               function(i) vdrPredict(vdrPars = as.numeric(fittedModel[i, 1:7]), 
+                               function(i) vdrPredict(pars = as.numeric(fittedModel[i, 1:6]), 
                                                       loads = dat[,c("day", "load")],
                                                       initialPars = as.numeric(fittedModel[i, 8:9])$performance,
                                ))
@@ -170,7 +172,7 @@ expandingWindow_CV <- function(dat,
   cl <- makeCluster(cores, type = "SOCK")              # Make cluster
   registerDoSNOW(cl)                                   # Register cluster
   fitted_splits <- foreach(i = 1:nSplits, .verbose = TRUE, .packages = c("optimx"),
-                           .export = c("train_test", "vdrObjectiveSS", "vdrPredict",
+                           .export = c("train_test", "vdrObjectiveLL", "vdrPredict",
                                        "mape")) %dopar%{
                                          train_test(dat, parmat, bounds, 
                                                     main = FALSE, splits = splits,

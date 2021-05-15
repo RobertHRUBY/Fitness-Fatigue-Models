@@ -52,6 +52,15 @@ fitnessDelayPredict <- function(pars, loads, initialPars = c(0,0)){
   
   # Ancillary function (required)
   # ----------------------------------------------------------------------------
+  convolveTrainingDelay <- function(loads, tau1, tau2){
+    
+    # Value of t relevant to (eq 6.9) 
+    dayt <- length(loads)
+    delay <- exp(-(dayt:1 / tau1)) - exp(-(dayt:1 / tau2)) 
+    
+    # Note that loads[1:dayt] will yield c(w(0), w(1), ... , w(t-1))
+    return(sum(loads[1:dayt] * delay))
+  }
   convolveTraining <- function(loads, tau){
     
     # Value of t relevant to (eq 6.9) 
@@ -71,7 +80,7 @@ fitnessDelayPredict <- function(pars, loads, initialPars = c(0,0)){
   
   # Calculate the fitness and fatigue effects (Utilizing sapply function)
   fitness <- pars[2] * 
-    base::sapply(1:T, function(t) convolveTraining(loads$load[1:t], 
+    base::sapply(1:T, function(t) convolveTrainingDelay(loads$load[1:t], 
                                                    pars[3], pars[4]))
   
   fatigue <- pars[5] * 

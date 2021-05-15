@@ -71,7 +71,7 @@ fitnessDelayObjectiveLL <- function(pars, loads, perfVals, initial = FALSE,
   
   # Ancillary function (required)
   # ----------------------------------------------------------------------------
-  convolveTraining <- function(loads, tau1, tau2){
+  convolveTrainingDelay <- function(loads, tau1, tau2){
     
     # Value of t relevant to (eq 6.9) 
     dayt <- length(loads)
@@ -79,6 +79,15 @@ fitnessDelayObjectiveLL <- function(pars, loads, perfVals, initial = FALSE,
     
     # Note that loads[1:dayt] will yield c(w(0), w(1), ... , w(t-1))
     return(sum(loads[1:dayt] * delay))
+  }
+  
+  convolveTraining <- function(loads, tau){
+    
+    # Value of t relevant to (eq 6.9) 
+    dayt <- length(loads)
+    
+    # Note that loads[1:dayt] will yield c(w(0), w(1), ... , w(t-1))
+    return(sum(loads[1:dayt] * exp(-(dayt:1 / tau))))
   }
   # ----------------------------------------------------------------------------
   
@@ -91,7 +100,7 @@ fitnessDelayObjectiveLL <- function(pars, loads, perfVals, initial = FALSE,
   
   # Compute modeled performance from t=1 to t=finalMeasurement
   modFitness <- pars[2] * 
-    sapply(1:finalMeasurement, function(t) convolveTraining(loads$load[1:t], pars[3], pars[4]))
+    sapply(1:finalMeasurement, function(t) convolveTrainingDelay(loads$load[1:t], pars[3], pars[4]))
   modFatigue <- pars[5] * 
     sapply(1:finalMeasurement, function(t) convolveTraining(loads$load[1:t], pars[6]))
   
