@@ -29,7 +29,7 @@ standardPredict <- function(pars, loads, initialPars = c(0,0)){
     base::sapply(1:T, function(t) convolveTraining(loads$load[1:t], 
                                                    pars[3]))
   
-  fatigue <- standardPars[4] * 
+  fatigue <- pars[4] * 
     base::sapply(1:T, function(t) convolveTraining(loads$load[1:t], 
                                                    pars[5]))
   
