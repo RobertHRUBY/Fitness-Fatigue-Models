@@ -23,11 +23,11 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 **Model Fitting:** Example plots showing fitted models from [example.R](example.R) via Maximum Likelihood Estimation (MLE) or Nonlinear Least-Squares (NLS) for multiple algorithmic approaches (quasi-Newton, Genetic Algorithm, Differential Evolution, Particle Swarm, CMA-ES)
 
-![Plots](example_plots.png)
+![Plots](readme_plots/example_plots.png)
 
 ***
 
 **Cross Validation:** Example plots showing the VDR model fitted to the synthetic data from [example.R](example.R) via MLE for a quasi-Newton algorithm under multi-start within a cross-validation framework
 
-![Plots](train_test.png)
-![Plots](splits.png)
+![Plots](readme_plots/train_test.png)
+![Plots](readme_plots/splits.png)
