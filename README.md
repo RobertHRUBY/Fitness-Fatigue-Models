@@ -17,8 +17,8 @@ The main folder of the repository is [software](software). From there, the user 
 Get in touch if you have a resource you think would fit here. To do this open an issue or submit a pull request.
 
 ### Repository contributions:
-- Ben Ogorek ([twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek))
 - Ben Stephens Hemingway ([github](github.com/bsh2))
+- Ben Ogorek ([twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek))
 - Paul Swinton ([github](github.com/p-swinton), [profile](https://www3.rgu.ac.uk/dmstaff/swinton-paul))
 
 ### Support
