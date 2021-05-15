@@ -109,6 +109,8 @@ expandingWindow_CV <- function(dat,
     dat_temp <- data.frame("day" = measure_idx_train, 
                            "performance" = measurements_train)
     
+    load_temp <- training_data[, c("day", "load")]
+    
     # Fitting iterations
     fittedModel <- optimx::multistart(parmat, 
                                       fn = vdrObjectiveLL, 
@@ -117,7 +119,7 @@ expandingWindow_CV <- function(dat,
                                       method = "L-BFGS-B",
                                       control = list(maxit = 500,
                                                      trace = FALSE),
-                                      loads = training_data[ ,c("day","load")],
+                                      loads = load_temp,
                                       perfVals = dat_temp,
                                       initial = initial)
     
@@ -125,8 +127,7 @@ expandingWindow_CV <- function(dat,
     temp_predictions <- sapply(1:dim(parmat)[1], 
                                function(i) vdrPredict(pars = as.numeric(fittedModel[i, 1:6]), 
                                                       loads = dat[,c("day", "load")],
-                                                      initialPars = as.numeric(fittedModel[i, 8:9])$performance,
-                               ))
+                                                      initialPars = as.numeric(fittedModel[i, 8:9]))$performance)
     
     # Extract predictions at required days to evaluate model performance
     predictions_training <- temp_predictions[measure_idx_train, ]

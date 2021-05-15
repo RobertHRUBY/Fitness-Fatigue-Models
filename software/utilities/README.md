@@ -2,7 +2,7 @@
 
 This directory includes easy to use [R](https://www.r-project.org/) functions for fitting and evaluating FFMs with modern optimisation options, and cross-validation (assessment of model performance).  
   
-**Under development:** The files in this directory are undergoing a major redevelopment, and as such the associated documentation is still on it's way. In the meantime, the code files themselves are mostly self-contained from an explanatory point of view
+**Under development:** The files in this directory are undergoing a major redevelopment, and as such the associated documentation is still on it's way. In the meantime, the code files themselves are mostly self-contained from an explanatory point of view. The hope is to put these ** into a package ** as soon as I have time.
 
 **Getting started:** To get started it is recommended the user visit the [example file](example.R), which has been produced to demonstrate the application of the files/functions contained in this repository. From there, they should then be able to get a feel for the particular bit of code they are interested in. Hopefully shortly documentation will be finished that makes this a bit easier.
 
@@ -21,7 +21,13 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 ***
 
-**Graphics:** Example plots showing fitted models from [example.R](example.R) via Maximum Likelihood Estimation (MLE) or Nonlinear Least-Squares (NLS) for multiple algorithmic approaches (quasi-Newton, Genetic Algorithm, Differential Evolution, Particle Swarm, CMA-ES)
+**Model Fitting:** Example plots showing fitted models from [example.R](example.R) via Maximum Likelihood Estimation (MLE) or Nonlinear Least-Squares (NLS) for multiple algorithmic approaches (quasi-Newton, Genetic Algorithm, Differential Evolution, Particle Swarm, CMA-ES)
 
 ![Plots](example_plots.png)
 
+***
+
+**Cross Validation:** Example plots showing the VDR model fitted to the synthetic data from [example.R](example.R) via MLE for a quasi-Newton algorithm under multi-start within a cross-validation framework
+
+![Plots](train_test.png)
+![Plots](splits.png)

@@ -248,7 +248,7 @@ source("cross_validation.R")
       require(caret)
       
       # Set up some box constraints for the examples c(p*, kg, Tg, kh, Th, Th2, sigma, qg, qh)
-      box_constraints <- data.frame("lower" = c(50, 0.1, 1, 0.1, 1, 1, 0, 0, 0),
+      box_constraints <- data.frame("lower" = c(50, 0.1, 1, 0.1, 1, 1, 0.01, 0, 0),
                                     "upper" = c(150, 3, 50, 3, 50, 10, 5, 20, 20))
       
       # Set up proper input data structure for this function
@@ -258,10 +258,66 @@ source("cross_validation.R")
       input_data$block <- c(rep(1,51), rep(2,50))
       
       # Run the function
-      fittedModel9_perf <- expandingWindow_CV(dat = input_data,
+      example <- expandingWindow_CV(dat = input_data,
                                               bounds = box_constraints,
                                               initial = TRUE)
       
+      # ------------------------------------------------------------------------------------------------------
+      # Create some plots
+      # ------------------------------------------------------------------------------------------------------
+      # Collate the parameters for train-test splits
+      p0_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$p0))
+      kg_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$kg))
+      Tg_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$Tg))
+      kh_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$kh))
+      Th_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$Th))
+      Th2_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$Th2))
+      sigma_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$sigma))
+      MAPE_train_across <-  sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$mape_train))
+      MAPE_test_across <-  sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$mape_test))
+      objective_across <- sapply(1:example$nSplits, function(i) rbind(example[[i]]$fittedModel$value))
+      
+      # Summary of iterations on all train-test splits
+      par(mfrow = c(2,5))
+      boxplot(p0_across,  main = "", ylab = expression(p^{"*"}), xlab = "Split No.")
+      boxplot(kg_across,  main = "", ylab = expression(k[g]), xlab = "Split No.")
+      boxplot(Tg_across, main = "", ylab = expression(tau[g]), xlab = "Split No.")
+      boxplot(kh_across,  main = "", ylab = expression(k[h]), xlab = "Split No.")
+      boxplot(Th_across,  main = "", ylab = expression(tau[h]), xlab = "Split No.")
+      boxplot(Th2_across,  main = "", ylab = expression(tau[h][2]), xlab = "Split No.")
+      boxplot(sigma_across, freq = TRUE, ylab = expression(sigma), xlab = "Split No.")
+      boxplot(MAPE_train_across, ylab = "MAPE (train)", xlab = "Split No.")
+      boxplot(MAPE_test_across, ylab = "MAPE (test)", xlab = "Split No.")
+      boxplot(objective_across, ylab = expression(-log(L)), xlab = "Split No.", main = "")
+      
+      # Summary of iterations on train_block1, test_block2
+      par(mfrow = c(2,5))
+      boxplot(example$main$fittedModel$p0, ylab = expression(p^{"*"}), main = "")
+      boxplot(example$main$fittedModel$kg, ylab = expression(k[g]), main = "")
+      boxplot(example$main$fittedModel$Tg, ylab = expression(tau[g]), main = "")
+      boxplot(example$main$fittedModel$kh, ylab = expression(k[h]), main = "")
+      boxplot(example$main$fittedModel$Th, ylab = expression(tau[h]), main = "")
+      boxplot(example$main$fittedModel$Th2, ylab = expression(tau[h][2]), main = "")
+      boxplot(example$main$fittedModel$sigma,  ylab = expression(sigma), main = "")
+      boxplot(example$main$fittedModel$mape_train, ylab = expression("MAPE"["TRAIN"]), main = "")
+      boxplot(example$main$fittedModel$mape_test, ylab = expression("MAPE"["TEST"]), main = "")
+      boxplot(example$main$fittedModel$value, ylab = "-log(L)", main = "")
+      
+      dev.off()
+      
+      # Plot the main set
+      plot(example$main$predictions[,1], type = "l", xlab = "Day", cex.main = 0.75,
+           ylab = "Performance [a.u]", main = "Main train (block 1) - test (block 2)")
+      for (i in 2:example$nStarts){
+        lines(example$main$predictions[,i])
+      }
+      points(x = input_data[input_data$block == 1, "day"], y = input_data[input_data$block == 1, "performances"], col = "blue", pch = 16)
+      points(x = input_data[input_data$block == 2, "day"], y = input_data[input_data$block == 2, "performances"], col = "red", pch = 16)
+      abline(v = head(input_data[input_data$block == 2, "day"], 1), lty = 2)
+      legend("topleft", c("Observed Data (seen)", "Observed Data (unseen)", "Model Predictions (fitted)"),
+             pch = c(16, 16, NA), lty = c(NA, NA, 1), col = c("blue", "red", "black"), cex = 0.75)
+      
+      # ------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------
 # Develop a plot for the repository
 # -----------------------------------------------------------------------------------
