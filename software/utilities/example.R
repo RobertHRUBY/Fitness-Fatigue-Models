@@ -58,7 +58,7 @@ source("cross_validation.R")
                              method = "L-BFGS-B",
                              lower = box_constraints$lower,
                              upper = box_constraints$upper,
-                             control = list(maxit = 100),
+                             control = list(maxit = 500),
                              perfVals = performances,
                              loads = training_loads,
                              # We have included initial conditions in par and lower/upper
@@ -75,7 +75,7 @@ source("cross_validation.R")
                              loads = training_loads,
                              lower = box_constraints$lower,
                              upper = box_constraints$upper,
-                             maxiter = 100,
+                             maxiter = 500,
                              monitor = TRUE,
                              optim = TRUE,    # Include local search (BFGS) at stochastic intervals
                              maximise = TRUE, # We pass this to fn to get back -1 * RSS as GA maximizes by default
@@ -102,7 +102,7 @@ source("cross_validation.R")
                                     fn = standardObjectiveLL,  # Log likelihood function (Negative by default)
                                     lower = box_constraints$lower,
                                     upper = box_constraints$upper,
-                                    control = list(maxit = 100),
+                                    control = list(maxit = 500),
                                     perfVals = performances,
                                     loads = training_loads,
                                     initial = TRUE)
@@ -119,7 +119,7 @@ source("cross_validation.R")
                              loads = training_loads,
                              lower = box_constraints$lower,
                              upper = box_constraints$upper,
-                             maxiter = 100,
+                             maxiter = 500,
                              monitor = TRUE,
                              optim = TRUE,    # Include local search (BFGS) at stochastic intervals
                              maximise = TRUE, # We pass this to fn to get back normal LL as GA maximizes by default
@@ -147,7 +147,7 @@ source("cross_validation.R")
                               fn = fitnessDelayObjectiveSS,
                               lower = box_constraints$lower,
                               upper = box_constraints$upper,
-                              control = list(maxit = 100),
+                              control = list(maxit = 500),
                               initial = TRUE,  # Find initial component values
                               loads = training_loads,
                               perfVals = performances)
@@ -193,7 +193,7 @@ source("cross_validation.R")
                              loads = training_loads,
                              lower = box_constraints$lower,
                              upper = box_constraints$upper,
-                             maxiter = 100,
+                             maxiter = 500,
                              monitor = TRUE,
                              optim = TRUE,    # Include local search (BFGS) at stochastic intervals
                              maximise = TRUE, # We pass this to fn to get back -1 * RSS as GA maximizes by default
@@ -220,7 +220,7 @@ source("cross_validation.R")
                              loads = training_loads,
                              lower = box_constraints$lower,
                              upper = box_constraints$upper,
-                             maxiter = 100,
+                             maxiter = 500,
                              monitor = TRUE,
                              optim = TRUE,    # Include local search (BFGS) at stochastic intervals
                              maximise = TRUE, # We pass this to fn to get back normal LL as GA maximizes by default
@@ -258,3 +258,48 @@ source("cross_validation.R")
                                               bounds = box_constraints,
                                               initial = TRUE)
       
+# -----------------------------------------------------------------------------------
+# Develop a plot for the repository
+# -----------------------------------------------------------------------------------
+      
+par(mfrow = c(2,4))
+# Standard FFM via L-BFGS-B fitted under NLS
+plot(x = fittedModel1_perf$day, y = fittedModel1_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "Standard FFM - L-BFGS-B (NLS)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))
+# Standard FFM via GA under NLS
+plot(x = fittedModel2_perf$day, y = fittedModel2_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "Standard FFM - GA (NLS)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))
+# Standard FFM via CMA-ES under MLE
+plot(x = fittedModel3_perf$day, y = fittedModel3_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "Standard FFM - CMA-ES (MLE)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))
+# Standard FFM via GA under MLE
+plot(x = fittedModel4_perf$day, y = fittedModel4_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "Standard FFM - GA (MLE)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))
+# Fitness-Delay FFM via Particle Swarm under NLS
+plot(x = fittedModel5_perf$day, y = fittedModel5_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "Fitness-delay FFM - pso (NLS)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))
+# Fitness-delay FFM via Differential evolution under MLE
+plot(x = fittedModel6_perf$day, y = fittedModel6_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "Fitness-delay FFM - DEoptim (NLS)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))
+# VDR FFM via GA under NLS
+plot(x = fittedModel7_perf$day, y = fittedModel7_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "VDR FFM - GA (NLS)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))
+# VDR FFM via GA under MLE
+plot(x = fittedModel8_perf$day, y = fittedModel8_perf$performance, type = "l", col = "blue",
+     ylab = "Performance [a.u]", xlab = "Day", main = "VDR FFM - GA (NLE)")
+points(x = performances$day, y = performances$performance, pch = 16, col = "red")
+legend("topleft", c("Data", "Fitted FFM"), pch = c(16, NA), lty = c(NA, 1), col = c("blue", "red"))

@@ -18,3 +18,8 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 | [cross_validation.R](cross_validation.R) | Expanding-window CV function for the VDR model (fitting via parallelised L-BFGS-B multi-start) | VDR FFM | `vdrCrossValidate` | **Packages**: <br><br>`optimx` `caret`<br>`RcppAlgos` `parallel``doSNOW` `foreach`<br>**Files**:<br>[vdr_ffm_objective.R](vdr_ffm_objective.R)<br>[ffm_simulation.R](ffm_simulation.R) |
 | [ffm_simulation.R](ffm_simulation.R) | Functions for simulating (computing/predicting) FFMs | Standard, Fitness-delay, VDR FFM | `standardPredict` `fitnessDelayPredict` `vdrPredict` | - |
 | [example.R](example.R) | Demonstration of the use of the above files/functions under synthetic inputs and different optimisation algos | All | N/A | **Packages:** <br><br>`optimx` `GA` <br>`pso` `cmaes` <br>`DEoptim` `caret`<br>`RcppAlgos` `parallel`<br>`doSNOW` `foreach`<br><br>**Files:**All in folder |
+
+***
+
+**[example.R](example.R) plots:** An example of the capability of the files as shown via plots relating to the example code script
+
