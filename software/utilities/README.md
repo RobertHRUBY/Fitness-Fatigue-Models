@@ -1,52 +1,33 @@
 # Utilities: An R toolbox for fitting and evaluating FFMs
 
-This directory includes easy to use [R](https://www.r-project.org/) functions for fitting and evaluating FFMs with modern optimisation, cross-validation (assessment of model performance), and input checking. Complete [documentation](documentation/) is provided for each. Furthermore, code files with reproducible examples are provided [here](documentation/examples).
+This directory includes easy to use [R](https://www.r-project.org/) functions for fitting and evaluating FFMs with modern optimisation options, and cross-validation (assessment of model performance).  
+  
+**Under development:** The files in this directory are undergoing a major redevelopment, and as such the associated documentation is still on it's way. In the meantime, the code files themselves are mostly self-contained from an explanatory point of view. The hope is to put these ** into a package ** as soon as I have time.
 
-## Currently available functions:
+**Getting started:** To get started it is recommended the user visit the [example file](example.R), which has been produced to demonstrate the application of the files/functions contained in this repository. From there, they should then be able to get a feel for the particular bit of code they are interested in. Hopefully shortly documentation will be finished that makes this a bit easier.
 
-| Function | Code file | Description | Usage | Optimizer | Features |
-|-|-|-|-|-|-|
-| `banisterModel()` | [banisterModel.R](banisterModel.R) | Numerical solver for original system of ODE's and optim wrapper to fit the model (a two step implementation) | [docs](documentation/banisterModel_docs.pdf) [example](documentation/examples/banisterModelExample.R) | GA | Bounds, estimation of initial conditions, cross validation, genetic algorithms |
-| `standardModel()` | [standardModel.R](standardModel.R) | Fitting function for the explicit solution to the standard two component model | [docs](documentation/standardModel_docs.pdf) [example](documentation/examples/standardModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
-| `calvertModel()` | [calvertModel.R](calvertModel.R) | Fitting function for the explicit solution to the fitness-delay model | [docs](documentation/calvertModel_docs.pdf) [example](documentation/examples/calvertModelExample.R) | GA or L-BFGS-B | Bounds, include estimation of initial components, cross validation, genetic algorithms |
-| `turnerModel()` | [turnerModel.R](turnerModel.R) | Numerically solve system of ODE's and fit the non-linear variant of the standard model | [docs](documentation/turnerModel_docs.pdf) [example](documentation/examples/turnerModelExample.R) | GA | Bounds, estimation of initial conditions, cross validation |
-| `computeModels()` | [computeModels.R](computeModels.R) | Compute model predictions for a definite set of model parameters and load series | [docs](documentation/computeModels_docs.pdf) [example](documentation/examples/computeModelsExample.R) | NA - Simple computation | Compute with or without initial traces for discrete models |
+***
 
-#### Experimental scripts:
+**Files contained:**
 
-These are functions that are currently under experimental development. They will become full features of the project, or removed if not proven to work well. Use with caution, limited documentation provided. See directory.
+| File | Contains | Model | Function name | Dependencies |
+|-|-|-|-|-|
+| [standard_ffm_objective.R](standard_ffm_objective.R) | Residual sum of squares and log-likelihood objective functions | Standard FFM | `standardObjectiveSS` `standardObjectiveLL` | - |
+| [fitness_delay_ffm_objective.R](fitness_delay_ffm_objective.R) | Residual sum of squares and log-likelihood objective functions | Fitness-delay FFM | `fitnessDelayObjectiveSS` `fitnessDelayObjectiveLL` | - |
+| [vdr_ffm_objective.R](vdr_ffm_objective.R) | Residual sum of squares and log-likelihood objective functions | VDR FFM | `vdrObjectiveSS` `vdrObjectiveLL` | - |
+| [cross_validation.R](cross_validation.R) | Expanding-window CV function for the VDR model (fitting via parallelised L-BFGS-B multi-start) | VDR FFM | `vdrCrossValidate` | **Packages**: <br><br>`optimx` `caret`<br>`RcppAlgos` `parallel``doSNOW` `foreach`<br>**Files**:<br>[vdr_ffm_objective.R](vdr_ffm_objective.R)<br>[ffm_simulation.R](ffm_simulation.R) |
+| [ffm_simulation.R](ffm_simulation.R) | Functions for simulating (computing/predicting) FFMs | Standard, Fitness-delay, VDR FFM | `standardPredict` `fitnessDelayPredict` `vdrPredict` | - |
+| [example.R](example.R) | Demonstration of the use of the above files/functions under synthetic inputs and different optimisation algos | All | N/A | **Packages:** <br><br>`optimx` `GA` <br>`pso` `cmaes` <br>`DEoptim` `caret`<br>`RcppAlgos` `parallel`<br>`doSNOW` `foreach`<br><br>**Files:**All in folder |
 
-| Function | File | Description | 
-|-|-|-|
-| `basicModel()` | [basicModel.R](basicModel.R) | Fit the one-component model
+***
 
-## How to: Structure input data
+**Model Fitting:** Example plots showing fitted models from [example.R](example.R) via Maximum Likelihood Estimation (MLE) or Nonlinear Least-Squares (NLS) for multiple algorithmic approaches (quasi-Newton, Genetic Algorithm, Differential Evolution, Particle Swarm, CMA-ES)
 
-Should be in three column form, in the order L-R of "days", "performances", "loads". NA (simply leave as empty cells in excel) values should be used in the performances column to indicate missing observed data, and load values of zero indicate that no training has taken place on a given day in the series. The order of the data, and appropriate use of NA or zero values as described is important. **This format is consistent for all functions in the repository for input data**
+![Plots](readme_plots/example_plots.png)
 
-    days   performances    loads
-       1          466.2    56.35
-       2             NA     0.00
-       3          440.5    59.15
-       4             NA   110.60
-       5          402.3     0.00
-       6          418.9     0.00
-       ...          ...      ...
+***
 
+**Cross Validation:** Example plots showing the VDR model fitted to the synthetic data from [example.R](example.R) via MLE for a quasi-Newton algorithm under multi-start within a cross-validation framework
 
-## How to: Import a function from this repo directly into R
-
-#### Step 1: Install and load the R package `devtools`
-
-    install.packages("devtools")
-    library(devtools)
-
-#### Step 2: Import the required function
-
-| Function | Code (copy, paste, run) |
-|-|-|
-| `banisterModel()` | `source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/banisterModel.R )` |
-| `standardModel()` | `source_url(https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/standardModel.R)` |
-| `calvertModel()` | `source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/calvertModel.R )` |
-| `turnerModel()` | `source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/turnerModel.R )` |
-| `computeModels()` | `source_url( https://raw.githubusercontent.com/bsh2/Fitness-Fatigue-Models/main/software/utilities/computeModels.R )` |
+![Plots](readme_plots/train_test.png)
+![Plots](readme_plots/splits.png)
