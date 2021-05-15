@@ -21,5 +21,5 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 ***
 
-**[example.R](example.R) plots:** An example of the capability of the files as shown via plots relating to the example code script
+**[example.R](example.R) plots:** Demonstration of the capabilities via simple plots
 
