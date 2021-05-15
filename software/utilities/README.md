@@ -21,5 +21,5 @@ This directory includes easy to use [R](https://www.r-project.org/) functions fo
 
 ***
 
-**[example.R](example.R) plots:** Demonstration of the capabilities via simple plots
+**[example.R](example.R) plots:** Output of models fitted in the example script demonstrating capabilities in R for fitting via maximum-likelihood estimation (MLE) or nonlinear least-squares (NLS) for multiple different algorithmic approaches (first-order quasi-Newton, genetic algorithm, differential evolution, particle swarm, CMA-ES)
 
