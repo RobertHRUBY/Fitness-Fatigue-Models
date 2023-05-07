@@ -1,5 +1,4 @@
-# The FFM Project (Code Repository)
-*Associated website:* [fitnessfatigue.com](https://fitnessfatigue.com)   
+# The FFM Project (Code Repository)  
 *Associated review:* [Part I](https://osf.io/preprints/sportrxiv/ap75j/) [Part II](https://osf.io/preprints/sportrxiv/5qgc2)
 
 ## Introduction
@@ -17,7 +16,6 @@ The main folder of the repository is [software](software). From there, the user 
 Get in touch if you have a resource you think would fit here. To do this open an issue or submit a pull request.
 
 ### Repository contributions:
-- Ben Stephens Hemingway ([github](github.com/bsh2))
 - Ben Ogorek ([twitter](https://twitter.com/benogorek?lang=en), [github](https://github.com/baogorek), [website](https://www.ogorekdatasciences.com/), [medium](https://medium.com/@baogorek))
 - Paul Swinton ([github](github.com/p-swinton), [profile](https://www3.rgu.ac.uk/dmstaff/swinton-paul))
 
